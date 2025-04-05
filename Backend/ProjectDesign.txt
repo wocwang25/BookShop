@@ -1,0 +1,84 @@
+
+
+
+Sơ đồ hoạt động luồng request:
+
+    Client → server.js → app.js → middleware → routes → controllers → services → models → database
+                                                                    ↑
+    Response ←───────────────────────────────────────────────────────┘
+
+
+
+Sơ đồ cụ thể luồng Request
+
+    participant Client
+    participant Server
+    participant Middleware
+    participant Routes
+    participant Controller
+    participant Service
+    participant Model
+    participant Database
+
+    Client->>Server: HTTP Request (GET /users)
+    Server->>Middleware: 1. Xử lý request (parse body, auth, log...)
+    Middleware->>Routes: 2. Phân tuyến request
+    Routes->>Controller: 3. Gọi đúng controller
+    Controller->>Service: 4. Yêu cầu xử lý nghiệp vụ
+    Service->>Model: 5. Truy vấn database
+    Model->>Database: 6. Thực thi query
+    Database-->>Model: 7. Dữ liệu trả về
+    Model-->>Service: 8. Trả kết quả
+    Service-->>Controller: 9. Trả kết quả
+    Controller-->>Routes: 10. Tạo HTTP response
+    Routes-->>Middleware: 11. Xử lý response (format, header...)
+    Middleware-->>Server: 12. Hoàn thiện response
+    Server-->>Client: HTTP Response (JSON/HTML)
+ 
+
+Models cụ thể:
+
+    Core models:
+        User        -> id, username, email, password (hashed), role (admin, seller, customer), phone, address, created_at, status (active/inactive).
+        -->> Xác thực đăng nhập/Đăng ký (feature 19), Phân quyền (feature 11)
+        Books       -> bookCode, title, author, category, cost(selling, cost, quantity_in_stock, rental_price), description, image_url, meatadata
+        -->> Quản lý thông tin sách (Features 12, 17), Hiển thị tồn kho (feature 13)
+        Category    -> name (Văn học, Khoa học...), description.
+        -->> Phân loại sách (feature 12)
+        Author      -> name, book, bookCount
+        -->> Liên kết với sách để quản lý thông tin chi tiết -> (cái này chưa rõ lắm)
+    
+    Transaction Models:
+        Order       -> id, user_id (FK), total_amount, status (pending, completed, cancelled), payment_method, created_at, shipping_address.
+        -->> Quản lý đơn hàng (feature 15), tích hợp thanh toán (feature 10)
+        OrderItem   -> id, order_id (FK), book_id (FK), quantity, price_at_purchase, is_rental (boolean), rental_days (nếu mượn).
+        -->> Lưu thông tin sách trong đơn hàng (feature 20)
+        Payment     -> id, order_id (FK), amount, transaction_id, payment_gateway (credit card, ví điện tử...), status, timestamp.
+        -->> Xử lí thanh toán trực tuyến
+    
+    Other Models:
+        Cart        -> id, user_id (FK), created_at.
+        -->> Lưu tạm sách trước khi thanh toán (feature 20).
+        CartItem    -> id, cart_id (FK), book_id (FK), quantity, is_rental (boolean).
+        Rental      -> id, user_id (FK), book_id (FK), start_date, end_date, status (active/returned), total_cost.
+        -->> Quản lý dịch vụ thuê sách (Features 1,9)
+        WishList    -> id, user_id (FK), book_id (FK), added_at.
+        -->> Lưu sách yêu thích (feature 6)
+
+    Management Support Models:
+        Review      -> id, user_id (FK), book_id (FK), rating, comment, created_at
+        -->> Quản lý đánh giá sách (feature 5)
+        Promotion   -> id, code, discount_type (percentage/fixed), discount_value, start_date, end_date, max_uses.
+        -->> Tạo mã giảm giá (feature 8)
+        Notification    ->  id, user_id (FK), message, type (order, stock, revenue...), is_read, created_at.
+        -->> Gửi thông báo (feature 7)
+        Membership  -> id, name, price, duration_days, benefits (text).
+        -->> Quản lý dịch vụ thành viên (feature 2)
+    
+    Noting&Sharing Support Models:
+        StudyGroup  -> id, name, created_by (FK to User), created_at.
+        GroupDocument   -> id, group_id (FK), book_id (FK), uploaded_by (FK to User), notes, uploaded_at.
+        -->> Chia sẻ tài liệu trong nhóm học tập (feature 4)
+        BookNote    -> id, user_id (FK), book_id (FK), page_number, content, created_at.
+        -->> Lưu ghi chú khi đọc sách (feature 3)
+        
