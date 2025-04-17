@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Book_Middleware = require('../../middleware/bookMdw');
 
 const Book_Schema = mongoose.Schema(
     {
@@ -34,7 +35,7 @@ const Book_Schema = mongoose.Schema(
             },
             selling_price: {
                 type: Number,
-                required: true,
+                required: false,
                 validate: {
                     validator: function (v) {
                         return v >= this.cost.cost_price;
@@ -70,5 +71,8 @@ const Book_Schema = mongoose.Schema(
         autoIndex: true
     }
 );
+
+Book_Schema.pre('save', Book_Middleware.PreQueryHandle);
+Book_Schema.post('save', Book_Middleware.PostQueryHandle);
 
 module.exports = mongoose.model('Book', Book_Schema);

@@ -1,26 +1,24 @@
-const User = require('../models/CoreModels/User');
 const USER = require('../models/CoreModels/User');
-
-
+const jwt = require('jsonwebtoken');
 
 //  Tính năng đăng kí
 exports.register = async (req, res) => {
+    const { username, password, role } = req.body;
     try {
-        const { username, password } = req.body;
-
-        const user = new USER({ username, password });
+        const user = new USER({ username, password, role });
         await user.save();
 
         const userResponse = user.toObject();
         delete userResponse.password;
 
-        res.status(201).json({
+        res.status(200).json({
             success: true,
+            message: "User registers successfully",
             data: userResponse
         });
     }
     catch (error) {
-        res.status(404).json({
+        res.status(401).json({
             success: false,
             error: error.message
         });
@@ -29,23 +27,15 @@ exports.register = async (req, res) => {
 
 //  Tính năng đăng nhập
 exports.login = async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({
+            message: "Username or password is not presented"
+        })
+    }
     try {
-        if (loginn === try_login) {
-            return res.status(400).json({
-                message: "Quá lượt đăng nhập, đợi 1p"
-            })
-        }
-        const { username, password } = req.body;
-
-        const user = User.findOne({ username }).select('+password');
-
-        if (!user || !(await user.comparePassword(password))) {
-            loginn++;
-            return res.status(401).json({
-                success: false,
-                error: "[Error] Username or Password incorrect"
-            });
-        }
+        const user = await USER.findOne({ username }).select('+password');
 
         if (user.loginAttempts >= 5 && user.lockUntil > Date.now()) {
             const remainingTime = Math.ceil((user.lockUntil - Date.now()) / 1000);
@@ -58,7 +48,6 @@ exports.login = async (req, res) => {
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             // Sai thông tin đăng nhập thì tăng loginAttempts
-
             user.loginAttempts++;
             if (user.loginAttempts >= 5) {
                 user.lockUntil = Date.now() + 5 * 60 * 1000;
@@ -74,26 +63,34 @@ exports.login = async (req, res) => {
         }
         else {
             // Đăng nhập thành công thì reset loginAttempts
-
             user.loginAttempts = 0;
             await user.save();
         }
 
-
-        const token = generateToken(user._id);
+        // Tạo token đăng nhập bằng jsonwebtoken
+        const token = jwt.sign(
+            {
+                id: user._id,
+                username: user.username,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        )
 
         res.json({
             success: true,
             token,
             user: {
                 id: user._id,
-                username: use.username,
+                username: user.username,
                 role: user.role
             }
         })
     }
     catch (error) {
-        res.status(505).json({
+        console.error("Login Error:", error);
+        res.status(500).json({
             success: false,
             error: "Login Failed"
         })
@@ -114,7 +111,7 @@ exports.changePassword = async (req, res) => {
 
             return res.status(401).json({
                 success: false,
-                error: "Sai mật khẩu đjtme mày"
+                error: "Sai mật khẩu"
             });
         }
         else {
@@ -137,4 +134,27 @@ exports.changePassword = async (req, res) => {
             error: error.message
         })
     }
+}
+
+// Update -> chỉ có admin mới có quyền update
+exports.update = async (req, res) => {
+    const { id, role } = req.body;
+    const validRoles = ['admin', 'seller', 'customer'];
+    const user = await USER.findById(id);
+    if (!user || !validRoles.includes(role)) {
+        res.status(400).json({
+            message: "Người dùng/Role không tồn tại"
+        });
+    }
+    user.role = role;
+    await user.save();
+
+    res.json({
+        success: true,
+        message: `Cập nhật role ${role} thành công cho user ${id}`
+    })
+}
+
+exports.profile = async (req, res) => {
+    res.json(req.user);
 }

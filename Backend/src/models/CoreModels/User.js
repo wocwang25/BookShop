@@ -7,17 +7,26 @@ const User_Schema = new mongoose.Schema(
         username: {
             type: String,
             unique: true,
-            required: true
+            required: true,
+            validate: {
+                validator: async function (username) {
+                    const user = await this.constructor.findOne({ username });
+                    return !user || this._id.equals(user._id);
+                },
+                message: "username đã tồn tại"
+            }
         },
         password: {
             type: String,
             required: true,
-            select: false
+            select: false,
+            required: true
         },
         role: {
             type: String,
             enum: ['admin', 'seller', 'customer'],
-            default: 'customer'
+            default: 'customer',
+            required: true
         },
         contact_info: {
             phone: {
@@ -42,7 +51,7 @@ const User_Schema = new mongoose.Schema(
         lockUntil: Date
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 )
 

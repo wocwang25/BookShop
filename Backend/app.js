@@ -1,22 +1,28 @@
+require('dotenv').config();
 const express = require('express');
+const body_parser = require('body-parser');
+const cors = require('cors')
 const app = express();
 
-// Middleware
-app.use(express.json());
+const connectDB = require('../../BookShop/Backend/src/config/db');
+connectDB();
 
-// Routes
+app.use(express.json());
+app.use(body_parser.json());
+
 app.get('/', (req, res) => {
     res.send('Home Page');
 });
-
 app.get('/about', (req, res) => {
     res.send('About Page with Express');
 });
-
 app.post('/data', (req, res) => {
     console.log(req.body);
     res.json({ message: 'Data received', data: req.body });
 });
+
+app.use("/api/auth", require("./src/routes/CLIENT.route"));
+
 
 // Xử lý 404 (phải đặt cuối cùng, sau các routes khác)
 app.use((req, res) => {
