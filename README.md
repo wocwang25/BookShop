@@ -9,7 +9,7 @@ A Node.js backend project organized with **feature-based MVC architecture**.
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/wocwang25/BookShop.git
-cd your-project
+cd ./BookShop/Backend
 ```
 
 ### 2. Install dependencies
@@ -32,10 +32,10 @@ Admin_infor={"username":"","password":""} -> for create admin account
 
 SALT_ROUNDS = 10
 
-# https://cloud.mongodb.com/v2/67f48d7434c0ee782cdc44d5#/overview -> tao tai khoan roi cluster mien phi
-# MONGO_URI=mongodb+srv://DB_USER:DB_PASS@cluster0.mongodb.net/DB_NAME
 
+# MONGO_URI=mongodb+srv://DB_USER:DB_PASS@cluster0.mongodb.net/DB_NAME
 ```
+https://cloud.mongodb.com/v2/67f48d7434c0ee782cdc44d5#/overview -> tao tai khoan roi cluster mien phi
 
 ### 4. Run the project
 
@@ -51,7 +51,7 @@ SALT_ROUNDS = 10
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Structure (sample)
 
 ```bash
 .
@@ -104,7 +104,7 @@ SALT_ROUNDS = 10
 
 ## ✍️ Author
 
-- **Võ Quốc Quang** – [https://github.com/wocwang25]
+- **Võ Quốc Quang** – [My GitHub](https://github.com/wocwang25)
 
 ---
 
