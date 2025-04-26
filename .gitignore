@@ -3,7 +3,7 @@ node_modules/
 
 # Bỏ qua file cấu hình môi trường (chứa thông tin nhạy cảm như API keys, database credentials)
 .env
-
+out/
 # Bỏ qua các thư mục build và logs
 dist/
 build/
