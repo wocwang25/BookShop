@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://bootswatch.com/4/journal/bootstrap.min.css">
+    <title>Dashboard</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'News Cycle', 'Arial Narrow Bold', sans-serif;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.95);
+            transition: transform 0.3s ease;
+            padding: 40px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: #4a4a4a;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .lead {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #eb6864;
+            border: none;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e22620;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(235, 104, 100, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 m-auto">
+                <div class="card card-body text-center">
+                    <h1 class="mb-3">Dashboard</h1>
+                    <p class="lead mb-4">Xin chào <span class="font-weight-bold">
+                            <% if (typeof user !=='undefined' ) { %>
+                                <p>Hello <%= user.name %>
+                                </p>
+                                <% } else { %>
+                                    <p>Welcome Guest</p>
+                                    <% } %>
+                        </span></p>
+                    <a href="/" class="btn btn-secondary">Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

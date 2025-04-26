@@ -1,0 +1,10 @@
+{
+    "username" : "yusato",
+    "email" : "yusato@hex.com",
+    "password" : "123456"
+}
+
+{
+    "identifier" : "yusato",
+    "password" : "123456"
+}

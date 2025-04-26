@@ -1,84 +1,160 @@
++------------------------+       +------------------------+
+|         User           |       |       UserManager      |             
++------------------------+       +------------------------+
+| - userId: int          |       | - users: List<User>    |
+| - username: String     |<----->| + registerUser(): User |
+| - password: String     |       | + loginUser(): boolean |
+| - email: String        |       | + logoutUser(): void   |
+| - role: String         |       | + manageUser(): void   |
+| - status: String       |       | + changeUserRole(): void|
+| - createdDate: Date    |       | + resetUserPassword(): void|
+| - lastLogin: Date      |       | + blockUser(): void    |
++------------------------+       +------------------------+
+         ^
+         |
+         |
++------------------------+       +------------------------+
+|       Customer         |       |        Admin           |
++------------------------+       +------------------------+
+| - address: String      |       | - adminLevel: int      |
+| - phone: String        |       | - department: String   |
+| - loyaltyPoints: int   |       | + manageInventory()    |
+| + viewBooks()          |       | + manageUsers()        |
+| + searchBooks()        |       | + generateReports()    |
+| + addBookToCart()      |       | + manageOrders()       |
+| + manageProfile()      |       | + managePromotions()   |
++------------------------+       +------------------------+
+
+
++------------------------+       +------------------------+
+|         Book           |       |     BookManager        |
++------------------------+       +------------------------+
+| - bookId: int          |       | - books: List<Book>    |
+| - title: String        |<----->| + addBook(): void      |
+| - author: String       |       | + updateBook(): void   |
+| - ISBN: String         |       | + removeBook(): void   |
+| - publisher: String    |       | + searchBook(): List<Book>|
+| - category: String     |       | + viewBookDetails(): Book|
+| - price: double        |       | + manageBookStock(): void|
+| - quantity: int        |       +------------------------+
+| - description: String  |
+| - publicationDate: Date|
+| - coverImage: String   |
++------------------------+
+         ^
+         |
+         |
++------------------------+       +------------------------+
+|     PhysicalBook       |       |      EBook            |
++------------------------+       +------------------------+
+| - shelfLocation: String|       | - fileFormat: String  |
+| - condition: String    |       | - fileSizeMB: double  |
+| - weight: double       |       | - downloadLink: String|
++------------------------+       | - deviceCompatibility |
+                                 +------------------------+
+
++------------------------+       +------------------------+
+|       ShoppingCart     |       |        Order          |
++------------------------+       +------------------------+
+| - cartId: int          |       | - orderId: int        |
+| - user: User           |<----->| - user: User          |
+| - items: List<CartItem>|       | - orderDate: Date     |
+| - createdDate: Date    |       | - status: String      |
+| + addItem(): void      |       | - totalAmount: double |
+| + removeItem(): void   |       | - paymentMethod: String|
+| + updateQuantity(): void|       | - items: List<OrderItem>|
+| + clearCart(): void    |       | - shippingAddress: String|
+| + checkout(): Order    |       | + calculateTotal(): double|
++------------------------+       | + processPayment(): boolean|
+         |                       | + updateStatus(): void |
+         |                       +------------------------+
+         v
++------------------------+       +------------------------+
+|       CartItem         |       |       OrderItem       |
++------------------------+       +------------------------+
+| - itemId: int          |       | - itemId: int         |
+| - book: Book           |       | - book: Book          |
+| - quantity: int        |       | - quantity: int       |
+| - price: double        |       | - price: double       |
+| + calculateSubtotal()  |       | - discount: double    |
++------------------------+       | + calculateSubtotal() |
+                                 +------------------------+
+
+
++------------------------+       +------------------------+
+|       Payment          |       |     OrderManager      |
++------------------------+       +------------------------+
+| - paymentId: int       |       | - orders: List<Order> |
+| - order: Order         |<----->| + createOrder(): Order|
+| - amount: double       |       | + updateOrder(): void |
+| - paymentDate: Date    |       | + cancelOrder(): void |
+| - paymentMethod: String|       | + trackOrder(): String|
+| - status: String       |       | + processOrder(): void|
+| + processPayment(): bool|      | + shipOrder(): void   |
+| + refund(): boolean    |       | + deliverOrder(): void|
++------------------------+       +------------------------+
+         ^
+         |
+         |
++------------------------+       +------------------------+
+|    OnlinePayment       |       |     CashPayment       |
++------------------------+       +------------------------+
+| - transactionId: String|       | - receiptNumber: String|
+| - gateway: String      |       | - cashierName: String |
++------------------------+       +------------------------+
+
+
++------------------------+       +------------------------+
+|      Inventory         |       |        Report         |
++------------------------+       +------------------------+
+| - books: Map<Book, int>|       | - reportId: int       |
+| + checkStock(): int    |<----->| - title: String       |
+| + updateStock(): void  |       | - generatedDate: Date |
+| + alertLowStock(): List|       | - type: String        |
+| + receiveBooks(): void |       | - content: String     |
+| + shipBooks(): void    |       | - createdBy: User     |
++------------------------+       | + generatePDF(): void |
+                                 | + sendByEmail(): void |
+                                 +------------------------+
+                                          ^
+                                          |
+                                          |
+                         +------------------------+
+                         |     SalesReport        |
+                         +------------------------+
+                         | - startDate: Date      |
+                         | - endDate: Date        |
+                         | - totalRevenue: double |
+                         | - topSellingBooks: List|
+                         +------------------------+
 
 
 
-Sơ đồ hoạt động luồng request:
++------------------------+       +------------------------+
+|      Promotion         |       |   PromotionManager    |
++------------------------+       +------------------------+
+| - promotionId: int     |       | - promotions: List    |
+| - name: String         |<----->| + createPromotion()   |
+| - description: String  |       | + updatePromotion()   |
+| - startDate: Date      |       | + deletePromotion()   |
+| - endDate: Date        |       | + applyPromotion()    |
+| - discountType: String |       | + listActivePromotions()|
+| - discountValue: double|       +------------------------+
+| - applicableBooks: List|
+| - minimumPurchase: double|
+| - isActive: boolean    |
++------------------------+
 
-    Client → server.js → app.js → middleware → routes → controllers → services → models → database
-                                                                    ↑
-    Response ←───────────────────────────────────────────────────────┘
-
-
-
-Sơ đồ cụ thể luồng Request
-
-    participant Client
-    participant Server
-    participant Middleware
-    participant Routes
-    participant Controller
-    participant Service
-    participant Model
-    participant Database
-
-    Client->>Server: HTTP Request (GET /users)
-    Server->>Middleware: 1. Xử lý request (parse body, auth, log...)
-    Middleware->>Routes: 2. Phân tuyến request
-    Routes->>Controller: 3. Gọi đúng controller
-    Controller->>Service: 4. Yêu cầu xử lý nghiệp vụ
-    Service->>Model: 5. Truy vấn database
-    Model->>Database: 6. Thực thi query
-    Database-->>Model: 7. Dữ liệu trả về
-    Model-->>Service: 8. Trả kết quả
-    Service-->>Controller: 9. Trả kết quả
-    Controller-->>Routes: 10. Tạo HTTP response
-    Routes-->>Middleware: 11. Xử lý response (format, header...)
-    Middleware-->>Server: 12. Hoàn thiện response
-    Server-->>Client: HTTP Response (JSON/HTML)
- 
-
-Models cụ thể:
-
-    Core models:
-        User        -> id, username, email, password (hashed), role (admin, seller, customer), phone, address, created_at, status (active/inactive).
-        -->> Xác thực đăng nhập/Đăng ký (feature 19), Phân quyền (feature 11)
-        Books       -> bookCode, title, author, category, cost(selling, cost, quantity_in_stock, rental_price), description, image_url, meatadata
-        -->> Quản lý thông tin sách (Features 12, 17), Hiển thị tồn kho (feature 13)
-        Category    -> name (Văn học, Khoa học...), description.
-        -->> Phân loại sách (feature 12)
-        Author      -> name, book, bookCount
-        -->> Liên kết với sách để quản lý thông tin chi tiết -> (cái này chưa rõ lắm)
-    
-    Transaction Models:
-        Order       -> id, user_id (FK), total_amount, status (pending, completed, cancelled), payment_method, created_at, shipping_address.
-        -->> Quản lý đơn hàng (feature 15), tích hợp thanh toán (feature 10)
-        OrderItem   -> id, order_id (FK), book_id (FK), quantity, price_at_purchase, is_rental (boolean), rental_days (nếu mượn).
-        -->> Lưu thông tin sách trong đơn hàng (feature 20)
-        Payment     -> id, order_id (FK), amount, transaction_id, payment_gateway (credit card, ví điện tử...), status, timestamp.
-        -->> Xử lí thanh toán trực tuyến
-    
-    Other Models:
-        Cart        -> id, user_id (FK), created_at.
-        -->> Lưu tạm sách trước khi thanh toán (feature 20).
-        CartItem    -> id, cart_id (FK), book_id (FK), quantity, is_rental (boolean).
-        Rental      -> id, user_id (FK), book_id (FK), start_date, end_date, status (active/returned), total_cost.
-        -->> Quản lý dịch vụ thuê sách (Features 1,9)
-        WishList    -> id, user_id (FK), book_id (FK), added_at.
-        -->> Lưu sách yêu thích (feature 6)
-
-    Management Support Models:
-        Review      -> id, user_id (FK), book_id (FK), rating, comment, created_at
-        -->> Quản lý đánh giá sách (feature 5)
-        Promotion   -> id, code, discount_type (percentage/fixed), discount_value, start_date, end_date, max_uses.
-        -->> Tạo mã giảm giá (feature 8)
-        Notification    ->  id, user_id (FK), message, type (order, stock, revenue...), is_read, created_at.
-        -->> Gửi thông báo (feature 7)
-        Membership  -> id, name, price, duration_days, benefits (text).
-        -->> Quản lý dịch vụ thành viên (feature 2)
-    
-    Noting&Sharing Support Models:
-        StudyGroup  -> id, name, created_by (FK to User), created_at.
-        GroupDocument   -> id, group_id (FK), book_id (FK), uploaded_by (FK to User), notes, uploaded_at.
-        -->> Chia sẻ tài liệu trong nhóm học tập (feature 4)
-        BookNote    -> id, user_id (FK), book_id (FK), page_number, content, created_at.
-        -->> Lưu ghi chú khi đọc sách (feature 3)
-        
+## Mối quan hệ giữa các lớp chính
+1. User - Customer/Admin : Quan hệ kế thừa (Inheritance), Customer và Admin là các lớp con của User.
+2. User - UserManager : Quan hệ kết hợp (Association), UserManager quản lý nhiều User.
+3. Book - BookManager : Quan hệ kết hợp, BookManager quản lý nhiều Book.
+4. Book - PhysicalBook/EBook : Quan hệ kế thừa, PhysicalBook và EBook là các lớp con của Book.
+5. User - ShoppingCart : Quan hệ kết hợp, một User có một ShoppingCart.
+6. ShoppingCart - CartItem : Quan hệ tổng hợp (Composition), ShoppingCart chứa nhiều CartItem.
+7. ShoppingCart - Order : Quan hệ kết hợp, ShoppingCart có thể chuyển đổi thành Order.
+8. Order - OrderItem : Quan hệ tổng hợp, Order chứa nhiều OrderItem.
+9. Order - Payment : Quan hệ kết hợp, một Order có một Payment.
+10. Order - OrderManager : Quan hệ kết hợp, OrderManager quản lý nhiều Order.
+11. Book - Inventory : Quan hệ kết hợp, Inventory theo dõi số lượng của nhiều Book.
+12. Promotion - PromotionManager : Quan hệ kết hợp, PromotionManager quản lý nhiều Promotion.

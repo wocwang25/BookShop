@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const User_mdw = require('../../middleware/userMdw');
-const User_Middleware = require('../../middleware/userMdw');
+const { hashPassword, comparePassword } = require('./middlewares/userPassword');
 
 const User_Schema = new mongoose.Schema(
     {
@@ -18,13 +17,15 @@ const User_Schema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
             select: false,
             required: true
         },
+        email: {
+            type: String
+        },
         role: {
             type: String,
-            enum: ['admin', 'seller', 'customer'],
+            enum: ['admin', 'staff', 'customer'],
             default: 'customer',
             required: true
         },
@@ -48,15 +49,28 @@ const User_Schema = new mongoose.Schema(
             type: Number,
             default: 0
         },
-        lockUntil: Date
+        lockUntil: Date,
+        tokens: [
+            {
+                token: {
+                    type: String,
+                    required: true
+                },
+                createdAt: {
+                    type: Date,
+                    default: Date.now,
+                    expires: 60 * 60 * 24 // Token hết hạn sau 1 ngày (tuỳ chỉnh)
+                }
+            }
+        ]
     },
     {
         timestamps: true,
     }
 )
 
-User_Schema.pre('save', User_Middleware.hashpassword);
-User_Schema.methods.comparePassword = User_mdw.comparePassword;
+User_Schema.pre('save', hashPassword);
+User_Schema.methods.comparePassword = comparePassword;
 
 User_Schema.methods.isLocked = function () {
     return this.lockUntil && this.lockUntil > Date.now();
