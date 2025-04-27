@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt')
 
 const User_Schema = new mongoose.Schema(
     {
+        name: {
+            type: String,
+            required: true
+        },
         username: {
             type: String,
             unique: true,
@@ -39,6 +43,10 @@ const User_Schema = new mongoose.Schema(
                 unique: false
             },
             // default: "You've not updated yet"
+        },
+        debt: {
+            type: Number,
+            default: 0
         },
         status: {
             type: String,

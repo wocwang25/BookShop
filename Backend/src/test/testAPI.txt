@@ -25,7 +25,7 @@
 {
   "details": [
     {
-      "title": "Đắc Nhân Tâm",
+      "title": "Đắc Yu Sato",
       "quantity": 200,
       "category": "Tâm lý - Kỹ năng sống",
       "author": "Dale Carnegie"

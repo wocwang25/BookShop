@@ -1,4 +1,6 @@
+const Author = require('../../models/Author');
 const Book = require('../../models/Book');
+const Category = require('../../models/Category');
 const { removeVietnameseTones } = require('../../utils/removeVNtones');
 
 exports.addBook = async function (req, res) {
@@ -62,12 +64,35 @@ exports.searchBooks = async function (req, res) {
 
         const books = await Book.find({
             $and: regexConditions
-        }).limit(5);
+        })
+            .limit(5)
+            .select('title author category stock');
+
+        // Lấy tất cả authorId và categoryId duy nhất
+        const authorIds = [...new Set(books.map(b => b.author))];
+        const categoryIds = [...new Set(books.map(b => b.category))];
+
+        // Query song song
+        const [authors, categories] = await Promise.all([
+            Author.find({ _id: { $in: authorIds } }).select('name'),
+            Category.find({ _id: { $in: categoryIds } }).select('name')
+        ]);
+
+        // Biến thành một cặp [id, name]
+        const authorMap = new Map(authors.map(a => [a._id.toString(), a.name]));
+        const categoryMap = new Map(categories.map(c => [c._id.toString(), c.name]));
+
+        const filteredBooks = books.map(book => ({
+            title: book.title,
+            author: authorMap.get(book.author) || 'Unknown',
+            category: categoryMap.get(book.category) || 'Unknown',
+            stock: book.stock
+        }));
 
         res.json({
             status: 'success',
             results: books.length,
-            data: books
+            data: filteredBooks
         });
 
     } catch (error) {
@@ -77,3 +102,4 @@ exports.searchBooks = async function (req, res) {
         });
     }
 }
+

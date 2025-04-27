@@ -53,12 +53,14 @@ exports.refreshToken = async function (req, res, next) {
     }
 }
 
-exports.isStaff = async function (req, res, next) {
-    if (req.user.role !== 'staff') {
-        return res.status(403).json({
-            status: "false",
-            message: "Tài khoản không đủ thẩm quyền để thực hiện hành động này (staff)"
-        });
-    }
-    next();
-}
+exports.checkRole = (role) => {
+    return async (req, res, next) => {
+        if (req.user?.role !== role) {
+            return res.status(403).json({
+                status: "false",
+                message: `Tài khoản không đủ thẩm quyền để thực hiện hành động này (yêu cầu role: ${role})`
+            });
+        }
+        next();
+    };
+};

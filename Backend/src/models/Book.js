@@ -71,32 +71,50 @@ const Book_Schema = mongoose.Schema(
     }
 );
 
+// Middleware chỉ chạy khi tạo mới
 Book_Schema.pre('save', async function (next) {
+    // Nếu không phải document mới, bỏ qua
+    if (!this.isNew) {
+        return next();
+    }
+
     try {
         const Author = mongoose.model('Author');
         const Category = mongoose.model('Category');
 
+        // Lưu giá trị string ban đầu
+        const authorName = this.author;
+        const categoryName = this.category;
+
         // Handle Category -> tìm hoặc tạo mới 
-        let category = await Category.findOne({ name: this.category });
+        let category = await Category.findOne({ name: categoryName });
         if (!category) {
             category = await Category.create({
-                name: this.category,
+                name: categoryName,
                 bookCount: 0
             });
         }
 
-        // Handle Author -> tìm hoặc tạo mới
-        let author = await Author.findOne({ name: this.author });
+        // Handle Author -> tìm hoặc tạo mới 
+        let author = await Author.findOne({ name: authorName });
         if (!author) {
             author = await Author.create({
-                name: this.author,
+                name: authorName,
                 bookCount: 0
             })
         }
-        this.search.title_search = removeVietnameseTones(this.title);
-        this.search.author_search = removeVietnameseTones(this.author);
-        this.search.category_search = removeVietnameseTones(this.category);
 
+        // Đảm bảo trường search tồn tại
+        if (!this.search) {
+            this.search = {};
+        }
+
+        // Cập nhật trường search
+        this.search.title_search = removeVietnameseTones(this.title);
+        this.search.author_search = removeVietnameseTones(authorName);
+        this.search.category_search = removeVietnameseTones(categoryName);
+
+        // Cập nhật author và category thành ObjectId
         this.category = category._id;
         this.author = author._id;
 
