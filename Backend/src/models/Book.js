@@ -93,13 +93,13 @@ Book_Schema.pre('save', async function (next) {
                 bookCount: 0
             })
         }
+        this.search.title_search = removeVietnameseTones(this.title);
+        this.search.author_search = removeVietnameseTones(this.author);
+        this.search.category_search = removeVietnameseTones(this.category);
 
         this.category = category._id;
         this.author = author._id;
 
-        this.search.title_search = removeVietnameseTones(this.title);
-        this.search.author_search = removeVietnameseTones(this.author);
-        this.search.category_search = removeVietnameseTones(this.category);
         next()
     }
     catch (error) {

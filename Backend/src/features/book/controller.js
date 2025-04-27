@@ -1,4 +1,5 @@
 const Book = require('../../models/Book');
+const { removeVietnameseTones } = require('../../utils/removeVNtones');
 
 exports.addBook = async function (req, res) {
     try {
@@ -53,9 +54,9 @@ exports.searchBooks = async function (req, res) {
 
         const regexConditions = keywords.map(word => ({
             $or: [
-                { title_search: { $regex: word, $options: 'i' } },
-                { author_search: { $regex: word, $options: 'i' } },
-                { category_search: { $regex: word, $options: 'i' } }
+                { 'search.title_search': { $regex: word, $options: 'i' } },
+                { 'search.author_search': { $regex: word, $options: 'i' } },
+                { 'search.category_search': { $regex: word, $options: 'i' } }
             ]
         }));
 

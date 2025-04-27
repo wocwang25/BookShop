@@ -20,9 +20,13 @@ async function updateBookSearchField() {
 
         const books = await Book.find();
         for (const book of books) {
+            let author = await Author.findById(book.author);
+            let category = await Category.findById(book.category);
             book.title_search = removeVietnameseTones(book.title)
-            book.author_search = removeVietnameseTones(book.author)
-            book.category_search = removeVietnameseTones(book.category)
+            book.author_search = removeVietnameseTones(author.name)
+            book.category_search = removeVietnameseTones(category.name)
+
+            console.log(author.name, category.name);
 
             await book.save();
         }
