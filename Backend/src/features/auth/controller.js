@@ -1,7 +1,5 @@
-const USER = require('../user/User');
+const USER = require('../../models/User');
 const jwt = require('jsonwebtoken');
-const formatUserResponse = require('../../utils/formatResponse');
-const { refreshToken } = require('./middleware');
 
 const AuthModule = {
     signup: async (req, res) => {
@@ -31,7 +29,6 @@ const AuthModule = {
 
     signin: async (req, res) => {
         const { identifier, password } = req.body;
-
         if (!identifier || !password) {
             return res.status(400).json({
                 status: "error",
@@ -88,7 +85,7 @@ const AuthModule = {
             const accessToken = jwt.sign(
                 { id: user._id, username: user.username, role: user.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '15m' }
+                { expiresIn: '1d' }
             );
             // Tạo refresh token
             const refreshToken = jwt.sign(
@@ -117,9 +114,9 @@ const AuthModule = {
                 }
             });
         } catch (error) {
-            res.json({
+            res.status(401).json({
                 status: "error",
-                message: "Login error, try again!"
+                message: error.message
             });
         }
     },

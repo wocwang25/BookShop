@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { hashPassword, comparePassword } = require('./middlewares/userPassword');
+const bcrypt = require('bcrypt')
 
 const User_Schema = new mongoose.Schema(
     {
@@ -26,7 +26,7 @@ const User_Schema = new mongoose.Schema(
         role: {
             type: String,
             enum: ['admin', 'staff', 'customer'],
-            default: 'customer',
+            default: 'staff',
             required: true
         },
         contact_info: {
@@ -69,8 +69,31 @@ const User_Schema = new mongoose.Schema(
     }
 )
 
-User_Schema.pre('save', hashPassword);
-User_Schema.methods.comparePassword = comparePassword;
+// const rateLimit = require('express-rate-limit');
+
+// const loginLimiter = rateLimit({
+//     windowMs: 60 * 1000,
+//     max: 5,
+//     skipSuccessfulRequests: true,
+//     message: "Thử quá nhiều lần, vui lòng thử lại sau 1 phút"
+// });
+
+User_Schema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    try {
+        const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS));
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+User_Schema.methods.comparePassword = async function (candidatePassword) {
+    if (!this.password) {
+        throw new Error('No password set for this user');
+    }
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
 User_Schema.methods.isLocked = function () {
     return this.lockUntil && this.lockUntil > Date.now();
@@ -91,3 +114,23 @@ User_Schema.methods.resetLoginAttempts = async function () {
 }
 
 module.exports = mongoose.model('User', User_Schema);
+
+
+// // Update -> chỉ có admin mới có quyền update
+// exports.update = async (req, res) => {
+//     const { id, role } = req.body;
+//     const validRoles = ['admin', 'seller', 'customer'];
+//     const user = await USER.findById(id);
+//     if (!user || !validRoles.includes(role)) {
+//         res.status(400).json({
+//             message: "Người dùng/Role không tồn tại"
+//         });
+//     }
+//     user.role = role;
+//     await user.save();
+
+//     res.json({
+//         success: true,
+//         message: `Cập nhật role ${role} thành công cho user ${id}`
+//     })
+// }

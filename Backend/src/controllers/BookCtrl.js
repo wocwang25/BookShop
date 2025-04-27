@@ -1,4 +1,4 @@
-const BOOK = require('../models/CoreModels/Book');
+const BOOK = require('../models/Book');
 
 // CRUD
 // -> create

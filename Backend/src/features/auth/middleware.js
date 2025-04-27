@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../user/User');
+const User = require('../../models/User');
 
 exports.verifyToken = async function (req, res, next) {
     const authHeader = req.headers.authorization;
@@ -51,4 +51,14 @@ exports.refreshToken = async function (req, res, next) {
             message: "Refresh token không hợp lệ hoặc đã bị thu hồi"
         });
     }
+}
+
+exports.isStaff = async function (req, res, next) {
+    if (req.user.role !== 'staff') {
+        return res.status(403).json({
+            status: "false",
+            message: "Tài khoản không đủ thẩm quyền để thực hiện hành động này (staff)"
+        });
+    }
+    next();
 }
