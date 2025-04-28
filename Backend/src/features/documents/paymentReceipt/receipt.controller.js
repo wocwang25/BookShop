@@ -64,7 +64,7 @@ exports.createPaymentReceipt = async function (req, res) {
                 book: book._id,
                 category: book.category,
                 quantity: item.quantity,
-                cost: book.cost.selling_price
+                cost: book.cost.selling_price * item.quantity
             });
         }
 

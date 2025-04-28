@@ -37,7 +37,12 @@ const BookImport_Schema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    detail: BookImportDetail_Schema
-})
+    detail: [BookImportDetail_Schema]
+},
+    {
+        timestamps: true
+
+    }
+);
 
 module.exports = mongoose.model('BookImport', BookImport_Schema);
