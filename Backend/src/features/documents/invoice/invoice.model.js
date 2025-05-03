@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ReceiptDetail_Schema = mongoose.Schema({
+const InvoiceDetail_Schema = mongoose.Schema({
     book: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Book',
@@ -21,7 +21,7 @@ const ReceiptDetail_Schema = mongoose.Schema({
     }
 });
 
-const Receipt_Schema = mongoose.Schema({
+const Invoice_Schema = mongoose.Schema({
     staff: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -32,7 +32,7 @@ const Receipt_Schema = mongoose.Schema({
         ref: 'User',
         required: true
     },
-    detail: [ReceiptDetail_Schema],
+    detail: [InvoiceDetail_Schema],
     date: {
         type: Date,
         default: Date.now
@@ -41,4 +41,4 @@ const Receipt_Schema = mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Receipt', Receipt_Schema);
+module.exports = mongoose.model('Invoice', Invoice_Schema);

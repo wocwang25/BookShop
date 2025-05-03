@@ -1,4 +1,4 @@
-const { createBookImport, getBookImport } = require('./bookImport.controller');
+const { createBookImport, getBookImport } = require('./import.controller');
 const { checkRole } = require('../../auth/middleware');
 const { verifyToken } = require('../../auth/middleware');
 const express = require('express');
