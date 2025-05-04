@@ -1,20 +1,31 @@
 const User = require('../../../models/User');
-const Receipt = require('./receipt.model');
 const receiptService = require('./receipt.service');
 const utils = require('./receipt.utils');
+const mongoose = require('mongoose');
 
 exports.createReceipt = async function (req, res) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     const { customer_info } = req.body;
     try {
-        const { receipt, customer } = await receiptService.create(customer_info);
-        await receipt.save();
-        await customer.save();
+        const { receipt, customer, transaction } = await receiptService.create(customer_info);
+        await receipt.save({ session });
+        await customer.save({ session });
 
-        return res.status(200).json({
+        await receiptService.transact(transaction, req.user.id, session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).json({
             status: 'success',
             data: receipt
         });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+
         res.status(error.status || 500).json({
             status: 'error',
             message: `Đã xảy ra lỗi khi tạo phiếu thu tiền: ${error.message}`,

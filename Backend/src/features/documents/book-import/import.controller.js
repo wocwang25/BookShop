@@ -1,19 +1,28 @@
 const BookImport = require('./import.model');
 const User = require('../../../models/User');
 const handleBookImport = require('./import.service');
+const mongoose = require('mongoose');
 
 exports.createBookImport = async function (req, res) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
         const { details } = req.body;
 
-        const detailForSave = await handleBookImport.create(details);
+        const { detailForSave, transactions } = await handleBookImport.create(details);
 
         const bookImport = new BookImport({
             staff: req.user.id,
             detail: detailForSave
         });
 
-        await bookImport.save();
+        await bookImport.save({ session });
+
+        await handleBookImport.transact(transactions, req.user.id, session)
+
+        await session.commitTransaction();
+        session.endSession();
 
         res.json({
             status: 'success',
@@ -22,6 +31,9 @@ exports.createBookImport = async function (req, res) {
         });
 
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+
         console.error(error);
         res.status(error.status || 500).json({
             status: 'error',

@@ -30,7 +30,7 @@ const User_Schema = new mongoose.Schema(
         role: {
             type: String,
             enum: ['admin', 'staff', 'customer'],
-            default: 'staff',
+            default: 'customer',
             required: true
         },
         contact_info: {
@@ -96,6 +96,39 @@ User_Schema.pre('save', async function (next) {
         next(err);
     }
 });
+
+const { DebtReport } = require('../features/documents/report/report.model');
+
+User_Schema.pre('save', async function (next) {
+    // Nếu không phải document mới, bỏ qua
+    if (!this.isNew) {
+        return next();
+    }
+
+    try {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const debt_report = await DebtReport.findOne({ month: month, year: year });
+        if (!debt_report) throw new Error(`No debt report found for ${month}/${year}`);
+
+        debt_report.debt_log.push({
+            customer: doc._id,
+            opening_debt: doc.debt,
+            closing_debt: doc.debt,
+            transactions: []
+        })
+
+        await debt_report.save();
+
+        next();
+
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
 User_Schema.methods.comparePassword = async function (candidatePassword) {
     if (!this.password) {
         throw new Error('No password set for this user');

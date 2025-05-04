@@ -71,6 +71,8 @@ const Book_Schema = mongoose.Schema(
     }
 );
 
+const { InventoryReport } = require('../features/documents/report/report.model');
+
 // Middleware chỉ chạy khi tạo mới
 Book_Schema.pre('save', async function (next) {
     // Nếu không phải document mới, bỏ qua
@@ -118,25 +120,48 @@ Book_Schema.pre('save', async function (next) {
         this.category = category._id;
         this.author = author._id;
 
-        next()
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const inventory_report = await InventoryReport.findOne({ month: month, year: year });
+        if (!inventory_report) throw new Error(`No inventory report found for ${month}/${year}`);
+
+        inventory_report.inventory_log.push({
+            book: doc._id,
+            openning_stock: doc.stock,
+            current_stock: doc.stock,
+            transactions: []
+        })
+
+        await inventory_report.save();
+
+        next();
     }
     catch (error) {
         next(error);
     }
 });
-Book_Schema.post('save', async function (doc) {
-    const Author = mongoose.model('Author');
-    const Category = mongoose.model('Category');
+Book_Schema.post('save', async function (doc, next) {
+    try {
+        const Author = mongoose.model('Author');
+        const Category = mongoose.model('Category');
 
-    await Category.findByIdAndUpdate(doc.category, {
-        $inc: { bookCount: 1 },
-        $addToSet: { featuredBook: doc._id }
-    });
+        await Category.findByIdAndUpdate(doc.category, {
+            $inc: { bookCount: 1 },
+            $addToSet: { featuredBook: doc._id }
+        });
 
-    await Author.findByIdAndUpdate(doc.author, {
-        $inc: { bookCount: 1 },
-        $addToSet: { book: doc._id }
-    });
+        await Author.findByIdAndUpdate(doc.author, {
+            $inc: { bookCount: 1 },
+            $addToSet: { book: doc._id }
+        });
+
+        next();
+
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 });
 
 module.exports = mongoose.model('Book', Book_Schema);

@@ -21,36 +21,35 @@
     "image_url": "https://example.com/image-nodejs.jpg"
 }
 
-
 {
   "details": [
     {
-      "title": "Đắc Yu Sato",
-      "quantity": 200,
+      "title": "Đắc đạo Yu Sato",
+      "quantity": 1,
       "category": "Tâm lý - Kỹ năng sống",
       "author": "Dale Carnegie"
     },
     {
-      "title": "Nhà Giả Kim",
-      "quantity": 180,
+      "title": "Loli triết gia, Ngộ",
+      "quantity": 1,
       "category": "Tiểu thuyết",
       "author": "Paulo Coelho"
     },
     {
-      "title": "Tuổi Trẻ Đáng Giá Bao Nhiêu",
-      "quantity": 150,
-      "category": "Tâm lý - Kỹ năng sống",
+      "title": "Loli triết gia, Minh",
+      "quantity": 1,
+      "category": "Tâm lý",
       "author": "Rosie Nguyễn"
     },
     {
       "title": "Cây Cam Ngọt Của Tôi",
-      "quantity": 250,
+      "quantity": 15,
       "category": "Tiểu thuyết",
       "author": "José Mauro de Vasconcelos"
     },
     {
       "title": "Tôi Thấy Hoa Vàng Trên Cỏ Xanh",
-      "quantity": 175,
+      "quantity": 15,
       "category": "Tiểu thuyết",
       "author": "Nguyễn Nhật Ánh"
     }

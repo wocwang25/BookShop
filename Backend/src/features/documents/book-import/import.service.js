@@ -1,5 +1,7 @@
 const BookImport = require('./import.model');
 const utils = require('./import.utils');
+const { InventoryReport } = require('../report/report.model');
+const User = require('../../../models/User');
 
 const handleBookImport = {
     create: async (details) => {
@@ -7,8 +9,8 @@ const handleBookImport = {
 
         const { bookMap, categoryMap, authorMap } = await utils.fetchEntities(details);
 
-        console.log(bookMap);
         const detailForSave = [];
+        const transactions = [];
 
         for (const item of details) {
             const book = bookMap.get(item.title);
@@ -19,6 +21,13 @@ const handleBookImport = {
 
             await utils.updateBookStock(book, item.quantity);
 
+            transactions.push({
+                type: 'import',
+                quantity: item.quantity,
+                book: book,
+
+            });
+
             detailForSave.push({
                 book: book._id,
                 category: category._id,
@@ -27,8 +36,39 @@ const handleBookImport = {
             });
         }
 
-        return detailForSave;
+        return { detailForSave, transactions };
     },
+    transact: async (transactions, staff_id, session) => {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const report = await InventoryReport.findOne({ month, year });
+        const staff = await User.findById(staff_id);
+
+        if (!report) throw new Error(`No inventory report found for ${month}/${year}`);
+
+        for (const item of transactions) {
+            const log = report.inventory_log.find(log => log.book.toString() === item.book._id.toString());
+
+            if (log) {
+                // Cập nhật tồn kho và thêm giao dịch mới
+                log.current_stock += item.quantity;
+
+                log.transactions.push({
+                    type: 'import',
+                    staff: staff.name, //Tên nhân viên nhập
+                    quantity: item.quantity,
+                    date: new Date()
+                });
+            } else {
+                throw new Error(`Sách "${log.book.title}" chưa được cập nhật trong báo cáo tồn`);
+            }
+            // console.log(log);
+        }
+
+        await report.save({ session });
+    },
+
 
     get: async (query) => {
         const bookImports = await BookImport.find(query)

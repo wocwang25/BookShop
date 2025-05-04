@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 const AuthModule = {
     signup: async (req, res) => {
-        const { username, email, password } = req.body;
+        const { name, username, email, password } = req.body;
         try {
-            const user = new USER({ username, email, password });
+            const user = new USER({ name, username, email, password });
             console.log(user);
             await user.save();
 

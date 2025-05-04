@@ -1,22 +1,31 @@
-const Receipt = require('./invoice.model');
+const Invoice = require('./invoice.model');
 const User = require('../../../models/User');
 const invoiceService = require('./invoice.service');
 const utils = require('./invoice.utils');
+const mongoose = require('mongoose');
 
 exports.createInvoice = async function (req, res) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     const { customer_name, details } = req.body;
     try {
-        const { customer, invoiceDetails } = await invoiceService.create(customer_name, details);
+        const { customer, invoiceDetails, transactions } = await invoiceService.create(customer_name, details);
 
-        const invoice = new Receipt({
+        const invoice = new Invoice({
             staff: req.user.id,
             customer: customer._id,
             detail: invoiceDetails
         });
 
-        await invoice.save();
-        await customer.save();
+        console.log(transactions)
 
+        await invoice.save({ session });
+        await customer.save({ session });
+        await invoiceService.transact(transactions, req.user.id, session);
+
+        await session.commitTransaction();
+        session.endSession();
 
         res.json({
             status: 'success',
@@ -25,6 +34,8 @@ exports.createInvoice = async function (req, res) {
         });
 
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         res.status(error.status || 500).json({
             status: 'error',
             message: error.message

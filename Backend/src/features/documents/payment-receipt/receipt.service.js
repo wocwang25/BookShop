@@ -1,14 +1,15 @@
 const User = require('../../../models/User');
 const Receipt = require('./receipt.model');
 const utils = require('./receipt.utils');
+const { DebtReport } = require('../report/report.model');
 
-const handleReceipt = {
+const receiptService = {
     create: async function (customer_info) {
         const customer = await User.findOne({ name: customer_info.name });
         utils.validateUser(customer);
         utils.validateCustomerDebt(customer, customer_info.deposit);
 
-        const receipt = await Receipt.create({
+        const receipt = await new Receipt({
             customer: customer._id,
             address: customer.contact_info?.address || customer_info.address,
             phoneNumber: customer.contact_info?.phone || customer_info.phoneNumber,
@@ -21,7 +22,42 @@ const handleReceipt = {
         customer.contact_info.phone = receipt.phone;
         customer.debt -= receipt.deposit;
 
-        return { receipt, customer };
+        const transaction = {
+            type: 'payment',
+            amount: receipt.deposit,
+            customer: customer
+        }
+
+        return { receipt, customer, transaction };
+    },
+
+    transact: async (transaction, staff_id, session) => {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        const report = await DebtReport.findOne({ month, year });
+        const staff = await User.findById(staff_id);
+
+        if (!report) throw new Error(`No debt report found for ${month}/${year}`);
+
+        const log = report.debt_log.find(log => log.customer.toString() === transaction.customer._id.toString());
+
+        if (log) {
+            // Cập nhật tồn kho và thêm giao dịch mới
+            log.closing_debt -= transaction.amount;
+
+            log.transactions.push({
+                type: 'payment',
+                staff: staff.name, //Tên nhân viên nhập
+                amount: transaction.amount,
+                date: new Date()
+            });
+        } else {
+            throw new Error(`Khách hàng ID "${transactions.addDebt_transaction.customer._id}" chưa được cập nhật trong báo cáo nợ`);
+        }
+
+
+        await report.save({ session });
     },
 
     get: async function (query) {
@@ -48,4 +84,4 @@ const handleReceipt = {
     }
 }
 
-module.exports = handleReceipt;
+module.exports = receiptService;

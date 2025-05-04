@@ -52,8 +52,8 @@ const utils = {
 
     prepareInvoiceDetails: async (bookMap, details) => {
         const invoiceDetails = [];
-
         var total_cost = 0;
+        const export_transaction = []
 
         for (const item of details) {
             const book = bookMap.get(item.title);
@@ -67,10 +67,15 @@ const utils = {
                 cost: book.cost.selling_price * item.quantity
             });
             total_cost += book.cost.selling_price * item.quantity;
+
+            export_transaction.push({
+                book: book,
+                quantity: item.quantity,
+            });
         }
         // console.log(invoiceDetails, total_cost)
 
-        return { invoiceDetails, total_cost };
+        return { invoiceDetails, total_cost, export_transaction };
     }
 }
 

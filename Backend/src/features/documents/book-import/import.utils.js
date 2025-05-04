@@ -16,7 +16,6 @@ const utils = {
         const titles = details.map(d => d.title);
         const categories = details.map(d => d.category);
         const authors = details.map(d => d.author);
-        console.log(titles)
         const [books, categoryDocs, authorDocs] = await Promise.all([
             Book.find({ title: { $in: titles } }),
             Category.find({ name: { $in: categories } }),
@@ -26,7 +25,6 @@ const utils = {
         const bookMap = new Map(books.map(b => [b.title, b]));
         const categoryMap = new Map(categoryDocs.map(c => [c.name, c]));
         const authorMap = new Map(authorDocs.map(a => [a.name, a]));
-        console.log(bookMap)
         return { bookMap, categoryMap, authorMap };
     },
 
@@ -52,7 +50,7 @@ const utils = {
     },
 
     updateBookStock: async (book, quantity) => {
-        console.log(book)
+        // console.log(book)
         book.stock += quantity;
         await book.save();
     }
