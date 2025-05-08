@@ -4,7 +4,7 @@ const body_parser = require('body-parser');
 const path = require('path');
 const app = express();
 
-const connectDB = require('../../BookShop/Backend/src/config/db');
+const connectDB = require('./src/config/db');
 connectDB();
 const { session } = require('passport');
 

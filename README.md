@@ -12,13 +12,8 @@ git clone https://github.com/wocwang25/BookShop.git
 cd ./BookShop/Backend
 ```
 
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Setup environment variables
-Create a `.env` file at the root with the following variables:
+### 2. Setup environment variables
+Create a `.env` file at the root with the following variables (do **not** commit this file):
 
 ```dotenv
 DB_USER = 
@@ -27,27 +22,32 @@ DB_NAME =
 DB_HOST=
 JWT_SECRET=yusatololicute
 JWT_REFRESH_SECRET=lolicute
-Admin_infor={"username":"","password":""} -> for create admin account
-
+Admin_infor={"username":"","password":""} # for create admin account
 
 SALT_ROUNDS = 10
-
 
 # MONGO_URI=mongodb+srv://DB_USER:DB_PASS@cluster0.mongodb.net/DB_NAME
 ```
 https://cloud.mongodb.com/v2/67f48d7434c0ee782cdc44d5#/overview -> tao tai khoan roi cluster mien phi
 
-### 4. Run the project
+### 3. Run the project with Docker
 
-- **Development mode** (with nodemon):
-  ```bash
-  npm run dev
-  ```
+#### 3.1. Build and start the containers
+```bash
+docker-compose up --build
+```
+- The first time, use `--build` to ensure dependencies are installed.
+- The app will be available at: http://localhost:3000
 
-- **Production mode**:
-  ```bash
-  npm start
-  ```
+#### 3.2. Stop the containers
+```bash
+docker-compose down
+```
+
+#### 3.3. (Optional) Remove all containers, networks, and volumes
+```bash
+docker-compose down -v
+```
 
 ---
 
@@ -75,7 +75,11 @@ https://cloud.mongodb.com/v2/67f48d7434c0ee782cdc44d5#/overview -> tao tai khoan
 │   └── helpers.js
 ├── app.js
 ├── server.js
-└── package.json
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── package.json
+└── package-lock.json
 ```
 
 ---
@@ -111,4 +115,3 @@ https://cloud.mongodb.com/v2/67f48d7434c0ee782cdc44d5#/overview -> tao tai khoan
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

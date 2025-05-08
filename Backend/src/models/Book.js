@@ -7,7 +7,7 @@ const Book_Schema = mongoose.Schema(
             type: String,
             unique: true,
             trim: true,
-            required: [true, 'Book title is required!'],
+            required: true,
             index: true
         },
         author: {
