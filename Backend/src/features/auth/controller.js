@@ -6,12 +6,12 @@ const AuthModule = {
         const { name, username, email, password } = req.body;
         try {
             const user = new USER({ name, username, email, password });
-            console.log(user);
             await user.save();
 
             const userResponse = user.toObject();
             delete userResponse.password;
 
+            console.log(user);
             res.status(200).json({
                 status: "success",
                 message: "User registers successfully",

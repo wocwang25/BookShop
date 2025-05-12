@@ -3,41 +3,6 @@ const Book = require('../../models/Book');
 const Category = require('../../models/Category');
 const { removeVietnameseTones } = require('../../utils/removeVNtones');
 
-exports.addBook = async function (req, res) {
-    try {
-        const {
-            title,
-            author,
-            category,
-            cost,
-            description,
-            image_url
-        } = req.body; // lấy trực tiếp từ body luôn
-
-        const book = new Book({
-            title,
-            author,
-            category,
-            cost,
-            description,
-            image_url
-        });
-
-        await book.save();
-
-        res.status(201).json({
-            status: 'success',
-            message: "Add book into database successfully",
-            data: book
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: "error",
-            message: error.message
-        });
-    }
-}
-
 exports.searchBooks = async function (req, res) {
     const { query } = req.body;
 

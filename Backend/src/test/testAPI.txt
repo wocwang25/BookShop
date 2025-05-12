@@ -17,8 +17,7 @@
         "cost_price": 80000,
         "selling_price": 120000
     },
-    "description": "Cuốn sách nhập môn lập trình Node.js từ A đến Z.",
-    "image_url": "https://example.com/image-nodejs.jpg"
+    "description": "Cuốn sách nhập môn lập trình Node.js từ A đến Z."
 }
 
 {
@@ -27,13 +26,13 @@
       "title": "Đắc đạo Yu Sato",
       "quantity": 1,
       "category": "Tâm lý - Kỹ năng sống",
-      "author": "Dale Carnegie"
+      "author": "Yu Sato"
     },
     {
       "title": "Loli triết gia, Ngộ",
       "quantity": 1,
       "category": "Tiểu thuyết",
-      "author": "Paulo Coelho"
+      "author": "Yu Loli"
     },
     {
       "title": "Loli triết gia, Minh",

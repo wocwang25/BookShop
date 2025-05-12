@@ -19,17 +19,21 @@ const Book_Schema = mongoose.Schema(
         category: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
+            index: true
+
         },
         cost: {
             cost_price: {
                 type: Number,
                 required: false,
-                min: 0
+                min: 0,
+                default: 0
             },
             selling_price: {
                 type: Number,
                 required: false,
+                default: 0,
                 validate: {
                     validator: function (v) {
                         return v >= this.cost.cost_price;
@@ -66,7 +70,7 @@ const Book_Schema = mongoose.Schema(
         }
     },
     {
-        Timestamp: true,
+        timestamps: true,
         autoIndex: true
     }
 );
@@ -127,9 +131,9 @@ Book_Schema.pre('save', async function (next) {
         if (!inventory_report) throw new Error(`No inventory report found for ${month}/${year}`);
 
         inventory_report.inventory_log.push({
-            book: doc._id,
-            openning_stock: doc.stock,
-            current_stock: doc.stock,
+            book: this._id,
+            openning_stock: this.stock,
+            current_stock: this.stock,
             transactions: []
         })
 

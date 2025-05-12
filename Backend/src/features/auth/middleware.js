@@ -51,7 +51,7 @@ exports.refreshToken = async function (req, res, next) {
             message: "Refresh token không hợp lệ hoặc đã bị thu hồi"
         });
     }
-}
+};
 
 exports.checkRole = (role) => {
     return async (req, res, next) => {

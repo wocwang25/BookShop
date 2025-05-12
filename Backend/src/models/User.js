@@ -77,15 +77,6 @@ const User_Schema = new mongoose.Schema(
     }
 )
 
-// const rateLimit = require('express-rate-limit');
-
-// const loginLimiter = rateLimit({
-//     windowMs: 60 * 1000,
-//     max: 5,
-//     skipSuccessfulRequests: true,
-//     message: "Thử quá nhiều lần, vui lòng thử lại sau 1 phút"
-// });
-
 User_Schema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     try {
@@ -113,9 +104,9 @@ User_Schema.pre('save', async function (next) {
         if (!debt_report) throw new Error(`No debt report found for ${month}/${year}`);
 
         debt_report.debt_log.push({
-            customer: doc._id,
-            opening_debt: doc.debt,
-            closing_debt: doc.debt,
+            customer: this._id,
+            opening_debt: this.debt,
+            closing_debt: this.debt,
             transactions: []
         })
 
@@ -156,22 +147,3 @@ User_Schema.methods.resetLoginAttempts = async function () {
 
 module.exports = mongoose.model('User', User_Schema);
 
-
-// // Update -> chỉ có admin mới có quyền update
-// exports.update = async (req, res) => {
-//     const { id, role } = req.body;
-//     const validRoles = ['admin', 'seller', 'customer'];
-//     const user = await USER.findById(id);
-//     if (!user || !validRoles.includes(role)) {
-//         res.status(400).json({
-//             message: "Người dùng/Role không tồn tại"
-//         });
-//     }
-//     user.role = role;
-//     await user.save();
-
-//     res.json({
-//         success: true,
-//         message: `Cập nhật role ${role} thành công cho user ${id}`
-//     })
-// }
