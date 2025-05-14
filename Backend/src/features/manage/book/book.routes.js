@@ -9,12 +9,14 @@ const { createBook,
 const { searchBooks } = require('../../search/search.controller');
 const { verifyToken, checkRole } = require('../../auth/middleware');
 
-router.post('/', verifyToken, checkRole('staff'), createBook);
+// Public routes
 router.get('/', getAllBooks);
 router.get('/search', searchBooks);
 router.get('/:id', getBookById);
+
+// Protected routes
+router.post('/', verifyToken, checkRole('staff'), createBook);
 router.put('/:id', verifyToken, checkRole('staff'), updateBook);
 router.delete('/:id', verifyToken, checkRole('staff'), deleteBook);
-// router.patch('/:id/stock', verifyToken, checkRole, updateStock);
 
 module.exports = router;

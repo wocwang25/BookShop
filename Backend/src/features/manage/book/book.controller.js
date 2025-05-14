@@ -9,7 +9,6 @@ exports.createBook = async (req, res) => {
     console.log(req.user)
     try {
         const bookData = req.body;
-        console.log(bookData)
         const book = new Book(bookData);
         await book.save();
 
@@ -136,7 +135,7 @@ exports.updateBook = async (req, res) => {
             if (!category) {
                 category = await Category.create({
                     name: req.body.category,
-                    book: book._id,
+                    featuredBook: book._id,
                 });
 
                 category.save();
@@ -208,19 +207,7 @@ exports.deleteBook = async (req, res) => {
             });
         }
 
-        // Update author and category counts
-        await Author.findByIdAndUpdate(book.author, {
-            $inc: { bookCount: -1 },
-            $pull: { book: book._id }
-        });
-
-        await Category.findByIdAndUpdate(book.category, {
-            $inc: { bookCount: -1 },
-            $pull: { featuredBook: book._id }
-        });
-
-        // Sử dụng findByIdAndDelete thay vì remove
-        await Book.findByIdAndDelete(req.params.id);
+        await book.remove();
 
         res.status(200).json({
             success: true,
@@ -233,4 +220,4 @@ exports.deleteBook = async (req, res) => {
             error: error.message
         });
     }
-};
+}; 

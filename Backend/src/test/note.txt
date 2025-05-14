@@ -1,0 +1,13 @@
+
+->Nên dùng transaction nếu có nhiều thao tác liên quan
+const session = await mongoose.startSession();
+session.startTransaction();
+try {
+  // ... các thao tác
+  await session.commitTransaction();
+} catch (error) {
+  await session.abortTransaction();
+  throw error;
+} finally {
+  session.endSession();
+}

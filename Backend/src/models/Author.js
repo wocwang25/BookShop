@@ -22,9 +22,13 @@ const Author_Schema = mongoose.Schema(
     }
 );
 
-Author_Schema.virtual('updateBookCount').get(function () {
-    this.bookCount = this.book.length();
-    return this.bookCount;
-})
+Author_Schema.pre('save', function (next) {
+    try {
+        this.bookCount = this.book ? this.book.length : 0;
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 module.exports = mongoose.model('Author', Author_Schema);

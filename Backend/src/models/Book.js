@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { removeVietnameseTones } = require('../utils/removeVNtones');
+const { InventoryReport } = require('../features/documents/report/report.model');
 
 const Book_Schema = mongoose.Schema(
     {
@@ -75,8 +76,6 @@ const Book_Schema = mongoose.Schema(
     }
 );
 
-const { InventoryReport } = require('../features/documents/report/report.model');
-
 // Middleware chỉ chạy khi tạo mới
 Book_Schema.pre('save', async function (next) {
     // Nếu không phải document mới, bỏ qua
@@ -97,7 +96,7 @@ Book_Schema.pre('save', async function (next) {
         if (!category) {
             category = await Category.create({
                 name: categoryName,
-                bookCount: 0
+                featuredBook: this._id
             });
         }
 
@@ -106,7 +105,7 @@ Book_Schema.pre('save', async function (next) {
         if (!author) {
             author = await Author.create({
                 name: authorName,
-                bookCount: 0
+                featuredBook: this._id
             })
         }
 
@@ -145,25 +144,75 @@ Book_Schema.pre('save', async function (next) {
         next(error);
     }
 });
+
+// Post-save middleware to update related Author and Category
 Book_Schema.post('save', async function (doc, next) {
     try {
         const Author = mongoose.model('Author');
         const Category = mongoose.model('Category');
 
-        await Category.findByIdAndUpdate(doc.category, {
-            $inc: { bookCount: 1 },
-            $addToSet: { featuredBook: doc._id }
-        });
+        // Update Category
+        if (doc.category) {
+            await Category.findByIdAndUpdate(
+                doc.category,
+                {
+                    $inc: { bookCount: 1 },
+                    $addToSet: { featuredBook: doc._id }
+                },
+                { new: true }
+            );
+        }
 
-        await Author.findByIdAndUpdate(doc.author, {
-            $inc: { bookCount: 1 },
-            $addToSet: { book: doc._id }
-        });
+        // Update Author
+        if (doc.author) {
+            await Author.findByIdAndUpdate(
+                doc.author,
+                {
+                    $inc: { bookCount: 1 },
+                    $addToSet: { book: doc._id }
+                },
+                { new: true }
+            );
+        }
 
         next();
-
     } catch (error) {
-        console.error(error);
+        console.error('Error in Book post-save middleware:', error);
+        next(error);
+    }
+});
+
+// Pre-remove middleware to update related Author and Category
+Book_Schema.pre('remove', async function (next) {
+    try {
+        const Author = mongoose.model('Author');
+        const Category = mongoose.model('Category');
+
+        // Update Category
+        if (this.category) {
+            await Category.findByIdAndUpdate(
+                this.category,
+                {
+                    $inc: { bookCount: -1 },
+                    $pull: { featuredBook: this._id }
+                }
+            );
+        }
+
+        // Update Author
+        if (this.author) {
+            await Author.findByIdAndUpdate(
+                this.author,
+                {
+                    $inc: { bookCount: -1 },
+                    $pull: { book: this._id }
+                }
+            );
+        }
+
+        next();
+    } catch (error) {
+        console.error('Error in Book pre-remove middleware:', error);
         next(error);
     }
 });
