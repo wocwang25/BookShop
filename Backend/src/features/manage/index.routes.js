@@ -4,9 +4,11 @@ const router = express.Router();
 const BookRoutes = require('./book/book.routes');
 const CategoryRoutes = require('./category/category.routes');
 const AdminRoutes = require('./admin/admin.routes')
+const ReviewRoutes = require('./review/review.routes')
 
 router.use('/book', BookRoutes);
 router.use('/category', CategoryRoutes);
 router.use('/admin', AdminRoutes);
+router.use('/review', ReviewRoutes);
 
 module.exports = router;

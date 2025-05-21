@@ -17,7 +17,6 @@ app.use(express.json());
 app.use(body_parser.json());
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 app.use('/auth', require('./src/features/auth/route'));
 app.use('/manage', require('./src/features/manage/index.routes'));

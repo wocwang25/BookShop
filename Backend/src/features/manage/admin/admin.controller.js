@@ -4,8 +4,14 @@ exports.getAllUser = async function (req, res) {
     try {
         const role = req.params.role
         console.log(role)
-        const users = await User.find({ role: role })
-            .select('name email contact_info debt status')
+        let users;
+        if (role === undefined) {
+            users = await User.find();
+        }
+        else {
+            users = await User.find({ role: role })
+                .select('name email contact_info debt status')
+        }
 
         res.json({
             status: 'success',
