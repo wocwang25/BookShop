@@ -1,6 +1,6 @@
 const { createBookImport, getBookImport } = require('./import.controller');
-const { checkRole } = require('../../auth/middleware');
-const { verifyToken } = require('../../auth/middleware');
+const { checkRole } = require('../../auth/auth.middleware');
+const { verifyToken } = require('../../auth/auth.middleware');
 const express = require('express');
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, checkRole } = require('../../auth/middleware');
+const { verifyToken, checkRole } = require('../../auth/auth.middleware');
 const { createReview, getReviewsByBook, updateReview, deleteReview } = require('./review.controller');
 
 router.post('/:id', verifyToken, createReview);

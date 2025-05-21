@@ -18,7 +18,8 @@ app.use(body_parser.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/auth', require('./src/features/auth/route'));
+app.use('/auth', require('./src/features/auth/auth.routes'));
+app.use('/cart', require('./src/features/cart/cart.routes'));
 app.use('/manage', require('./src/features/manage/index.routes'));
 app.use('/documents', require('./src/features/documents/index.routes'))
 

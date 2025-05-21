@@ -10,7 +10,7 @@ const {
     addFeaturedBook,
     removeFeaturedBook
 } = require('./category.controller');
-const { verifyToken, checkRole } = require('../../auth/middleware');
+const { verifyToken, checkRole } = require('../../auth/auth.middleware');
 
 // Public routes
 router.get('/', getAllCategories);

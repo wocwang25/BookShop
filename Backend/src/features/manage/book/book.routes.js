@@ -7,7 +7,7 @@ const { createBook,
     deleteBook,
 } = require('./book.controller');
 const { searchBooks } = require('../../search/search.controller');
-const { verifyToken, checkRole } = require('../../auth/middleware');
+const { verifyToken, checkRole } = require('../../auth/auth.middleware');
 
 // Public routes
 router.get('/', getAllBooks);

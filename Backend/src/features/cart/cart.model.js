@@ -1,39 +1,53 @@
 const mongoose = require('mongoose');
 
+const CartItemSchema = mongoose.Schema({
+    book: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book'
+    },
+    quantity: {
+        type: Number,
+        default: 1
+    },
+    cost: Number,
+    selected: {
+        type: Boolean,
+        default: false
+    }
+});
+
 const CartSchema = mongoose.Schema({
-    books: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Book'
-        }
-    ],
+    items: [CartItemSchema],
+    total_cost: {
+        type: Number,
+        default: 0
+    },
     quantity: {
         type: Number,
         default: 0
     },
-    total_cost: Number,
-    custormer: {
+    customer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }
-})
+});
 
-CartSchema.post('save', async function (doc, next) {
+CartSchema.pre('save', async function (next) {
     try {
-        await doc.populate('books');
-        doc.quantity = doc.books.length;
-
         let total = 0;
-        for (const book of doc.books) {
-            if (book.cost && book.cost.selling_price) {
-                total += book.cost.selling_price;
-            }
+        let qty = 0;
+        for (const item of this.items) {
+            // if (item.selected) {
+            total += (item.cost * item.quantity);
+            qty += item.quantity;
+            // }
         }
-        doc.total_cost = total;
-
-        await doc.save();
+        this.total_cost = total;
+        this.quantity = qty;
         next();
     } catch (error) {
         next(error);
     }
 })
+
+module.exports = mongoose.model('Cart', CartSchema)
