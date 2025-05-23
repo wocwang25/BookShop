@@ -52,33 +52,14 @@ const AuthModule = {
                 });
             }
 
-            // Kiểm tra số lần đăng nhập sai
-            if (user.loginAttempts >= 5 && user.lockUntil > Date.now()) {
-                const remainingTime = Math.ceil((user.lockUntil - Date.now()) / 1000);
-                return res.status(429).json({
-                    status: "error",
-                    message: `Your account is temporarily locked for ${remainingTime}s. Please wait before attempting to log in again.`
-                });
-            }
-
             // So sánh mật khẩu
             const isMatch = await user.comparePassword(password);
             if (!isMatch) {
-                user.loginAttempts++;
-                if (user.loginAttempts >= 5) {
-                    user.lockUntil = Date.now() + 5 * 60 * 1000; // Khoá 5 phút
-                }
-
-                await user.save();
-
                 return res.status(401).json({
                     status: "error",
                     message: "Invalid login information",
                     remainingAttempts: 5 - user.loginAttempts
                 });
-            } else {
-                user.loginAttempts = 0;
-                await user.save();
             }
 
             // Tạo token
@@ -157,15 +138,10 @@ const AuthModule = {
 
             const isMatch = await user.comparePassword(currentPassword);
             if (!isMatch) {
-                // Sai mật khẩu thì tăng loginAttempts
-                await user.incrementLoginAttempts();
                 return res.status(401).json({
                     status: "error",
                     message: "Incorrect password!"
                 });
-            } else {
-                // Nhập mật khẩu đúng thì reset loginAttempts
-                await user.resetLoginAttempts();
             }
 
             // Đổi mật khẩu mới
@@ -177,7 +153,7 @@ const AuthModule = {
                 message: "Change password successfully!"
             });
         } catch (error) {
-            res.status(400).json({
+            res.status(500).json({
                 status: "error",
                 message: error.message
             });
