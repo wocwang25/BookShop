@@ -8,12 +8,27 @@ const Author_Schema = mongoose.Schema(
             trim: true,
             index: true
         },
-        bio: String,
+        book: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Book'
+        }],
+        bookCount: {
+            type: Number,
+            default: 0
+        }
     },
     {
-        timestamps: true
+        Timestamp: true
     }
 );
 
+Author_Schema.pre('save', function (next) {
+    try {
+        this.bookCount = this.book ? this.book.length : 0;
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 module.exports = mongoose.model('Author', Author_Schema);
