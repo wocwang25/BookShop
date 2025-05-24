@@ -3,9 +3,9 @@ const router = express.Router();
 const AuthService = require('../services/auth.service');
 const RuleController = require('../controllers/rule.controller');
 
-router.post('/', RuleController.createOrUpdateRule);
 router.get('/', RuleController.getAllRules);
 router.get('/:code', RuleController.getRuleByCode);
-router.delete('/:code', RuleController.deleteRuleByCode);
+router.post('/', AuthService.verifyToken, AuthService.checkRole('admin'), RuleController.createOrUpdateRule);
+router.delete('/:code', AuthService.verifyToken, AuthService.checkRole('admin'), RuleController.deleteRuleByCode);
 
 module.exports = router;
