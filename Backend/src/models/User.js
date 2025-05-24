@@ -29,29 +29,13 @@ const User_Schema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ['admin', 'staff', 'customer'],
-            default: 'customer',
+            enum: ['admin', 'staff'],
+            default: 'staff',
             required: true
         },
-        contact_info: {
-            phone: {
-                type: String,
-                unique: false
-            },
-            address: {
-                type: String,
-                unique: false
-            },
-            // default: "You've not updated yet"
-        },
-        debt: {
-            type: Number,
-            default: 0
-        },
-        status: {
-            type: String,
-            enum: ['active', 'inactive'],
-            default: 'active'
+        is_active: {
+            type: Boolean,
+            default: true
         },
         loginAttempts: {
             type: Number,

@@ -37,7 +37,7 @@ const RuleService = {
         return await Rule.find();
     },
     async findRuleByCode(code) {
-        return await Rule.find({ code });
+        return await Rule.findOne({ code });
     },
     async findAndDeleteRule(code) {
         const rule = await Rule.findOne({ code });

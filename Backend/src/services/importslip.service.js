@@ -1,32 +1,40 @@
 const BookImportSlip = require('../models/BookImportSlip');
 const Book = require('../models/Book');
+const Rule = require('../models/Rule')
 const fs = require("fs");
 const csv = require('csv-parser');
 
 const BookImportService = {
     async createImportSlip({ userId, items }) {
         if (!items || items.length === 0) throw new Error("No items provided");
+        const rule = await Rule.findOne({ code: "QD1" });
 
         const session = await BookImportSlip.startSession();
         session.startTransaction();
 
         try {
             // Cập nhật tồn kho từng sách
+            let slipItems = []
             for (const item of items) {
                 const book = await Book.findById(item.bookId).session(session);
-                console.log(book)
                 if (!book) {
                     throw new Error(`Book not found: ${item.bookId}`);
                 }
+
+                //Quy định 1
+                if (item.quantity < rule.ruleValue.min_import && book.currentStock > rule.ruleValue.min_stock) {
+                    continue;
+                }
+
                 book.currentStock += item.quantity;
                 await book.save({ session });
-            }
 
-            const slipItems = items.map(item => ({
-                book: item.bookId, // đây là trường required
-                quantity: item.quantity,
-                unitImportPrice: item.unitImportPrice
-            }));
+                slipItems.push({
+                    book: item.bookId,
+                    quantity: item.quantity,
+                    unitImportPrice: item.unitImportPrice
+                });
+            }
 
             const importSlip = await new BookImportSlip({
                 user: userId,
@@ -61,6 +69,7 @@ const BookImportService = {
         const session = await BookImportSlip.startSession();
         session.startTransaction();
         try {
+            const rule = await Rule.findOne({ code: "QD1" });
             const rows = await parseCSV(filePath);
             console.log(rows)
             const items = [];
@@ -81,6 +90,11 @@ const BookImportService = {
                     throw new Error(`Book ${title} chưa có trong cơ sở dữ liệu`)
                 }
 
+                //Quy định 1
+                if (quantity < rule.ruleValue.min_import && book.currentStock > rule.ruleValue.min_stock) {
+                    continue;
+                }
+
                 // Cập nhật stock (nếu muốn tracking tồn kho luôn)
                 book.currentStock += quantity;
                 await book.save({ session });
@@ -98,7 +112,7 @@ const BookImportService = {
 
             const slip = new BookImportSlip({
                 user: userId,
-                items,
+                items: items,
                 totalItem: items.reduce((sum, i) => sum + i.quantity, 0),
             });
 
@@ -115,8 +129,6 @@ const BookImportService = {
         }
 
     },
-
-
 };
 
 module.exports = BookImportService;
