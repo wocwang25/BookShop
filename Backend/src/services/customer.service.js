@@ -11,6 +11,14 @@ const CustomerService = {
             await customer.save();
         }
         return customer;
+    },
+    async findAndUpdateCustomer(name, updateData) {
+        // Tìm khách hàng theo tên và cập nhật thông tin
+        const customer = await Customer.findOneAndUpdate(
+            { name },
+            { $set: updateData }
+        );
+        return customer;
     }
 }
 

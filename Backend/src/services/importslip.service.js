@@ -3,13 +3,14 @@ const Book = require('../models/Book');
 const Rule = require('../models/Rule')
 const fs = require("fs");
 const csv = require('csv-parser');
+const mongoose = require('mongoose');
 
 const BookImportService = {
     async createImportSlip({ userId, items }) {
         if (!items || items.length === 0) throw new Error("No items provided");
         const rule = await Rule.findOne({ code: "QD1" });
 
-        const session = await BookImportSlip.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
@@ -66,7 +67,7 @@ const BookImportService = {
             });
         }
 
-        const session = await BookImportSlip.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
         try {
             const rule = await Rule.findOne({ code: "QD1" });

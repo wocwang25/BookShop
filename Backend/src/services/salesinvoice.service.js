@@ -2,6 +2,8 @@ const SalesInvoice = require('../models/SalesInvoice');
 const Rule = require('../models/Rule')
 const Book = require('../models/Book');
 const CustomerService = require('./customer.service');
+const mongoose = require('mongoose');
+
 
 const SalesInvoiceService = {
     async createSalesInvoice(userId, customer_name, items) {
@@ -11,7 +13,7 @@ const SalesInvoiceService = {
         const minStock = rule?.ruleValue?.min_stock;
         const maxDebt = rule?.ruleValue?.max_debt;
 
-        const session = await SalesInvoice.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
