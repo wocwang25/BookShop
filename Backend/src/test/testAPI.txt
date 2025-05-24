@@ -54,3 +54,6 @@
     }
   ]
 }
+
+
+{min_import, min_stock}, {max_debt, min_stock}, {null}

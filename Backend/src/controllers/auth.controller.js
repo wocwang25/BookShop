@@ -1,7 +1,7 @@
-const USER = require('../../models/User');
+const USER = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-const AuthModule = {
+const AuthController = {
     signup: async (req, res) => {
         const { name, username, email, password } = req.body;
         try {
@@ -185,4 +185,4 @@ const AuthModule = {
     }
 }
 
-module.exports = AuthModule;
+module.exports = AuthController;
