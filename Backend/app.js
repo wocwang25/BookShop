@@ -19,6 +19,7 @@ app.use(body_parser.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', require('./src/routes/auth.routes'));
+app.use('/api/customer', require('./src/routes/customer.routes'));
 app.use('/api/rules', require('./src/routes/rule.routes'))
 app.use('/api/books', require('./src/routes/book.routes'))
 app.use('/api/import-slip', require('./src/routes/importslip.routes'))
