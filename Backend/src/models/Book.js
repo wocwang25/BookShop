@@ -30,4 +30,8 @@ const Book_Schema = mongoose.Schema(
     }
 );
 
+Book_Schema.index({ title: 1 });
+Book_Schema.index({ author: 1 });
+Book_Schema.index({ category: 1 });
+
 module.exports = mongoose.model('Book', Book_Schema);

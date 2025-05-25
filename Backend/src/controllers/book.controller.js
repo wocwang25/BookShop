@@ -20,8 +20,17 @@ const BookController = {
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
-    }
+    },
 
+    async searchBook(req, res) {
+        try {
+            const { keyword } = req.body;
+            const results = await BookService.searchBook({ keyword });
+            res.status(201).json(results);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = BookController;

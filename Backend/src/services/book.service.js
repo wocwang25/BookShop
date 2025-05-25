@@ -58,6 +58,7 @@ const BookService = {
 
         return book;
     },
+
     async importFromCSV(filePath) {
         const rows = [];
         const results = [];
@@ -82,8 +83,55 @@ const BookService = {
                 })
                 .on("error", reject);
         });
-    }
+    },
 
+    async searchBook({ keyword = '', page = 1, limit = 10 }) {
+        console.log(keyword)
+        const regex = new RegExp(keyword, 'i'); // tìm kiếm không phân biệt hoa thường
+
+        // 1. Tìm authorId theo tên
+        const authors = await Author.find({ name: regex }).select('_id');
+        const authorIds = authors.map(a => a._id);
+
+        // 2. Tìm categoryId theo tên
+        const categories = await Category.find({ name: regex }).select('_id');
+        const categoryIds = categories.map(c => c._id);
+
+        // 3. Xây dựng filter cho Book
+        const filter = {
+            $or: [
+                { title: regex },
+                { author: { $in: authorIds } },
+                { category: { $in: categoryIds } }
+            ]
+        };
+
+        const skip = (page - 1) * limit;
+
+        const books = await Book.find(filter)
+            .select('title currentStock')
+            .populate({
+                path: 'author',
+                select: 'name'
+            })
+            .populate({
+                path: 'category',
+                select: 'name'
+            })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Book.countDocuments(filter);
+
+        return {
+            books,
+            pagination: {
+                page,
+                limit,
+                total
+            }
+        };
+    }
 }
 
 module.exports = BookService;
