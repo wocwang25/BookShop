@@ -26,5 +26,6 @@ app.use('/api/import-slip', require('./src/routes/importslip.routes'))
 app.use('/api/sales-invoice', require('./src/routes/salesinvoice.routes'))
 app.use('/api/payment-receipt', require('./src/routes/receipt.routes'))
 app.use('/api/reports', require('./src/routes/report.routes'))
+app.use('/api/favourite', require('./src/routes/favourite.routes'))
 
 module.exports = app; // Export app để server.js sử dụng

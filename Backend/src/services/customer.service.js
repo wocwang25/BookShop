@@ -64,8 +64,7 @@ const CustomerService = {
         }
 
         return { message: 'Cập nhật thông tin khách hàng thành công' };
-    }
-    ,
+    },
 
     async registerCustomerAccount(name, email, password) {
         const customer = await this.findOrCreateCustomer(name);
@@ -101,7 +100,7 @@ const CustomerService = {
                 customerId: account.customer._id
             };
 
-            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15m' });
+            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
             const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
             account.tokens.push({ token: refreshToken });
