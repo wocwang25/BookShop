@@ -18,6 +18,9 @@ const CustomerService = {
             { name },
             { $set: updateData }
         );
+        if (!customer) {
+            throw new Error("Không có dữ liệu khách hàng");
+        }
         return customer;
     }
 }

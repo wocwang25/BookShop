@@ -23,10 +23,10 @@ const ImportItem = mongoose.Schema(
 
 const BookImportSlip = mongoose.Schema(
     {
-        importDate: {
-            type: Date,
-            default: Date.now
-        },
+        // importDate: {
+        //     type: Date,
+        //     default: Date.now
+        // },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
@@ -37,6 +37,9 @@ const BookImportSlip = mongoose.Schema(
             default: 0
         },
         items: [ImportItem]
+    },
+    {
+        timestamps: true
     }
 );
 

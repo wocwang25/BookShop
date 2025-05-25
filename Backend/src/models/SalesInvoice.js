@@ -26,10 +26,10 @@ const SalesItem = mongoose.Schema({
 
 const SalesInvoice = mongoose.Schema(
     {
-        invoiceDate: {
-            type: Date,
-            default: Date.now
-        },
+        // invoiceDate: {
+        //     type: Date,
+        //     default: Date.now
+        // },
         customer: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Customer',
