@@ -21,3 +21,6 @@ const Custormer_Schema = mongoose.Schema(
 );
 
 module.exports = mongoose.model('Customer', Custormer_Schema);
+
+
+

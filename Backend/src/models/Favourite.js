@@ -21,9 +21,6 @@ const FavouriteBook = mongoose.Schema(
             unique: true
         },
         items: [FavouriteItem]
-    },
-    {
-        unique: true
     }
 );
 

@@ -54,12 +54,14 @@ const AuthService = {
         }
     },
 
-    checkRole: (role) => {
+    checkRole: (roles) => {
         return async (req, res, next) => {
-            if (req.user?.role !== role) {
+            // roles có thể là string hoặc array
+            const allowRoles = Array.isArray(roles) ? roles : [roles];
+            if (!allowRoles.includes(req.user?.role)) {
                 return res.status(400).json({
                     status: "false",
-                    message: `Tài khoản không đủ thẩm quyền để thực hiện hành động này (yêu cầu role: ${role})`
+                    message: `Tài khoản không đủ thẩm quyền để thực hiện hành động này (yêu cầu role: ${allowRoles.join(', ')})`
                 });
             }
             next();
