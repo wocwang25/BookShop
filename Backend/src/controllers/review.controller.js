@@ -40,17 +40,15 @@ const ReviewController = {
     async deleteReview(req, res) {
         try {
             const userId = req.user.id;
-            const bookId = req.params.id;
+            const reviewId = req.params.id;
             const role = req.user.role;
 
-            const results = await ReviewService.deleteReview(userId, bookId, role);
+            const results = await ReviewService.deleteReview(userId, reviewId, role);
             res.json(results);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 }
-
-module.exports = ReviewController;
 
 module.exports = ReviewController;

@@ -1,11 +1,11 @@
-const CustomerAccount = require('../models/CustomerAccount');
+const User = require('../models/User');
 const FavouriteBook = require('../models/Favourite');
 const Book = require('../models/Book');
 
 const FavouriteService = {
     async addBookToFavourite(customerId, bookId) {
         try {
-            const customer = await CustomerAccount.findById(customerId);
+            const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Dữ liệu khách hàng không hợp lệ");
             }
@@ -42,7 +42,7 @@ const FavouriteService = {
 
     async removeBookFromFavourite(customerId, bookId) {
         try {
-            const customer = await CustomerAccount.findById(customerId);
+            const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Dữ liệu khách hàng không hợp lệ");
             }
@@ -79,7 +79,7 @@ const FavouriteService = {
 
     async getBookFavouriteList(customerId) {
         try {
-            const customer = await CustomerAccount.findById(customerId);
+            const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Dữ liệu khách hàng không hợp lệ");
             }

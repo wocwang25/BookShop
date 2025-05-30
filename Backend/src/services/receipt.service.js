@@ -16,7 +16,6 @@ const PaymentReceiptService = {
         session.startTransaction();
 
         try {
-
             const customer = await CustomerService.findAndUpdateCustomer(customer_name, customer_info);
 
             if (!paymentAmount) {

@@ -1,29 +1,79 @@
-const USER = require('../models/User');
+const User = require('../models/User');
+const Customer = require('../models/Customer');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const AuthController = {
     signup: async (req, res) => {
         const { name, username, email, password } = req.body;
+
+        if (!name || !username || !email || !password) {
+            return res.status(400).json({
+                status: "error",
+                message: "Vui lòng điền đầy đủ Tên, Tên đăng nhập, Email và Mật khẩu."
+            });
+        }
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
         try {
-            const user = new USER({ name, username, email, password });
-            await user.save();
+            const existingUser = await User.findOne({
+                $or: [{ username: username }, { email: email }]
+            }).session(session);
+
+            if (existingUser) {
+                throw new Error("Tên đăng nhập hoặc Email đã tồn tại. Vui lòng chọn cái khác.");
+            }
+
+            let customerProfile = await Customer.findOne({ name: name, email: email });
+            console.log(customerProfile)
+
+            if (!customerProfile) {
+                customerProfile = await new Customer({
+                    name: name,
+                    email: email
+                });
+                await customerProfile.save({ session });
+            }
+
+            const user = await new User({
+                name,
+                username,
+                email,
+                password,
+                customerProfile: customerProfile._id
+            });
+            await user.save({ session });
+
+            await session.commitTransaction();
 
             const userResponse = user.toObject();
             delete userResponse.password;
 
-            console.log(user);
-            res.status(200).json({
+            res.status(201).json({
                 status: "success",
-                message: "User registers successfully",
+                message: "Đăng ký tài khoản khách hàng thành công!",
                 data: userResponse
             });
-        }
-        catch (error) {
-            console.error("Login Error:", error);
-            res.status(401).json({
+
+        } catch (error) {
+            await session.abortTransaction();
+            console.error("Signup Error:", error);
+
+            if (error.code === 11000) {
+                return res.status(409).json({
+                    status: "error",
+                    message: "Tên đăng nhập hoặc Email đã tồn tại. Vui lòng chọn cái khác."
+                });
+            }
+
+            res.status(400).json({
                 status: "error",
-                message: error.message
+                message: error.message || "Đã xảy ra lỗi trong quá trình đăng ký."
             });
+        } finally {
+            session.endSession();
         }
     },
 
@@ -38,7 +88,7 @@ const AuthController = {
 
         try {
             // Tìm user bằng username hoặc email
-            const user = await USER.findOne({
+            const user = await User.findOne({
                 $or: [
                     { username: identifier },
                     { email: identifier }
@@ -83,7 +133,7 @@ const AuthController = {
 
             // Tạo token
             const accessToken = jwt.sign(
-                { id: user._id, username: user.username, role: user.role },
+                { id: user._id, username: user.username, role: user.role, customerProfileId: user.customerProfile },
                 process.env.JWT_SECRET,
                 { expiresIn: '1d' }
             );
@@ -111,6 +161,7 @@ const AuthController = {
                     id: user._id,
                     username: user.username,
                     role: user.role,
+                    customerProfileId: user.customerProfile
                 }
             });
         } catch (error) {
@@ -125,7 +176,7 @@ const AuthController = {
         const refreshToken = req.cookies.refreshToken;
         console.log(refreshToken);
         if (refreshToken) {
-            const user = await USER.findOne({ "tokens.token": refreshToken });
+            const user = await User.findOne({ "tokens.token": refreshToken });
             if (user) {
                 user.tokens = user.tokens.filter(t => t.token !== refreshToken);
                 await user.save();
@@ -143,7 +194,7 @@ const AuthController = {
             const { currentPassword, newPassword } = req.body;
 
             // Tìm user theo id và lấy cả password
-            const user = await USER.findById(userId).select('+password');
+            const user = await User.findById(userId).select('+password');
             console.log(user.password);
             console.log(currentPassword);
 

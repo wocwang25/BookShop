@@ -29,9 +29,15 @@ const User_Schema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: ['admin', 'staff'],
-            default: 'staff',
+            enum: ['admin', 'staff', 'customer'],
+            default: 'customer',
             required: true
+        },
+        customerProfile: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Customer',
+            unique: true,
+            sparse: true
         },
         is_active: {
             type: Boolean,
@@ -57,7 +63,7 @@ const User_Schema = new mongoose.Schema(
         ]
     },
     {
-        timestamps: true,
+        timestamps: true
     }
 )
 

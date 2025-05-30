@@ -39,7 +39,7 @@ const AuthService = {
             }
 
             const accessToken = jwt.sign(
-                { id: user._id, username: user.username, role: user.role },
+                { id: user._id, username: user.username, role: user.role, customerProfileId: user.customerProfile },
                 process.env.JWT_SECRET,
                 { expiresIn: '15m' }
             );

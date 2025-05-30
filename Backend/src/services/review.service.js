@@ -1,10 +1,10 @@
 const Book = require('../models/Book');
 const Review = require('../models/Review');
-const CustomerAccount = require('../models/CustomerAccount');
+const User = require('../models/User');
 const ReviewService = {
     async createReview(customerId, bookId, string, rating) {
         try {
-            const customer = await CustomerAccount.findById(customerId);
+            const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Không có dữ liệu khách hàng");
             }
@@ -42,7 +42,7 @@ const ReviewService = {
             const reviews = await Review.find({ book: bookId })
                 .populate({
                     path: 'reviewer',
-                    select: 'email'
+                    select: 'name email'
                 })
                 .select('content rating')
 
@@ -54,7 +54,7 @@ const ReviewService = {
 
     async updateReview(customerId, bookId, content, rating) {
         try {
-            const customer = await CustomerAccount.findById(customerId);
+            const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Không có dữ liệu khách hàng");
             }
@@ -79,24 +79,19 @@ const ReviewService = {
         }
     },
 
-    async deleteReview(requesterId, bookId, role) {
+    async deleteReview(requesterId, reviewId, role) {
         try {
-            // Kiểm tra sách tồn tại
-            const book = await Book.findById(bookId);
-            if (!book) {
-                throw new Error("Không có dữ liệu sách");
+            const review = await Review.findById(reviewId);
+            if (!review) {
+                throw new Error("Không tìm thấy review");
             }
 
-            let filter = { book: bookId };
-            if (role !== 'admin') {
-                // Nếu không phải admin, chỉ cho phép xóa review của chính mình
-                filter.reviewer = requesterId;
+            // Nếu không phải admin, chỉ cho phép xóa review của chính mình
+            if (role !== 'admin' && review.reviewer.toString() !== requesterId) {
+                throw new Error("Bạn không có quyền xóa review này");
             }
 
-            const result = await Review.deleteOne(filter);
-            if (result.deletedCount === 0) {
-                throw new Error("Không tìm thấy review để xóa hoặc bạn không có quyền");
-            }
+            await Review.deleteOne({ _id: reviewId });
 
             return { message: "Xóa review thành công" };
         } catch (error) {
