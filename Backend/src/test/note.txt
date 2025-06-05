@@ -12,3 +12,21 @@ try {
   session.endSession();
 }
 
+
+Offline:
+-> Tạo hóa đơn -> tạo phiếu thu tiền -> đưa hàng
+-> Tạo hóa đơn -> tạo phiếu thu tiền -> đưa hàng thuê
+
+Online:
+-> Thêm vào giỏ hàng
+  -> chọn mua -> chọn phương thức thanh toán (thanh toán khi nhận hàng, thanh toán online(momo)) 
+      -> nhân viên xác nhận -> in hóa đơn -> phiếu thu tiền -> dán lên đơn hàng gửi đi (nếu thanh toán online thì phiếu thu = 0)
+  -> chọn thuê -> chọn phương thức thanh toán (thanh toán khi nhận hàng, thanh toán online(momo)) 
+      -> nhân viên xác nhận -> in hóa đơn -> phiếu thu tiền -> dán lên đơn hàng gửi đi (nếu thanh toán online thì phiếu thu = 0)
+
+*-> Khi mua thì thanh toán bằng 
+
+
+
+mình đang muốn giải bài toán cho thuê sách, khi mà nhà sách đã có chức năng tạo hóa đơn, tạo phiếu thu tiền, tạo báo cáo tồn kho sách và công nợ khách hàng hàng tháng.
+Ý tưởng đặt ra ở đây là khi lập hóa đơn thuê/mua sách thì cộng vào công nợ của khách hàng, khi lập phiếu thu tiền (model PaymentReceipt) thì tiền được trừ vào công nợ của khách hàng

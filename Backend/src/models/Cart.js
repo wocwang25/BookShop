@@ -10,9 +10,21 @@ const CartItem = mongoose.Schema(
             type: Number,
             default: 1
         },
-        type: ['buy', 'rent'],
-        priceForBuy: Number,
-        priceForRent: Number
+        type: {
+            type: String,
+            enum: ['buy', 'rent'],
+            default: 'buy'
+        },
+        price: {
+            type: Number
+        },
+        rentDuration: {
+            type: Number,
+            default: 10
+        }
+    },
+    {
+        _id: false
     }
 );
 
@@ -20,7 +32,16 @@ const Cart = mongoose.Schema(
     {
         customer: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Customer'
-        }
+            ref: 'User',
+            required: true,
+            unique: true
+        },
+        items: [CartItem],
+
+    },
+    {
+        timestamps: true
     }
 )
+
+module.exports = mongoose.model('Cart', Cart);

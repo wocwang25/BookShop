@@ -3,8 +3,6 @@ const Customer = require('../models/Customer')
 const BookImportSlip = require('../models/BookImportSlip')
 const SalesInvoice = require('../models/SalesInvoice')
 const PaymentReceipt = require('../models/PaymentReceipt')
-const mongoose = require('mongoose');
-const moment = require('moment');
 
 const ReportService = {
     async getMonthlyInventoryReport(month, year) {

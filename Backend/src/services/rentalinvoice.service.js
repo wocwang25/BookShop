@@ -1,12 +1,11 @@
-const SalesInvoice = require('../models/SalesInvoice');
+const RentalInvoice = require('../models/RentalInvoice');
 const Rule = require('../models/Rule')
 const Book = require('../models/Book');
 const CustomerService = require('./customer.service');
 const mongoose = require('mongoose');
 
-
-const SalesInvoiceService = {
-    async createSalesInvoice(userId, customer_name, items) {
+const RentalService = {
+    async createRentalInvoice(userId, customer_name, items) {
         if (!items || items.length === 0) throw new Error("No items provided");
 
         const rule = await Rule.findOne({ code: "QD2" });
@@ -78,4 +77,4 @@ const SalesInvoiceService = {
     }
 }
 
-module.exports = SalesInvoiceService;
+module.exports = RentalService

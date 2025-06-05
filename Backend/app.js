@@ -28,5 +28,6 @@ app.use('/api/payment-receipt', require('./src/routes/receipt.routes'))
 app.use('/api/reports', require('./src/routes/report.routes'))
 app.use('/api/favourite', require('./src/routes/favourite.routes'))
 app.use('/api/reviews', require('./src/routes/review.routes'))
+app.use('/api/cart', require('./src/routes/cart.routes'))
 
 module.exports = app; // Export app để server.js sử dụng

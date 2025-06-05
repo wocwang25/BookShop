@@ -16,6 +16,11 @@ const PaymentReceipt = mongoose.Schema(
             type: Number,
             required: true
         },
+        type: {
+            type: String,
+            enum: ['BUY', 'RENT'],
+            default: 'BUY'
+        },
         note: String
     },
     {
