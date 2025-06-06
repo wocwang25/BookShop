@@ -27,7 +27,7 @@ const AuthController = {
             }
 
             let customerProfile = await Customer.findOne({ name: name, email: email });
-            console.log(customerProfile)
+            // console.log(customerProfile)
 
             if (!customerProfile) {
                 customerProfile = await new Customer({

@@ -12,13 +12,14 @@ const RentalItem = mongoose.Schema(
             ref: 'Category',
             required: true
         },
-        quantity: {
-            type: Number,
+        bookCopy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'BookCopy',
             required: true
         },
-        rentalPrice: {
+        quantity: {
             type: Number,
-            required: true
+            default: 1
         }
     }, {
     _id: false
@@ -51,8 +52,8 @@ const RentalInvoice = mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['active', 'overdue', 'returned'],
-            default: active
+            enum: ['active', 'returned'],
+            default: 'active'
         },
         totalAmount: Number,
         items: [RentalItem],

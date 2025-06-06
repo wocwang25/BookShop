@@ -3,6 +3,7 @@ const Rule = require('../models/Rule')
 const Book = require('../models/Book');
 const CustomerService = require('./customer.service');
 const mongoose = require('mongoose');
+const BookCopy = require('../models/BookCopy');
 
 
 const SalesInvoiceService = {
@@ -22,44 +23,61 @@ const SalesInvoiceService = {
                 throw new Error(`Customer debt (${customer.debt}) exceeds the allowed limit (${maxDebt})`);
             }
 
+            const salesInvoice = new SalesInvoice({
+                customer: customer._id,
+                user: userId
+            });
+
             let invoiceItems = [];
             let totalAmount = 0;
             for (const item of items) {
-                const { title, quantity, unitPrice } = item;
+                const { title, quantity } = item;
 
                 const book = await Book.findOne({ title }).session(session);
                 if (!book) throw new Error(`Book "${title}" not found`);
 
-                if (book.currentStock < quantity) {
-                    throw new Error(`Not enough stock for "${title}". Current: ${book.currentStock}, Required: ${quantity}`);
+                const availableCopies = await BookCopy.countDocuments(
+                    {
+                        book: book._id,
+                        status: 'available'
+                    }
+                );
+
+                if (availableCopies < quantity) {
+                    throw new Error(`Not enough stock for "${title}". Current: ${availableCopies}, Required: ${quantity}`);
                 }
 
-                if ((book.currentStock - quantity) < minStock) {
+                if ((availableCopies - quantity) < minStock) {
                     throw new Error(`Selling "${title}" would reduce stock below minimum (${minStock})`);
                 }
 
-                // Cập nhật tồn kho
-                book.currentStock -= quantity;
-                await book.save({ session });
+                const copiesToSell = await BookCopy.find({ book: book._id, status: 'available' }).limit(item.quantity).session(session);
+
+                if (copiesToSell.length < quantity) {
+                    throw new Error(`Not enough stock for "${title}". Current: ${copiesToSell.length}, Required: ${quantity}`);
+                }
+
+                // Đánh dấu từng bản copy là 'sold' và gán saleInvoiceId
+                for (const copy of copiesToSell) {
+                    copy.status = 'sold';
+                    copy.saleInvoiceId = salesInvoice._id;
+                    await copy.save({ session });
+                }
 
                 invoiceItems.push({
                     book: book._id,
                     category: book.category,
                     quantity: quantity,
-                    unitPrice: unitPrice
+                    unitPrice: book.price
                 });
 
-                totalAmount += quantity * unitPrice;
+                totalAmount += quantity * book.price;
             }
 
-            const slip = new SalesInvoice({
-                customer: customer._id,
-                user: userId,
-                items: invoiceItems,
-                totalAmount: totalAmount
-            });
+            salesInvoice.items = invoiceItems;
+            salesInvoice.totalAmount = totalAmount;
 
-            await slip.save({ session });
+            await salesInvoice.save({ session });
 
             // Cập nhật nợ
             customer.debt += totalAmount;
@@ -68,7 +86,7 @@ const SalesInvoiceService = {
             await session.commitTransaction();
             session.endSession();
 
-            return { slip, success: true };
+            return { salesInvoice: salesInvoice };
 
         } catch (error) {
             await session.abortTransaction();

@@ -23,10 +23,6 @@ const ImportItem = mongoose.Schema(
 
 const BookImportSlip = mongoose.Schema(
     {
-        // importDate: {
-        //     type: Date,
-        //     default: Date.now
-        // },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

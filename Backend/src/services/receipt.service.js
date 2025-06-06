@@ -4,7 +4,7 @@ const PaymentReceipt = require('../models/PaymentReceipt');
 const mongoose = require('mongoose');
 
 const PaymentReceiptService = {
-    async createPaymentReceipt(userId, data) {
+    async createPaymentReceipt_Buy(userId, data) {
         let { customer_name, customer_info, paymentAmount, note } = data;
 
         if (!customer_name || paymentAmount <= 0) {
