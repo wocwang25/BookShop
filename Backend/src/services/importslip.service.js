@@ -8,6 +8,31 @@ const csv = require('csv-parser');
 const mongoose = require('mongoose');
 
 const BookImportService = {
+    async getImportSlipList({ page = 1, limit = 20 } = {}) {
+        const skips = (page - 1) * limit;
+        const slips = await BookImportSlip.find({})
+            .populate({
+                path: 'user',
+                select: 'name email'
+            })
+            .populate({
+                path: 'items.book',
+                select: 'title author category'
+            })
+            .sort({ createdAt: -1 })
+            .skip(skips)
+            .limit(limit)
+            .lean();
+
+        const total = await BookImportSlip.countDocuments({});
+        return {
+            total,
+            page,
+            limit,
+            slips
+        };
+    },
+
     async createImportSlip({ userId, items }) {
         if (!items || items.length === 0) throw new Error("No items provided");
         const rule = await Rule.findOne({ code: "QD1" });
@@ -61,7 +86,7 @@ const BookImportService = {
                         book: item.bookId,
                         copyIdentifier: copyIdentifier,
                         status: 'available',
-                        importedBySlip: slip._id
+                        importedBySlip: importSlip._id
                     });
                     await copy.save({ session });
                 }

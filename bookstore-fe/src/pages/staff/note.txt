@@ -1,0 +1,236 @@
+Logic nhập sách vào kho của staff khác với nhập sách vào database của admin. Đây là service xử lí bên backend:
+const BookImportSlip = require('../models/BookImportSlip');
+const Book = require('../models/Book');
+const BookCopy = require('../models/BookCopy');
+const Rule = require('../models/Rule');
+const { generateCopyIdentifier } = require('../utils/bookCopyIdentifierGenerator');
+const fs = require("fs");
+const csv = require('csv-parser');
+const mongoose = require('mongoose');
+
+const BookImportService = {
+    async getImportSlipList({ page = 1, limit = 20 } = {}) {
+        const skips = (page - 1) * limit;
+        const slips = await BookImportSlip.find({})
+            .populate({
+                path: 'user',
+                select: 'name username email'
+            })
+            .populate({
+                path: 'items.book',
+                select: 'title author category'
+            })
+            .sort({ createdAt: -1 })
+            .skip(skips)
+            .limit(limit)
+            .lean();
+
+        const total = await BookImportSlip.countDocuments({});
+        return {
+            total,
+            page,
+            limit,
+            slips
+        };
+    },
+
+    async createImportSlip({ userId, items }) {
+        if (!items || items.length === 0) throw new Error("No items provided");
+        const rule = await Rule.findOne({ code: "QD1" });
+        const min_import = rule.ruleValue.min_import;
+        const min_stock = rule.ruleValue.min_stock;
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const importSlip = new BookImportSlip({
+                user: userId
+            });
+
+            // Cập nhật tồn kho từng sách
+            let slipItems = []
+            for (const item of items) {
+                const book = await Book.findById(item.bookId).session(session)
+                    .populate({
+                        path: 'author',
+                        select: 'name'
+                    })
+                    .select('title');
+                if (!book) {
+                    throw new Error(`Book not found: ${item.bookId}`);
+                }
+
+                //Quy định 1 về số lượng nhập tối thiểu
+                if (item.quantity < min_import) {
+                    continue;
+                }
+
+                const availableCopies = await BookCopy.countDocuments(
+                    { book: item.bookId, status: 'available' },
+                    { session }
+                );
+
+                //Quy định 1 về số lượng sách tối đa
+                if (availableCopies >= min_stock) {
+                    continue;
+                }
+
+                for (let index = 0; index < item.quantity; index++) {
+                    const copyIdentifier = await generateCopyIdentifier(item.bookId, book.title, book.author.name, session);
+
+                    // console.log('copyIdentifier:', copyIdentifier, 'book:', item.bookId, 'author:', book.author.name);
+                    if (!copyIdentifier || !item.bookId) {
+                        throw new Error('Thiếu copyIdentifier hoặc bookId khi tạo BookCopy');
+                    }
+                    const copy = await new BookCopy({
+                        book: item.bookId,
+                        copyIdentifier: copyIdentifier,
+                        status: 'available',
+                        importedBySlip: importSlip._id
+                    });
+                    await copy.save({ session });
+                }
+
+                slipItems.push({
+                    book: item.bookId,
+                    quantity: item.quantity,
+                    unitImportPrice: item.unitImportPrice,
+                });
+            }
+
+            importSlip.items = items;
+            importSlip.totalItem = items.reduce((sum, i) => sum + i.quantity, 0);
+
+            await importSlip.save({ session });
+            await session.commitTransaction();
+            session.endSession();
+
+            return importSlip;
+        } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
+            throw error;
+        }
+    },
+
+    async createImportSlipFromCSV(filePath, userId) {
+
+        function parseCSV(filePath) {
+            return new Promise((resolve, reject) => {
+                const results = [];
+                fs.createReadStream(filePath)
+                    .pipe(csv())
+                    .on("data", (data) => results.push(data))
+                    .on("end", () => resolve(results))
+                    .on("error", reject);
+            });
+        }
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        try {
+            const rule = await Rule.findOne({ code: "QD1" });
+            const min_import = rule.ruleValue.min_import;
+            const min_stock = rule.ruleValue.min_stock;
+
+            const rows = await parseCSV(filePath);
+            console.log(rows)
+            const items = [];
+            const errors = [];
+
+            const slip = new BookImportSlip({
+                user: userId
+            });
+
+
+            for (const row of rows) {
+                const title = row.bookTitle?.trim();
+                const quantity = parseInt(row.quantity);
+                const unitImportPrice = parseFloat(row.unitImportPrice);
+
+                if (!title || isNaN(quantity) || isNaN(unitImportPrice)) {
+                    errors.push({ row, error: "Invalid or missing data" });
+                    continue;
+                }
+
+                const book = await Book.findOne({ title: title }).session(session)
+                    .populate({
+                        path: 'author',
+                        select: 'name'
+                    })
+                    .select('title');
+                if (!book) {
+                    throw new Error(`Book ${title} chưa có trong cơ sở dữ liệu`)
+                }
+
+                //Quy định 1 về số lượng nhập tối thiểu
+                if (quantity < min_import) {
+                    continue;
+                }
+
+                const availableCopies = await BookCopy.countDocuments(
+                    { book: book._id, status: 'available' },
+                    { session }
+                );
+
+                //Quy định 1 về số lượng sách tối đa
+                if (availableCopies >= min_stock) {
+                    continue;
+                }
+
+                for (let index = 0; index < quantity; index++) {
+                    const copyIdentifier = await generateCopyIdentifier(book._id, book.title, book.author.name, session);
+
+                    // console.log('copyIdentifier:', copyIdentifier, 'book:', item.bookId, 'author:', book.author.name);
+                    if (!copyIdentifier || !book._id) {
+                        throw new Error('Thiếu copyIdentifier hoặc bookId khi tạo BookCopy');
+                    }
+                    const copy = await new BookCopy({
+                        book: book._id,
+                        copyIdentifier: copyIdentifier,
+                        status: 'available',
+                        importedBySlip: slip._id
+                    });
+
+                    console.log(copy)
+
+                    await copy.save({ session });
+                }
+
+
+                items.push({
+                    book: book._id,
+                    quantity,
+                    unitImportPrice
+                });
+            }
+
+            if (items.length === 0) {
+                throw new Error("No valid book entries found.");
+            }
+
+            slip.items = items;
+            slip.totalItem = items.reduce((sum, i) => sum + i.quantity, 0);
+
+            await slip.save({ session });
+            await session.commitTransaction();
+            return { slip, successCount: items.length, items, failed: errors };
+
+        } catch (error) {
+            if (session.inTransaction()) {
+                await session.abortTransaction();
+            }
+            throw error;
+        } finally {
+            session.endSession();
+        }
+
+    },
+};
+
+mục tiêu chính page này là 2 nút Nhập sách thủ công và import csv
+về logic thì nhập sách thủ công sẽ có đầu vào là 1 mảng items có bookId, quantity, unitImportPrice còn import csv sẽ là bookTitle, quantity, unitImportPrice
+về giao diện thì mình muốn bạn làm tương tự như AdminDashboard nhưng ở thống kê nhập kho chỉ cần mục tìm kiếm sách và sách nhập gần đây, sô lượng sách hiện tại trong database
+sách nhập gần đây sẽ hiển thị Tên Sách, Tác Giả, Giá Bán, Tồn Kho, Ngày Nhập mà ngày nhập là ngày nó được nhập vào kho chứ không phải nhập vào trong database bằng quyền admin.
+Nếu bạn cần thêm api nào bên phía backend để hoàn thiện yêu cầu của mình thì đừng ngần ngại nói

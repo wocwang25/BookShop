@@ -1,6 +1,5 @@
 # Bỏ qua thư mục node_modules (không cần push lên Git)
 node_modules/
-uploads/
 # Bỏ qua file cấu hình môi trường (chứa thông tin nhạy cảm như API keys, database credentials)
 .env
 out/

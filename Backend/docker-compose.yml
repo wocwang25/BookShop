@@ -6,16 +6,7 @@ services:
     container_name: node_app
     ports:
       - "3000:3000"
-    environment:
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - redis
     volumes:
       - .:/app
       - /app/node_modules
 
-  redis:
-    image: redis:alpine
-    container_name: redis
-    ports:
-      - "6379:6379"

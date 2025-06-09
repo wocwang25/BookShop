@@ -87,29 +87,33 @@ const BookService = {
 
     async searchBook({ keyword = '', page = 1, limit = 10 }) {
         console.log(keyword)
-        const regex = new RegExp(keyword, 'i'); // tìm kiếm không phân biệt hoa thường
 
-        // 1. Tìm authorId theo tên
-        const authors = await Author.find({ name: regex }).select('_id');
-        const authorIds = authors.map(a => a._id);
+        let filter = {};
 
-        // 2. Tìm categoryId theo tên
-        const categories = await Category.find({ name: regex }).select('_id');
-        const categoryIds = categories.map(c => c._id);
+        if (keyword) {
+            const regex = new RegExp(keyword, 'i'); // tìm kiếm không phân biệt hoa thường
 
-        // 3. Xây dựng filter cho Book
-        const filter = {
-            $or: [
-                { title: regex },
-                { author: { $in: authorIds } },
-                { category: { $in: categoryIds } }
-            ]
-        };
+            // 1. Tìm authorId theo tên
+            const authors = await Author.find({ name: regex }).select('_id');
+            const authorIds = authors.map(a => a._id);
+
+            // 2. Tìm categoryId theo tên
+            const categories = await Category.find({ name: regex }).select('_id');
+            const categoryIds = categories.map(c => c._id);
+
+            // 3. Xây dựng filter cho Book
+            filter = {
+                $or: [
+                    { title: regex },
+                    { author: { $in: authorIds } },
+                    { category: { $in: categoryIds } }
+                ]
+            };
+        }
 
         const skip = (page - 1) * limit;
 
         const books = await Book.find(filter)
-            .select('title currentStock')
             .populate({
                 path: 'author',
                 select: 'name'
@@ -121,16 +125,107 @@ const BookService = {
             .skip(skip)
             .limit(limit);
 
+        // Transform data để phù hợp với frontend
+        const transformedBooks = books.map(book => ({
+            _id: book._id,
+            title: book.title,
+            author: book.author?.name || 'Unknown',
+            genre: book.category?.name || 'Unknown',
+            price: book.price,
+            quantity: book.currentStock,
+            description: book.description,
+            publishedYear: book.publicationYear,
+            createdAt: book.createdAt,
+            updatedAt: book.updatedAt
+        }));
+
         const total = await Book.countDocuments(filter);
 
+        return transformedBooks;
+    },
+
+    async getBookById(id) {
+        const book = await Book.findById(id)
+            .populate({
+                path: 'author',
+                select: 'name'
+            })
+            .populate({
+                path: 'category',
+                select: 'name'
+            });
+
+        if (!book) {
+            return null;
+        }
+
+        // Transform data để phù hợp với frontend
         return {
-            books,
-            pagination: {
-                page,
-                limit,
-                total
-            }
+            _id: book._id,
+            title: book.title,
+            author: book.author?.name || 'Unknown',
+            genre: book.category?.name || 'Unknown',
+            price: book.price,
+            quantity: book.availableStock,
+            description: book.description,
+            publishedYear: book.publicationYear,
+            createdAt: book.createdAt,
+            updatedAt: book.updatedAt
         };
+    },
+
+    async updateBook(id, data) {
+        const {
+            title,
+            author,
+            category,
+            description,
+            price,
+            publicationYear,
+        } = data;
+
+        let authorDoc, categoryDoc;
+
+        if (author) {
+            authorDoc = await this.findOrCreateAuthor(author);
+        }
+
+        if (category) {
+            categoryDoc = await this.findOrCreateCategory(category);
+        }
+
+        const updateData = {};
+        if (title) updateData.title = title;
+        if (authorDoc) updateData.author = authorDoc._id;
+        if (categoryDoc) updateData.category = categoryDoc._id;
+        if (description) updateData.description = description;
+        if (price) updateData.price = price;
+        if (publicationYear) updateData.publicationYear = publicationYear;
+
+        const updatedBook = await Book.findByIdAndUpdate(id, updateData, { new: true })
+            .populate('author', 'name')
+            .populate('category', 'name');
+
+        if (!updatedBook) {
+            return null;
+        }
+
+        // Transform data để phù hợp với frontend
+        return {
+            _id: updatedBook._id,
+            title: updatedBook.title,
+            author: updatedBook.author?.name || 'Unknown',
+            genre: updatedBook.category?.name || 'Unknown',
+            price: updatedBook.price,
+            description: updatedBook.description,
+            publishedYear: updatedBook.publicationYear,
+            createdAt: updatedBook.createdAt,
+            updatedAt: updatedBook.updatedAt
+        };
+    },
+
+    async deleteBook(id) {
+        return await Book.findByIdAndDelete(id);
     }
 }
 

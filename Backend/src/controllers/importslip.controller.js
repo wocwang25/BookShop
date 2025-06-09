@@ -2,6 +2,16 @@ const BookImportService = require('../services/importslip.service');
 
 
 const BookImportController = {
+    async getImportSlip(req, res) {
+        try {
+            const result = await BookImportService.getImportSlipList();
+
+            res.status(201).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
     async createImportSlip(req, res) {
         try {
             const userId = req.user.id;

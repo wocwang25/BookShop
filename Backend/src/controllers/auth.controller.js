@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const AuthController = {
     signup: async (req, res) => {
         const { name, username, email, password } = req.body;
-
+        console.log(req.body)
         if (!name || !username || !email || !password) {
             return res.status(400).json({
                 status: "error",
@@ -48,13 +48,27 @@ const AuthController = {
 
             await session.commitTransaction();
 
-            const userResponse = user.toObject();
-            delete userResponse.password;
+            // Tạo token cho user mới đăng ký
+            const accessToken = jwt.sign(
+                { id: user._id, username: user.username, role: user.role, customerProfileId: user.customerProfile },
+                process.env.JWT_SECRET,
+                { expiresIn: '1d' }
+            );
+
+            const userResponse = {
+                id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                customerProfileId: user.customerProfile
+            };
 
             res.status(201).json({
-                status: "success",
+                success: true,
                 message: "Đăng ký tài khoản khách hàng thành công!",
-                data: userResponse
+                token: accessToken,
+                user: userResponse
             });
 
         } catch (error) {
@@ -79,6 +93,7 @@ const AuthController = {
 
     signin: async (req, res) => {
         const { identifier, password } = req.body;
+        console.log(req.body)
         if (!identifier || !password) {
             return res.status(400).json({
                 status: "error",
@@ -159,7 +174,9 @@ const AuthController = {
                 token: accessToken,
                 user: {
                     id: user._id,
+                    name: user.name,
                     username: user.username,
+                    email: user.email,
                     role: user.role,
                     customerProfileId: user.customerProfile
                 }
@@ -229,6 +246,40 @@ const AuthController = {
             });
         } catch (error) {
             res.status(400).json({
+                status: "error",
+                message: error.message
+            });
+        }
+    },
+
+    // Method để lấy thông tin profile user (cần cho frontend)
+    getProfile: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await User.findById(userId).populate('customerProfile');
+
+            if (!user) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "User not found"
+                });
+            }
+
+            const userResponse = {
+                id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                customerProfile: user.customerProfile
+            };
+
+            res.json({
+                status: "success",
+                user: userResponse
+            });
+        } catch (error) {
+            res.status(500).json({
                 status: "error",
                 message: error.message
             });
