@@ -192,6 +192,9 @@ export const rulesAPI = {
     // Tạo hoặc cập nhật quy định (Admin only)
     createOrUpdateRule: (ruleData) => apiClient.post('/rules', ruleData),
 
+    // Cập nhật quy định theo code (Admin only)
+    updateRuleByCode: (code, ruleData) => apiClient.put(`/rules/${code}`, ruleData),
+
     // Xóa quy định (Admin only)
     deleteRule: (code) => apiClient.delete(`/rules/${code}`)
 };

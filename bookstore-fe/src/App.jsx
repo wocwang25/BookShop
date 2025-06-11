@@ -9,14 +9,22 @@ import DashboardPage from './pages/DashboardPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import StaffDashboardPage from './pages/staff/StaffDashboardPage';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
+
+import ReportsPage from './pages/staff/ReportsPage'
+import PaymentPage from './pages/staff/PaymentPage'
+import ImportPage from './pages/staff/ImportPage'
+import InvoicePage from './pages/staff/InvoicePage'
 import { AppShell } from '@mantine/core';
 
 function App() {
+  const role = localStorage.getItem('role'); // ví dụ: 'admin', 'staff', 'user'
+  console.log(role)
+
   return (
     <div>
-      {/* Navbar sẽ luôn hiển thị ở tất cả các trang */}
+      {/* Chỉ hiển thị Navbar nếu KHÔNG phải staff hoặc admin */}
+      {/* {role !== 'admin' && role !== 'staff' && <Navbar />} */}
       <Navbar />
-
       <main style={{ padding: '20px' }}>
         {/* Routes sẽ quyết định component nào được render dựa trên URL */}
         <Routes>
@@ -40,10 +48,42 @@ function App() {
             element={
               <RoleProtectedRoute allowedRoles={['staff']}>
                 <StaffDashboardPage />
+
               </RoleProtectedRoute>
             }
           />
-
+          <Route
+            path="/staff/reports"
+            element={
+              <RoleProtectedRoute allowedRoles={['staff']}>
+                <ReportsPage />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff/payment"
+            element={
+              <RoleProtectedRoute allowedRoles={['staff']}>
+                <PaymentPage />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff/import"
+            element={
+              <RoleProtectedRoute allowedRoles={['staff']}>
+                <ImportPage />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff/invoice"
+            element={
+              <RoleProtectedRoute allowedRoles={['staff']}>
+                <InvoicePage />
+              </RoleProtectedRoute>
+            }
+          />
           {/* Một route ví dụ cho cả admin và staff */}
           {/*
       <Route 

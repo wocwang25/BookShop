@@ -27,6 +27,7 @@ const Navbar = () => {
     const [opened, { toggle }] = useDisclosure(false);
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
+    const role = user?.role;
 
     const handleLogout = () => {
         logout();
@@ -34,7 +35,7 @@ const Navbar = () => {
     };
 
     const userMenuItems = [
-        { label: 'Bảng Điều Khiển', href: '/dashboard' },
+        { label: 'Bảng Điều Khiển', href: `/${role}/dashboard` },
         { label: 'Sách Yêu Thích', href: '/favorites' },
         { label: 'Đơn Hàng Của Tôi', href: '/orders' },
     ];

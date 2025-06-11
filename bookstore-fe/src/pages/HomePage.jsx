@@ -30,7 +30,7 @@ const BookCard = ({ book }) => {
             <Card.Section>
                 <Link to={`/books/${book._id}`}>
                     <Image
-                        src={book.imageUrl || '/images/default_image.jpg'}
+                        src={book.imageUrl || '/images/default_image01.jpg'}
                         height={350}
                         alt={book.title}
                     />
@@ -97,7 +97,7 @@ const HomePage = () => {
                 width: '100vw',
                 overflowX: 'hidden',
                 background: '#f8f9fa',
-                backgroundImage: 'url("/images/737386.png")', // <-- Đúng cú pháp
+                backgroundImage: 'url("/images/1139490.png")', // <-- Đúng cú pháp
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',

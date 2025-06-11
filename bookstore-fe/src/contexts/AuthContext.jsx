@@ -43,8 +43,9 @@ export const AuthProvider = ({ children }) => {
       const { token: newToken, user: userData } = response.data;
 
       console.log(userData)
-
+      console.log(user)
       localStorage.setItem('token', newToken);
+      localStorage.setItem('role', user.role)
       setToken(newToken); // Cập nhật token trong state -> useEffect sẽ chạy lại
       setUser(userData); // Cập nhật user ngay lập tức để UI mượt hơn
       return { success: true, user: userData };
