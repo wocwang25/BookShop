@@ -30,7 +30,8 @@ const BookController = {
             const results = await BookService.searchBook({ keyword });
             res.status(200).json({
                 success: true,
-                books: results
+                books: results.Books,
+                total: results.total
             });
         } catch (error) {
             res.status(400).json({

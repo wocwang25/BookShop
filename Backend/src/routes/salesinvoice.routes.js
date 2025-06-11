@@ -4,5 +4,6 @@ const AuthService = require('../services/auth.service');
 const SalesInvoiceController = require('../controllers/salesinvoice.controller');
 
 router.post('/sale', AuthService.verifyToken, SalesInvoiceController.createSalesInvoice);
+router.post('/sale', AuthService.verifyToken, SalesInvoiceController.createSalesInvoice);
 
 module.exports = router;

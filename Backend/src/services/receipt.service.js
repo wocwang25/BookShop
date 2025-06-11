@@ -4,7 +4,31 @@ const PaymentReceipt = require('../models/PaymentReceipt');
 const mongoose = require('mongoose');
 
 const PaymentReceiptService = {
-    async createPaymentReceipt_Buy(userId, data) {
+    async getAllPaymentReceiptInCurrentMonth() {
+        try {
+            // Lấy ngày đầu và cuối tháng hiện tại
+            const now = new Date();
+            const startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+            const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+            // Lấy danh sách phiếu thu trong tháng hiện tại
+            const receipts = await PaymentReceipt.find({
+                createdAt: { $gte: startDate, $lte: endDate }
+            }).populate('customer', 'name').populate('user', 'name');
+
+            // Tính tổng tiền
+            const totalAmount = receipts.reduce((sum, r) => sum + (r.paymentAmount || 0), 0);
+
+            return {
+                receipts,
+                totalAmount
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async createPaymentReceipt(userId, data) {
         let { customer_name, customer_info, paymentAmount, note } = data;
 
         if (!customer_name || paymentAmount <= 0) {

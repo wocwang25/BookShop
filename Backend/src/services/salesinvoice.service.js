@@ -7,6 +7,35 @@ const BookCopy = require('../models/BookCopy');
 
 
 const SalesInvoiceService = {
+
+    async getAllSalesInvoiceInCurrentMonth() {
+        // Lấy ngày đầu và cuối tháng hiện tại
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        // Lấy danh sách hóa đơn bán trong tháng hiện tại
+        const invoices = await SalesInvoice.find({
+            createdAt: { $gte: startDate, $lte: endDate }
+        })
+            .populate('customer', 'name')
+            .populate('user', 'name')
+            .populate({
+                path: 'items.book',
+                select: 'title author category'
+            })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Tính tổng tiền
+        const totalAmount = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+        return {
+            invoices,
+            totalAmount
+        };
+    },
+
     async createSalesInvoice(userId, customer_name, items) {
         if (!items || items.length === 0) throw new Error("No items provided");
 
@@ -43,20 +72,21 @@ const SalesInvoiceService = {
                     }
                 );
 
-                if (availableCopies < quantity) {
-                    throw new Error(`Not enough stock for "${title}". Current: ${availableCopies}, Required: ${quantity}`);
-                }
-
-                if ((availableCopies - quantity) < minStock) {
-                    throw new Error(`Selling "${title}" would reduce stock below minimum (${minStock})`);
-                }
-
                 const copiesToSell = await BookCopy.find({ book: book._id, status: 'available' }).limit(item.quantity).session(session);
+                if (rule.is_active) {
+                    if (availableCopies < quantity) {
+                        throw new Error(`Not enough stock for "${title}". Current: ${availableCopies}, Required: ${quantity}`);
+                    }
 
-                if (copiesToSell.length < quantity) {
-                    throw new Error(`Not enough stock for "${title}". Current: ${copiesToSell.length}, Required: ${quantity}`);
+                    if ((availableCopies - quantity) < minStock) {
+                        throw new Error(`Selling "${title}" would reduce stock below minimum (${minStock})`);
+                    }
+
+
+                    if (copiesToSell.length < quantity) {
+                        throw new Error(`Not enough stock for "${title}". Current: ${copiesToSell.length}, Required: ${quantity}`);
+                    }
                 }
-
                 // Đánh dấu từng bản copy là 'sold' và gán saleInvoiceId
                 for (const copy of copiesToSell) {
                     copy.status = 'sold';

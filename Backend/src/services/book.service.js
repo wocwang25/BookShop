@@ -126,22 +126,24 @@ const BookService = {
             .limit(limit);
 
         // Transform data để phù hợp với frontend
-        const transformedBooks = books.map(book => ({
+        const total = await Book.countDocuments(filter);
+        const Books = books.map(book => ({
             _id: book._id,
             title: book.title,
-            author: book.author?.name || 'Unknown',
-            genre: book.category?.name || 'Unknown',
+            author: book.author || 'Unknown',
+            category: book.category || 'Unknown',
             price: book.price,
-            quantity: book.currentStock,
+            quantity: book.availableStock,
             description: book.description,
             publishedYear: book.publicationYear,
             createdAt: book.createdAt,
             updatedAt: book.updatedAt
         }));
 
-        const total = await Book.countDocuments(filter);
+        console.log(total)
 
-        return transformedBooks;
+
+        return { Books, total };
     },
 
     async getBookById(id) {

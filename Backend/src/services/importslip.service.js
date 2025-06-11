@@ -60,19 +60,21 @@ const BookImportService = {
                     throw new Error(`Book not found: ${item.bookId}`);
                 }
 
-                //Quy định 1 về số lượng nhập tối thiểu
-                if (item.quantity < min_import) {
-                    continue;
-                }
+                if (rule.is_active) {
+                    //Quy định 1 về số lượng nhập tối thiểu
+                    if (item.quantity < min_import) {
+                        continue;
+                    }
 
-                const availableCopies = await BookCopy.countDocuments(
-                    { book: item.bookId, status: 'available' },
-                    { session }
-                );
+                    const availableCopies = await BookCopy.countDocuments(
+                        { book: item.bookId, status: 'available' },
+                        { session }
+                    );
 
-                //Quy định 1 về số lượng sách tối đa
-                if (availableCopies >= min_stock) {
-                    continue;
+                    //Quy định 1 về số lượng sách tối đa
+                    if (availableCopies >= min_stock) {
+                        continue;
+                    }
                 }
 
                 for (let index = 0; index < item.quantity; index++) {
