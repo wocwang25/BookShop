@@ -3,7 +3,7 @@ const ReportService = require('../services/report.service');
 const ReportController = {
     async getMonthlyInventoryReport(req, res) {
         try {
-            const { month, year } = req.body;
+            const { month, year } = req.params;
             const report = await ReportService.getMonthlyInventoryReport(month, year);
 
             res.status(200).json(report);
@@ -13,7 +13,7 @@ const ReportController = {
     },
     async getMonthlyDebtReport(req, res) {
         try {
-            const { month, year } = req.body;
+            const { month, year } = req.params;
             const report = await ReportService.getMonthlyDebtReport(month, year);
 
             res.status(200).json(report);

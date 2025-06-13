@@ -1,11 +1,17 @@
 const SalesInvoiceService = require('../services/salesinvoice.service');
 
 const SalesInvoiceController = {
-    async createSalesInvoice(req, res) {
+    async getAllSalesInvoice(req, res) {
         try {
-            const result = await SalesInvoiceService.getAllSalesInvoiceInCurrentMonth();
+            const { month, year } = req.query;
+            const result = await SalesInvoiceService.getAllSalesInvoice(month, year);
 
-            res.status(201).json(result);
+            res.status(201).json(
+                {
+                    invoices: results.invoices,
+                    totalAmount: results.totalAmount
+                }
+            );
         } catch (error) {
             res.status(400).json({ error: error.message });
         }
@@ -18,7 +24,7 @@ const SalesInvoiceController = {
             console.log(items, customer_name)
             const result = await SalesInvoiceService.createSalesInvoice(userId, customer_name, items);
 
-            res.status(201).json({ message: 'Sales Invoice created successfully', result });
+            res.status(201).json({ message: 'Sales Invoice created successfully', data: result });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }

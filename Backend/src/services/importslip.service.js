@@ -8,9 +8,14 @@ const csv = require('csv-parser');
 const mongoose = require('mongoose');
 
 const BookImportService = {
-    async getImportSlipList({ page = 1, limit = 20 } = {}) {
-        const skips = (page - 1) * limit;
-        const slips = await BookImportSlip.find({})
+    async getImportSlipList(month, year) {
+        // Xác định ngày đầu và cuối tháng
+        const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        const slips = await BookImportSlip.find({
+            createdAt: { $gte: startDate, $lte: endDate }
+        })
             .populate({
                 path: 'user',
                 select: 'name email'
@@ -20,15 +25,14 @@ const BookImportService = {
                 select: 'title author category'
             })
             .sort({ createdAt: -1 })
-            .skip(skips)
-            .limit(limit)
             .lean();
 
-        const total = await BookImportSlip.countDocuments({});
+        const total = await BookImportSlip.countDocuments({
+            createdAt: { $gte: startDate, $lte: endDate }
+        });
+
         return {
             total,
-            page,
-            limit,
             slips
         };
     },
@@ -47,15 +51,18 @@ const BookImportService = {
                 user: userId
             });
 
+            console.log(items)
+
             // Cập nhật tồn kho từng sách
             let slipItems = []
             for (const item of items) {
-                const book = await Book.findById(item.bookId).session(session)
-                    .populate({
-                        path: 'author',
-                        select: 'name'
-                    })
-                    .select('title');
+                console.log(item.bookId)
+                const book = await Book.findById(item.bookId)
+                    .populate([
+                        { path: 'author', select: 'name' },
+                        { path: 'category', select: 'name' }
+                    ])
+                    .session(session);
                 if (!book) {
                     throw new Error(`Book not found: ${item.bookId}`);
                 }
@@ -91,6 +98,8 @@ const BookImportService = {
                         importedBySlip: importSlip._id
                     });
                     await copy.save({ session });
+                    console.log(copy)
+
                 }
 
                 slipItems.push({
@@ -100,9 +109,8 @@ const BookImportService = {
                 });
             }
 
-            importSlip.items = items;
-            importSlip.totalItem = items.reduce((sum, i) => sum + i.quantity, 0);
-
+            importSlip.items = slipItems;
+            importSlip.totalItem = slipItems.reduce((sum, i) => sum + i.quantity, 0);
             await importSlip.save({ session });
             await session.commitTransaction();
             session.endSession();

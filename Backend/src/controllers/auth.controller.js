@@ -26,7 +26,7 @@ const AuthController = {
                 throw new Error("Tên đăng nhập hoặc Email đã tồn tại. Vui lòng chọn cái khác.");
             }
 
-            let customerProfile = await Customer.findOne({ name: name, email: email });
+            let customerProfile = await Customer.findOne({ name: name, email: email }).session(session);
             // console.log(customerProfile)
 
             if (!customerProfile) {
@@ -37,7 +37,7 @@ const AuthController = {
                 await customerProfile.save({ session });
             }
 
-            const user = await new User({
+            const user = new User({
                 name,
                 username,
                 email,
@@ -100,6 +100,15 @@ const AuthController = {
                 message: "Missing Login Information"
             });
         }
+        // Tìm user bằng username hoặc email
+        const user = await User.findOne({
+            $or: [
+                { username: identifier },
+                { email: identifier }
+            ]
+        }).select('+password');
+        console.log(user)
+
 
         try {
             // Tìm user bằng username hoặc email
@@ -109,6 +118,7 @@ const AuthController = {
                     { email: identifier }
                 ]
             }).select('+password');
+            console.log(user)
 
             if (!user) {
                 return res.status(401).json({

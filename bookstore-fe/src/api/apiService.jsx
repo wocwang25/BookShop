@@ -28,14 +28,20 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Token hết hạn, xóa token và redirect về login
-            localStorage.removeItem('token');
-            window.location.href = '/login';
+            // Chỉ xóa token, không redirect trực tiếp
+            // Để AuthContext xử lý logic logout
+            const currentToken = localStorage.getItem('token');
+            if (currentToken) {
+                localStorage.removeItem('token');
+                // Không dùng window.location.href để tránh conflict với React Router
+                // AuthContext sẽ tự động phát hiện token bị xóa và xử lý
+            }
         }
         return Promise.reject(error);
     }
 );
 
+//             =================== START ADMIN RELATED API ===================
 // ===== AUTHENTICATION APIs =====
 export const authAPI = {
     // Đăng ký
@@ -93,22 +99,26 @@ export const booksAPI = {
     }
 };
 
-// ===== IMPORT SLIP APIs =====
-export const importAPI = {
-    // Lấy toàn bộ phiếu nhập sách
-    getAllSlip: () => apiClient.get('/import-slip/'),
+// ===== RULES APIs =====
+export const rulesAPI = {
+    // Lấy tất cả quy định
+    getAllRules: () => apiClient.get('/rules'),
 
-    // Import sách đơn lẻ
-    importBook: (slipData) => apiClient.post('/import-slip/import', slipData),
+    // Lấy quy định theo code
+    getRuleByCode: (code) => apiClient.get(`/rules/${code}`),
 
-    // Import sách từ CSV
-    importFromCSV: (formData) => apiClient.post('/import-slip/import-csv', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
+    // Tạo hoặc cập nhật quy định (Admin only)
+    createOrUpdateRule: (ruleData) => apiClient.post('/rules', ruleData),
+
+    // Cập nhật quy định theo code (Admin only)
+    updateRuleByCode: (code, ruleData) => apiClient.put(`/rules/${code}`, ruleData),
+
+    // Xóa quy định (Admin only)
+    deleteRule: (code) => apiClient.delete(`/rules/${code}`)
 };
+//             =================== END ADMIN RELATED API ===================
 
+//             =================== START CUSTOMER RELATED API ===================
 // ===== CUSTOMER APIs =====
 export const customerAPI = {
     // Lấy profile khách hàng
@@ -157,47 +167,53 @@ export const reviewsAPI = {
     deleteReview: (reviewId) => apiClient.delete(`/reviews/${reviewId}`)
 };
 
+//              =================== END CUSTOMER RELATED API ===================
+
+//              =================== START STAFF RELATED API ===================
+// ===== IMPORT SLIP APIs =====
+export const importAPI = {
+    // Lấy toàn bộ phiếu nhập sách trong tháng: data: {totals, slips}
+    getAllSlip: ({ month, year }) => apiClient.get('/import-slip/', { params: { month, year } }),
+
+    // Import sách đơn lẻ
+    importBook: (slipData) => apiClient.post('/import-slip/import', slipData),
+
+    // Import sách từ CSV
+    importFromCSV: (formData) => apiClient.post('/import-slip/import-csv', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+};
+
 // ===== INVOICES APIs =====
 export const invoiceAPI = {
-    // Tạo hóa đơn bán
+    // Tạo/Lấy hóa đơn bán: data: {totalAmount, invoices}
+    getSalesInvoice: ({ month, year }) => apiClient.get('/invoice/sale', { params: { month, year } }),
     createSalesInvoice: (invoiceData) => apiClient.post('/invoice/sale', invoiceData),
 
-    // Tạo hóa đơn thuê
+    // Tạo/Lấy hóa đơn thuê: data: {totalAmount, invoices}
+    getRentalInvoice: ({ month, year }) => apiClient.get('/invoice/rent', { params: { month, year } }),
     createRentalInvoice: (invoiceData) => apiClient.post('/invoice/rent', invoiceData)
 };
 
 // ===== PAYMENT APIs =====
 export const paymentAPI = {
     // Tạo phiếu thu
+    getAllPaymentReceipt: ({ month, year }) => apiClient.get('/payment-receipt', { params: { month, year } }),
     createPaymentReceipt: (paymentData) => apiClient.post('/payment-receipt', paymentData)
 };
 
 // ===== REPORTS APIs =====
 export const reportsAPI = {
     // Báo cáo tồn kho hàng tháng
-    getInventoryReport: () => apiClient.get('/reports/inventory-report'),
+    getInventoryReport: ({ month, year }) => apiClient.get('/reports/inventory-report', { params: { month, year } }),
 
     // Báo cáo công nợ hàng tháng
-    getDebtReport: () => apiClient.get('/reports/debt-report')
+    getDebtReport: ({ month, year }) => apiClient.get('/reports/debt-report', { params: { month, year } }),
 };
 
-// ===== RULES APIs =====
-export const rulesAPI = {
-    // Lấy tất cả quy định
-    getAllRules: () => apiClient.get('/rules'),
-
-    // Lấy quy định theo code
-    getRuleByCode: (code) => apiClient.get(`/rules/${code}`),
-
-    // Tạo hoặc cập nhật quy định (Admin only)
-    createOrUpdateRule: (ruleData) => apiClient.post('/rules', ruleData),
-
-    // Cập nhật quy định theo code (Admin only)
-    updateRuleByCode: (code, ruleData) => apiClient.put(`/rules/${code}`, ruleData),
-
-    // Xóa quy định (Admin only)
-    deleteRule: (code) => apiClient.delete(`/rules/${code}`)
-};
+//           =================== END STAFF RELATED API ===================
 
 // Export instance chính
 export default apiClient;

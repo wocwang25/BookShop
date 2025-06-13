@@ -4,9 +4,15 @@ const BookImportService = require('../services/importslip.service');
 const BookImportController = {
     async getImportSlip(req, res) {
         try {
-            const result = await BookImportService.getImportSlipList();
+            const { month, year } = req.query;
+            const result = await BookImportService.getImportSlipList(month, year);
 
-            res.status(201).json(result);
+            res.status(201).json(
+                {
+                    slips: result.slips,
+                    total: result.total
+                }
+            );
         } catch (err) {
             res.status(400).json({ error: err.message });
         }
@@ -18,7 +24,7 @@ const BookImportController = {
             const { items } = req.body;
             const result = await BookImportService.createImportSlip({ userId, items });
 
-            res.status(201).json({ message: 'Import slip created successfully', result });
+            res.status(201).json({ message: 'Import slip created successfully', data: result });
         } catch (err) {
             res.status(400).json({ error: err.message });
         }

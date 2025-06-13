@@ -7,6 +7,37 @@ const BookCopy = require('../models/BookCopy');
 
 
 const RentalInvoiceService = {
+    async getAllRentInvoice(month, year) {
+        // Xác định ngày đầu và cuối tháng
+        const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        // Lấy danh sách hóa đơn thuê trong tháng/năm
+        const invoices = await RentalInvoice.find({
+            createdAt: { $gte: startDate, $lte: endDate }
+        })
+            .populate('customer', 'name')
+            .populate('user', 'name')
+            .populate({
+                path: 'items.book',
+                select: 'title author category'
+            })
+            .populate({
+                path: 'items.bookCopy',
+                select: 'identifier status'
+            })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Tính tổng tiền thuê
+        const totalAmount = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+        return {
+            invoices,
+            totalAmount
+        };
+    },
+
     async createRentalInvoice(userId, customer_name, items, rent_info) {
         if (!items || items.length === 0) throw new Error("No items provided");
 

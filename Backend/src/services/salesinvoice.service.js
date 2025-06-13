@@ -8,12 +8,9 @@ const BookCopy = require('../models/BookCopy');
 
 const SalesInvoiceService = {
 
-    async getAllSalesInvoiceInCurrentMonth() {
-        // Lấy ngày đầu và cuối tháng hiện tại
-        const now = new Date();
-        const startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-
+    async getAllSalesInvoice(month, year) {
+        const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
         // Lấy danh sách hóa đơn bán trong tháng hiện tại
         const invoices = await SalesInvoice.find({
             createdAt: { $gte: startDate, $lte: endDate }
@@ -73,7 +70,7 @@ const SalesInvoiceService = {
                 );
 
                 const copiesToSell = await BookCopy.find({ book: book._id, status: 'available' }).limit(item.quantity).session(session);
-                if (rule.is_active) {
+                if (rule?.is_active) {
                     if (availableCopies < quantity) {
                         throw new Error(`Not enough stock for "${title}". Current: ${availableCopies}, Required: ${quantity}`);
                     }

@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data.user);
         } catch (error) {
           localStorage.removeItem('token');
+          localStorage.removeItem('role');
           setToken(null);
           setUser(null);
         }
@@ -37,6 +38,34 @@ export const AuthProvider = ({ children }) => {
     verifyUserToken();
   }, [token]);
 
+  // Thêm listener để phát hiện thay đổi localStorage từ bên ngoài (ví dụ: interceptor)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const currentToken = localStorage.getItem('token');
+      if (!currentToken && token) {
+        // Token bị xóa từ bên ngoài (ví dụ: bởi interceptor)
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    // Listener cho storage event (chỉ hoạt động cross-tab)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Polling để phát hiện thay đổi trong cùng tab
+    const intervalId = setInterval(() => {
+      const currentToken = localStorage.getItem('token');
+      if (currentToken !== token) {
+        setToken(currentToken);
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(intervalId);
+    };
+  }, [token]);
+
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
@@ -45,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       console.log(userData)
       console.log(user)
       localStorage.setItem('token', newToken);
-      localStorage.setItem('role', user.role)
+      localStorage.setItem('role', userData.role)
       setToken(newToken); // Cập nhật token trong state -> useEffect sẽ chạy lại
       setUser(userData); // Cập nhật user ngay lập tức để UI mượt hơn
       return { success: true, user: userData };
@@ -72,9 +101,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     setToken(null); // Việc này sẽ kích hoạt useEffect để dọn dẹp user state
     setUser(null);
-    window.location.reload();
   };
 
   const value = {

@@ -169,7 +169,7 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
 
     const handleSubmit = (values) => {
         console.log('📝 Form submitted with values:', values);
-        
+
         let ruleValue = null;
         if (values.ruleValue && values.ruleValue.trim()) {
             try {
@@ -186,7 +186,7 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
             description: values.description.trim(),
             active: values.active
         };
-        
+
         console.log('📤 Calling onSave with:', formData);
         onSave(formData);
     };
@@ -204,7 +204,7 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
         },
         {
             label: 'QD2 - Quy định bán sách',
-            code: 'QD2', 
+            code: 'QD2',
             description: 'Quy định về công nợ tối đa của khách hàng và lượng tồn tối thiểu sau khi bán',
             ruleValue: {
                 max_debt: 20000,
@@ -252,7 +252,7 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
                             </Group>
                         </div>
                     )}
-                    
+
                     <TextInput
                         label="🏷️ Mã quy định"
                         placeholder="VD: QD1, QD2, QD3, CUSTOM_RULE..."
@@ -263,7 +263,7 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
                         disabled={!!rule} // Không cho sửa code nếu đang edit
                         description="Mã quy định viết hoa, chỉ chứa chữ cái và số"
                     />
-                    
+
                     <Textarea
                         label="📝 Mô tả quy định"
                         placeholder="Mô tả chi tiết về quy định này"
@@ -316,7 +316,6 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
         </div>
     );
 };
-
 
 // --- Component Trang Dashboard Chính ---
 const AdminDashboardPage = () => {
@@ -427,7 +426,7 @@ const AdminDashboardPage = () => {
         try {
             console.log('💾 Saving rule with formData:', formData);
             console.log('💾 Is editing mode:', !!editingRule);
-            
+
             // Ensure consistent field naming
             const ruleData = {
                 code: formData.code,
@@ -435,9 +434,9 @@ const AdminDashboardPage = () => {
                 description: formData.description,
                 is_active: formData.active  // Convert active to is_active
             };
-            
+
             console.log('📤 Sending ruleData:', ruleData);
-            
+
             if (editingRule) {
                 console.log('🔄 Updating rule:', editingRule.code);
                 await API.rules.updateRuleByCode(editingRule.code, ruleData);
@@ -469,12 +468,12 @@ const AdminDashboardPage = () => {
     const handleDeleteRule = async () => {
         console.log('🔥 handleDeleteRule called');
         console.log('🔥 ruleToDelete:', ruleToDelete);
-        
+
         if (!ruleToDelete) {
             console.error('❌ No rule to delete');
             return;
         }
-        
+
         try {
             console.log('🗑️ Deleting rule:', ruleToDelete.code);
             await API.rules.deleteRule(ruleToDelete.code);
@@ -494,7 +493,7 @@ const AdminDashboardPage = () => {
     const handleToggleRuleStatus = async (rule) => {
         try {
             console.log('🔄 Toggling rule status for:', rule.code, 'from', rule.is_active, 'to', !rule.is_active);
-            
+
             // Ensure we use the correct field name that backend expects
             const updatedData = {
                 code: rule.code,  // Add code field explicitly
@@ -502,7 +501,7 @@ const AdminDashboardPage = () => {
                 description: rule.description,
                 is_active: !rule.is_active  // Use is_active instead of active
             };
-            
+
             console.log('📤 Sending update data:', updatedData);
             await API.rules.updateRuleByCode(rule.code, updatedData);
             showNotification(`${rule.is_active ? 'Tắt' : 'Bật'} quy định thành công!`, 'teal');
@@ -513,10 +512,6 @@ const AdminDashboardPage = () => {
             showNotification(error.response?.data?.error || 'Lỗi khi thay đổi trạng thái quy định', 'red');
         }
     };
-
-
-
-
 
     // Hàm tìm kiếm
     const handleSearch = async (event) => {
@@ -726,190 +721,190 @@ const AdminDashboardPage = () => {
     const RulesTable = ({ data, title }) => {
         console.log('🔍 RulesTable rendering with data:', data);
         console.log('📊 Data length:', data?.length);
-        
+
         return (
-        <Paper
-            withBorder
-            p="xl"
-            radius="lg"
-            shadow="sm"
-            style={{
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                width: '100%',
-                height: 'fit-content'
-            }}
-        >
-            <Title order={3} mb="xl" ta="center" c="dark">
-                {title}
-            </Title>
-            <div style={{
-                maxHeight: '500px',
-                overflowY: 'auto',
-                borderRadius: '12px',
-                border: '1px solid #e9ecef'
-            }}>
-                <Table
-                    striped
-                    highlightOnHover
-                    withTableBorder
-                    style={{
-                        borderRadius: '12px',
-                        overflow: 'hidden'
-                    }}
-                >
-                    <Table.Thead style={{ backgroundColor: '#f1f3f4' }}>
-                        <Table.Tr>
-                            <Table.Th style={{ fontWeight: 600, color: '#495057',  whiteSpace: 'nowrap' }}>🏷️ Mã QĐ</Table.Th>
-                            <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>📝 Mô Tả</Table.Th>
-                            <Table.Th style={{ fontWeight: 600, color: '#495057',  whiteSpace: 'nowrap' }}>⚙️ Giá Trị</Table.Th>
-                            <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap', textAlign: 'center' }}>🔄 Trạng Thái</Table.Th>
-                            <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap', textAlign: 'center' }}>⚙️ Hành Động</Table.Th>
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                        {data.length > 0 ? (
-                            data.map((rule, index) => {
-                                console.log(`📋 Rule ${index}:`, {
-                                    id: rule._id,
-                                    code: rule.code,
-                                    is_active: rule.is_active,
-                                    ruleValue: rule.ruleValue,
-                                    description: rule.description
-                                });
-                                return (
-                                <Table.Tr key={rule._id || rule.code || index} style={{ transition: 'background-color 0.2s ease' }}>
-                                    <Table.Td>
-                                        <Badge
-                                            variant="gradient"
-                                            gradient={rule.is_active ? { from: 'green', to: 'teal' } : { from: 'gray', to: 'gray' }}
-                                            size="lg"
-                                        >
-                                            {rule.code}
-                                        </Badge>
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <Text lineClamp={2} size="sm">
-                                            {rule.description}
-                                        </Text>
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <div style={{ maxWidth: '250px' }}>
-                                            {rule.ruleValue ? (
-                                                (() => {
-                                                    // Smart display logic based on ruleValue content
-                                                    const rv = rule.ruleValue;
-                                                    
-                                                    // QD1-like structure
-                                                    if (rv.min_import !== undefined && rv.min_stock !== undefined) {
-                                                        return (
-                                                            <div>
-                                                                <Text size="sm" c="blue">Nhập tối thiểu: {rv.min_import}</Text>
-                                                                <Text size="sm" c="green">Tồn kho tối thiểu: {rv.min_stock}</Text>
-                                                            </div>
-                                                        );
-                                                    }
-                                                    
-                                                    // QD2-like structure
-                                                    if (rv.max_debt !== undefined) {
-                                                        return (
-                                                            <div>
-                                                                <Text size="sm" c="red">Công nợ tối đa: {rv.max_debt?.toLocaleString()}₫</Text>
-                                                                {rv.min_stock && <Text size="sm" c="green">Tồn kho tối thiểu: {rv.min_stock}</Text>}
-                                                            </div>
-                                                        );
-                                                    }
-                                                    
-                                                    // QD6-like structure
-                                                    if (rv.allow_rule_change !== undefined) {
-                                                        return (
-                                                            <Text size="sm" c={rv.allow_rule_change ? "green" : "red"}>
-                                                                {rv.allow_rule_change ? "✅ Cho phép thay đổi" : "❌ Không cho phép thay đổi"}
-                                                            </Text>
-                                                        );
-                                                    }
-                                                    
-                                                    // Generic display for other structures
-                                                    return (
-                                                        <div>
-                                                            {Object.entries(rv).map(([key, value]) => (
-                                                                <Text key={key} size="xs" c="dimmed">
-                                                                    <Text span fw={500}>{key}:</Text> {String(value)}
-                                                                </Text>
-                                                            ))}
-                                                        </div>
-                                                    );
-                                                })()
-                                            ) : (
-                                                <Text size="xs" c="dimmed" fs="italic">
-                                                    Không có giá trị
+            <Paper
+                withBorder
+                p="xl"
+                radius="lg"
+                shadow="sm"
+                style={{
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                    width: '100%',
+                    height: 'fit-content'
+                }}
+            >
+                <Title order={3} mb="xl" ta="center" c="dark">
+                    {title}
+                </Title>
+                <div style={{
+                    maxHeight: '500px',
+                    overflowY: 'auto',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef'
+                }}>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        style={{
+                            borderRadius: '12px',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <Table.Thead style={{ backgroundColor: '#f1f3f4' }}>
+                            <Table.Tr>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>🏷️ Mã QĐ</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>📝 Mô Tả</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>⚙️ Giá Trị</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap', textAlign: 'center' }}>🔄 Trạng Thái</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap', textAlign: 'center' }}>⚙️ Hành Động</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                            {data.length > 0 ? (
+                                data.map((rule, index) => {
+                                    console.log(`📋 Rule ${index}:`, {
+                                        id: rule._id,
+                                        code: rule.code,
+                                        is_active: rule.is_active,
+                                        ruleValue: rule.ruleValue,
+                                        description: rule.description
+                                    });
+                                    return (
+                                        <Table.Tr key={rule._id || rule.code || index} style={{ transition: 'background-color 0.2s ease' }}>
+                                            <Table.Td>
+                                                <Badge
+                                                    variant="gradient"
+                                                    gradient={rule.is_active ? { from: 'green', to: 'teal' } : { from: 'gray', to: 'gray' }}
+                                                    size="lg"
+                                                >
+                                                    {rule.code}
+                                                </Badge>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text lineClamp={2} size="sm">
+                                                    {rule.description}
                                                 </Text>
-                                            )}
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <div style={{ maxWidth: '250px' }}>
+                                                    {rule.ruleValue ? (
+                                                        (() => {
+                                                            // Smart display logic based on ruleValue content
+                                                            const rv = rule.ruleValue;
+
+                                                            // QD1-like structure
+                                                            if (rv.min_import !== undefined && rv.min_stock !== undefined) {
+                                                                return (
+                                                                    <div>
+                                                                        <Text size="sm" c="blue">Nhập tối thiểu: {rv.min_import}</Text>
+                                                                        <Text size="sm" c="green">Tồn kho tối thiểu: {rv.min_stock}</Text>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            // QD2-like structure
+                                                            if (rv.max_debt !== undefined) {
+                                                                return (
+                                                                    <div>
+                                                                        <Text size="sm" c="red">Công nợ tối đa: {rv.max_debt?.toLocaleString()}₫</Text>
+                                                                        {rv.min_stock && <Text size="sm" c="green">Tồn kho tối thiểu: {rv.min_stock}</Text>}
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            // QD6-like structure
+                                                            if (rv.allow_rule_change !== undefined) {
+                                                                return (
+                                                                    <Text size="sm" c={rv.allow_rule_change ? "green" : "red"}>
+                                                                        {rv.allow_rule_change ? "✅ Cho phép thay đổi" : "❌ Không cho phép thay đổi"}
+                                                                    </Text>
+                                                                );
+                                                            }
+
+                                                            // Generic display for other structures
+                                                            return (
+                                                                <div>
+                                                                    {Object.entries(rv).map(([key, value]) => (
+                                                                        <Text key={key} size="xs" c="dimmed">
+                                                                            <Text span fw={500}>{key}:</Text> {String(value)}
+                                                                        </Text>
+                                                                    ))}
+                                                                </div>
+                                                            );
+                                                        })()
+                                                    ) : (
+                                                        <Text size="xs" c="dimmed" fs="italic">
+                                                            Không có giá trị
+                                                        </Text>
+                                                    )}
+                                                </div>
+                                            </Table.Td>
+                                            <Table.Td style={{ textAlign: 'center' }}>
+                                                <Switch
+                                                    checked={rule.is_active}
+                                                    onChange={() => {
+                                                        console.log('🎯 Switch clicked for rule:', rule.code, 'current status:', rule.is_active);
+                                                        handleToggleRuleStatus(rule);
+                                                    }}
+                                                    size="md"
+                                                    color="green"
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Group gap="xs" justify="center" wrap="nowrap">
+                                                    <ActionIcon
+                                                        color="blue"
+                                                        variant="gradient"
+                                                        gradient={{ from: 'blue', to: 'cyan' }}
+                                                        onClick={() => handleEditRule(rule)}
+                                                        radius="md"
+                                                        size="lg"
+                                                    >
+                                                        <IconPencil size="1rem" />
+                                                    </ActionIcon>
+                                                    <ActionIcon
+                                                        color="red"
+                                                        variant="gradient"
+                                                        gradient={{ from: 'red', to: 'pink' }}
+                                                        onClick={() => {
+                                                            console.log('🔴 Delete button clicked for rule:', rule);
+                                                            confirmDeleteRule(rule);
+                                                        }}
+                                                        radius="md"
+                                                        size="lg"
+                                                    >
+                                                        <IconTrash size="1rem" />
+                                                    </ActionIcon>
+                                                </Group>
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    );
+                                })
+                            ) : (
+                                <Table.Tr>
+                                    <Table.Td colSpan={5}>
+                                        <div style={{
+                                            textAlign: 'center',
+                                            padding: '2rem',
+                                            color: '#868e96'
+                                        }}>
+                                            <Text size="lg" c="dimmed" mb="sm">
+                                                ⚙️ Chưa có qui định nào
+                                            </Text>
+                                            <Text size="sm" c="dimmed">
+                                                Thêm qui định đầu tiên cho nhà sách
+                                            </Text>
                                         </div>
                                     </Table.Td>
-                                    <Table.Td style={{ textAlign: 'center' }}>
-                                        <Switch
-                                            checked={rule.is_active}
-                                            onChange={() => {
-                                                console.log('🎯 Switch clicked for rule:', rule.code, 'current status:', rule.is_active);
-                                                handleToggleRuleStatus(rule);
-                                            }}
-                                            size="md"
-                                            color="green"
-                                            style={{ cursor: 'pointer' }}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <Group gap="xs" justify="center" wrap="nowrap">
-                                            <ActionIcon
-                                                color="blue"
-                                                variant="gradient"
-                                                gradient={{ from: 'blue', to: 'cyan' }}
-                                                onClick={() => handleEditRule(rule)}
-                                                radius="md"
-                                                size="lg"
-                                            >
-                                                <IconPencil size="1rem" />
-                                            </ActionIcon>
-                                            <ActionIcon
-                                                color="red"
-                                                variant="gradient"
-                                                gradient={{ from: 'red', to: 'pink' }}
-                                                onClick={() => {
-                                                    console.log('🔴 Delete button clicked for rule:', rule);
-                                                    confirmDeleteRule(rule);
-                                                }}
-                                                radius="md"
-                                                size="lg"
-                                            >
-                                                <IconTrash size="1rem" />
-                                            </ActionIcon>
-                                        </Group>
-                                    </Table.Td>
                                 </Table.Tr>
-                                );
-                            })
-                        ) : (
-                            <Table.Tr>
-                                <Table.Td colSpan={5}>
-                                    <div style={{
-                                        textAlign: 'center',
-                                        padding: '2rem',
-                                        color: '#868e96'
-                                    }}>
-                                        <Text size="lg" c="dimmed" mb="sm">
-                                            ⚙️ Chưa có qui định nào
-                                        </Text>
-                                        <Text size="sm" c="dimmed">
-                                            Thêm qui định đầu tiên cho nhà sách
-                                        </Text>
-                                    </div>
-                                </Table.Td>
-                            </Table.Tr>
-                        )}
-                    </Table.Tbody>
-                </Table>
-            </div>
-        </Paper>
+                            )}
+                        </Table.Tbody>
+                    </Table>
+                </div>
+            </Paper>
         );
     };
 
@@ -1042,7 +1037,8 @@ const AdminDashboardPage = () => {
             style={{
                 minHeight: '100vh',
                 width: '100vw',
-                backgroundColor: '#f8f9fa',
+                // backgroundColor: '#f8f9fa',
+                backgroundImage: 'url("/images/1139490.png")',
                 padding: '1rem',
                 boxSizing: 'border-box',
                 overflow: 'auto',
