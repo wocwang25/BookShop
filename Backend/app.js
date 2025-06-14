@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 // Thêm CORS middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:4173', 'https://bookshop-frontend-y515.onrender.com/'], // Cho phép frontend truy cập
+    origin: ['http://localhost:5173', 'http://localhost:4173', 'https://bookshop-frontend-y515.onrender.com'], // Cho phép frontend truy cập
     credentials: true, // Cho phép gửi cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
