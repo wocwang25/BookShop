@@ -3,7 +3,8 @@ import axios from 'axios';
 
 // Tạo một instance axios với cấu hình chung
 const apiClient = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL_development: 'http://localhost:5000/api',
+    baseURL_production: 'https://bookshop-backend-tfzk.onrender.com',
     headers: {
         'Content-Type': 'application/json',
     },
