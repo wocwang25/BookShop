@@ -1,14 +1,24 @@
 // src/api/apiClient.js
 import axios from 'axios';
 
+// Tự động chọn base URL dựa trên environment
+const getBaseURL = () => {
+    // Nếu đang ở production (deployed), sử dụng backend URL trên Render
+    if (import.meta.env.PROD) {
+        return import.meta.env.VITE_API_URL || 'https://bookshop-backend-tfzk.onrender.com/api';
+    }
+    // Nếu đang development, sử dụng localhost
+    return 'http://localhost:5000/api';
+};
+
 // Tạo một instance axios với cấu hình chung
 const apiClient = axios.create({
-    baseURL_development: 'http://localhost:5000/api',
-    baseURL_production: 'https://bookshop-backend-tfzk.onrender.com/api',
+    baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',
     },
 });
+
 
 // Interceptor để tự động đính kèm token vào mỗi request
 apiClient.interceptors.request.use(
