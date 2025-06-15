@@ -76,7 +76,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchFeaturedBooks = async () => {
             try {
-                const response = await API.books.getAllBooks({ params: { limit: 4, sort: '-createdAt' } });
+                const response = await API.books.getAllBooks({ params: { limit: 8, sort: '-createdAt' } });
                 const books = response.data?.books || [];
                 setFeaturedBooks(books);
             } catch (err) {

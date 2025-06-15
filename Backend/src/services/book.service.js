@@ -43,19 +43,19 @@ const BookService = {
         // Tìm sách theo tiêu đề
         let book = await Book.findOne({ title });
 
-        if (!book) {
-            book = new Book({
-                title,
-                author: authorDoc._id,
-                category: categoryDoc._id,
-                description,
-                price,
-                publicationYear
-            });
-
-            await book.save();
+        if (book) {
+            throw new Error("Sách đã tồn tại trong database")
         }
+        book = new Book({
+            title,
+            author: authorDoc._id,
+            category: categoryDoc._id,
+            description,
+            price,
+            publicationYear
+        });
 
+        await book.save();
         return book;
     },
 

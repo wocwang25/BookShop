@@ -20,7 +20,11 @@ const RentalInvoiceService = {
             .populate('user', 'name')
             .populate({
                 path: 'items.book',
-                select: 'title author category'
+                select: 'title author category',
+                populate: [
+                    { path: 'author', select: 'name' },
+                    { path: 'category', select: 'name' }
+                ]
             })
             .populate({
                 path: 'items.bookCopy',
@@ -44,7 +48,11 @@ const RentalInvoiceService = {
         const rule7 = await Rule.findOne({ code: "QD7" });
         const default_duration = rule7?.ruleValue?.default_duration;
         const overdue_fee = rule7?.ruleValue?.overdue_fee;
-        const rent_fee = rule7?.ruleValue?.rent_fee;
+        const rent_fee = rule7?.ruleValue?.rent_fee ?? 5000;
+
+        if (typeof rent_fee !== 'number' || isNaN(rent_fee)) {
+            throw new Error('Phí thuê sách (rent_fee) không hợp lệ. Vui lòng kiểm tra cấu hình QD7.');
+        }
 
         const rule2 = await Rule.findOne({ code: 'QD2' });
         const minStock = rule2?.ruleValue?.min_stock;
@@ -68,6 +76,12 @@ const RentalInvoiceService = {
             let totalAmount = 0;
 
             const { startDate, dueDate } = rent_info;
+
+            // Tính số ngày thuê (ít nhất 1 ngày)
+            const start = new Date(startDate);
+            const due = new Date(dueDate);
+            const days = Math.max(1, Math.ceil((due - start) / (1000 * 60 * 60 * 24)));
+
             for (const item of items) {
                 const { title } = item;
 
@@ -81,8 +95,8 @@ const RentalInvoiceService = {
                     }
                 );
 
-                if (availableCopies.length < minStock) {
-                    throw new Error(`Không đủ bản copy có sẵn cho sách "${bookInfo.title}". Có sẵn: ${availableCopies.length}.`);
+                if (availableCopies < minStock) {
+                    throw new Error(`Không đủ bản copy có sẵn cho sách "${book.title}". Có sẵn: ${availableCopies}.`);
                 }
 
                 const copyToRent = await BookCopy.findOneAndUpdate(
@@ -104,8 +118,9 @@ const RentalInvoiceService = {
                 });
             }
 
+            // Tổng tiền = số sách * số ngày thuê * phí thuê/ngày
             rentalInvoice.items = invoiceItems;
-            rentalInvoice.totalAmount = rent_fee * items.length;
+            rentalInvoice.totalAmount = rent_fee * items.length * days;
 
             // Nếu truyền startDate thì dùng, không thì lấy ngày hiện tại
             rentalInvoice.startDate = startDate ? new Date(startDate) : new Date();

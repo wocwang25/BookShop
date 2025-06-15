@@ -168,14 +168,11 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
     });
 
     const handleSubmit = (values) => {
-        console.log('📝 Form submitted with values:', values);
-
         let ruleValue = null;
         if (values.ruleValue && values.ruleValue.trim()) {
             try {
                 ruleValue = JSON.parse(values.ruleValue);
             } catch (error) {
-                console.error('Invalid JSON in ruleValue:', error);
                 return; // Validation should have caught this
             }
         }
@@ -187,7 +184,6 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
             active: values.active
         };
 
-        console.log('📤 Calling onSave with:', formData);
         onSave(formData);
     };
 
@@ -392,14 +388,9 @@ const AdminDashboardPage = () => {
     // Hàm lấy danh sách rules
     const fetchRules = useCallback(async () => {
         try {
-            console.log('🔄 Fetching rules...');
             const response = await API.rules.getAllRules();
-            console.log('📋 Rules response:', response);
-            console.log('📋 Rules data:', response.data);
             setRules(response.data || []);
-            console.log('✅ Rules updated successfully');
         } catch (error) {
-            console.error('❌ Error fetching rules:', error);
             showNotification('Không thể tải danh sách quy định', 'red');
         }
     }, [showNotification]);
@@ -424,9 +415,6 @@ const AdminDashboardPage = () => {
     // Hàm xử lý lưu rule
     const handleSaveRule = async (formData) => {
         try {
-            console.log('💾 Saving rule with formData:', formData);
-            console.log('💾 Is editing mode:', !!editingRule);
-
             // Ensure consistent field naming
             const ruleData = {
                 code: formData.code,
@@ -435,56 +423,37 @@ const AdminDashboardPage = () => {
                 is_active: formData.active  // Convert active to is_active
             };
 
-            console.log('📤 Sending ruleData:', ruleData);
-
             if (editingRule) {
-                console.log('🔄 Updating rule:', editingRule.code);
                 await API.rules.updateRuleByCode(editingRule.code, ruleData);
                 showNotification('Cập nhật qui định thành công!', 'teal');
             } else {
-                console.log('➕ Creating new rule');
                 await API.rules.createOrUpdateRule(ruleData);
                 showNotification('Thêm qui định mới thành công!', 'teal');
             }
             closeRuleModal();
             fetchRules();
         } catch (error) {
-            console.error('❌ Error saving rule:', error);
-            console.error('❌ Error response:', error.response?.data);
             showNotification(error.response?.data?.error || error.response?.data?.message || 'Có lỗi xảy ra', 'red');
         }
     };
 
     // Hàm xử lý xóa rule
     const confirmDeleteRule = (rule) => {
-        console.log('🗑️ Confirm delete rule clicked for:', rule);
-        console.log('🗑️ Rule code:', rule.code);
         setRuleToDelete(rule);
-        console.log('🗑️ Opening delete modal...');
         openDeleteRuleModal();
-        console.log('🗑️ Delete modal should be open now');
     };
 
     const handleDeleteRule = async () => {
-        console.log('🔥 handleDeleteRule called');
-        console.log('🔥 ruleToDelete:', ruleToDelete);
-
         if (!ruleToDelete) {
-            console.error('❌ No rule to delete');
             return;
         }
 
         try {
-            console.log('🗑️ Deleting rule:', ruleToDelete.code);
             await API.rules.deleteRule(ruleToDelete.code);
-            console.log('✅ Delete API call successful');
             showNotification('Xóa quy định thành công!', 'teal');
             closeDeleteRuleModal();
-            console.log('♻️ Refetching rules after delete...');
             await fetchRules();
         } catch (error) {
-            console.error('❌ Error deleting rule:', error);
-            console.error('❌ Error details:', error.response?.data);
             showNotification(error.response?.data?.error || error.response?.data?.message || 'Lỗi khi xóa quy định', 'red');
         }
     };
@@ -492,8 +461,6 @@ const AdminDashboardPage = () => {
     // Hàm toggle trạng thái rule
     const handleToggleRuleStatus = async (rule) => {
         try {
-            console.log('🔄 Toggling rule status for:', rule.code, 'from', rule.is_active, 'to', !rule.is_active);
-
             // Ensure we use the correct field name that backend expects
             const updatedData = {
                 code: rule.code,  // Add code field explicitly
@@ -502,14 +469,11 @@ const AdminDashboardPage = () => {
                 is_active: !rule.is_active  // Use is_active instead of active
             };
 
-            console.log('📤 Sending update data:', updatedData);
             await API.rules.updateRuleByCode(rule.code, updatedData);
             showNotification(`${rule.is_active ? 'Tắt' : 'Bật'} quy định thành công!`, 'teal');
-            console.log('♻️ Refetching rules after toggle...');
             await fetchRules();
         } catch (error) {
-            console.error('❌ Error toggling rule status:', error);
-            showNotification(error.response?.data?.error || 'Lỗi khi thay đổi trạng thái quy định', 'red');
+            showNotification(error.response?.data?.error || error.response?.data?.message || 'Lỗi khi thay đổi trạng thái quy định', 'red');
         }
     };
 
@@ -559,7 +523,10 @@ const AdminDashboardPage = () => {
             fetchDashboardData(); // Tải lại dữ liệu dashboard
             if (searchQuery) handleSearch(new Event('submit')); // Tải lại kết quả search nếu đang search
         } catch (error) {
-            showNotification(error.response?.data?.message || 'Có lỗi xảy ra', 'red');
+            showNotification(
+                error.response?.data?.error || error.response?.data?.message || 'Lỗi khi lưu sách',
+                'red'
+            );
         }
     };
 
@@ -578,7 +545,10 @@ const AdminDashboardPage = () => {
             fetchDashboardData(); // Tải lại dữ liệu dashboard
             if (searchQuery) handleSearch(new Event('submit')); // Tải lại kết quả search nếu đang search
         } catch (error) {
-            showNotification(error.response?.data?.message || 'Lỗi khi xóa sách', 'red');
+            showNotification(
+                error.response?.data?.error || error.response?.data?.message || 'Lỗi khi xóa sách',
+                'red'
+            );
         }
     };
 
@@ -592,25 +562,16 @@ const AdminDashboardPage = () => {
 
     // Hàm xử lý import CSV
     const handleCsvImport = async () => {
-        console.log('=== CSV IMPORT DEBUG START ===');
-        console.log('1. csvFile:', csvFile);
-        console.log('2. csvFile name:', csvFile?.name);
-        console.log('3. csvFile size:', csvFile?.size);
-        console.log('4. csvFile type:', csvFile?.type);
-
         if (!csvFile) {
-            console.log('ERROR: No CSV file selected');
             showNotification('Vui lòng chọn file CSV', 'red');
             return;
         }
 
-        console.log('5. Starting import process...');
         setIsImporting(true);
         setImportProgress(0);
         setImportResult(null);
 
         try {
-            console.log('6. Setting up progress interval...');
             // Simulate progress
             const progressInterval = setInterval(() => {
                 setImportProgress(prev => {
@@ -622,16 +583,7 @@ const AdminDashboardPage = () => {
                 });
             }, 200);
 
-            console.log('7. Making API call to import CSV...');
-            console.log('8. API.books.importBooksFromCSV function:', API.books.importBooksFromCSV);
-
             const response = await API.books.importBooksFromCSV(csvFile);
-
-            console.log('9. API call completed successfully!');
-            console.log('10. Full response:', response);
-            console.log('11. Response status:', response.status);
-            console.log('12. Response data:', response.data);
-            console.log('13. Response data.result:', response.data.result);
 
             clearInterval(progressInterval);
             setImportProgress(100);
@@ -642,8 +594,6 @@ const AdminDashboardPage = () => {
             const importedCount = result.successCount || result.imported || result.importedCount || 0;
             const failedCount = Array.isArray(result.failed) ? result.failed.length : (result.failedCount || 0);
 
-            console.log('14. Parsed counts - imported:', importedCount, 'failed:', failedCount);
-
             setImportResult({
                 success: true,
                 message: data.message || 'Import thành công!',
@@ -652,19 +602,10 @@ const AdminDashboardPage = () => {
                 details: result.details || result.errors || []
             });
 
-            console.log('15. Success notification and UI update');
             showNotification(`Import thành công ${importedCount} sách!`, 'teal');
             fetchDashboardData(); // Tải lại dữ liệu dashboard
 
         } catch (error) {
-            console.log('ERROR: CSV Import failed');
-            console.log('Error object:', error);
-            console.log('Error message:', error.message);
-            console.log('Error response:', error.response);
-            console.log('Error response data:', error.response?.data);
-            console.log('Error response status:', error.response?.status);
-            console.log('Error stack:', error.stack);
-
             setImportProgress(100);
             setImportResult({
                 success: false,
@@ -673,9 +614,7 @@ const AdminDashboardPage = () => {
             });
             showNotification(error.response?.data?.message || error.message || 'Lỗi khi import CSV', 'red');
         } finally {
-            console.log('14. Cleanup - setting isImporting to false');
             setIsImporting(false);
-            console.log('=== CSV IMPORT DEBUG END ===');
         }
     };
 
@@ -719,9 +658,6 @@ const AdminDashboardPage = () => {
 
     // Component để render bảng rules
     const RulesTable = ({ data, title }) => {
-        console.log('🔍 RulesTable rendering with data:', data);
-        console.log('📊 Data length:', data?.length);
-
         return (
             <Paper
                 withBorder
@@ -764,13 +700,6 @@ const AdminDashboardPage = () => {
                         <Table.Tbody>
                             {data.length > 0 ? (
                                 data.map((rule, index) => {
-                                    console.log(`📋 Rule ${index}:`, {
-                                        id: rule._id,
-                                        code: rule.code,
-                                        is_active: rule.is_active,
-                                        ruleValue: rule.ruleValue,
-                                        description: rule.description
-                                    });
                                     return (
                                         <Table.Tr key={rule._id || rule.code || index} style={{ transition: 'background-color 0.2s ease' }}>
                                             <Table.Td>
@@ -845,7 +774,6 @@ const AdminDashboardPage = () => {
                                                 <Switch
                                                     checked={rule.is_active}
                                                     onChange={() => {
-                                                        console.log('🎯 Switch clicked for rule:', rule.code, 'current status:', rule.is_active);
                                                         handleToggleRuleStatus(rule);
                                                     }}
                                                     size="md"
@@ -870,7 +798,6 @@ const AdminDashboardPage = () => {
                                                         variant="gradient"
                                                         gradient={{ from: 'red', to: 'pink' }}
                                                         onClick={() => {
-                                                            console.log('🔴 Delete button clicked for rule:', rule);
                                                             confirmDeleteRule(rule);
                                                         }}
                                                         radius="md"
@@ -1582,7 +1509,6 @@ const AdminDashboardPage = () => {
                 </Modal>
 
                 {/* Modal Xác Nhận Xóa Rule */}
-                {console.log('🔍 Rendering delete modal, isOpen:', isDeleteRuleModalOpen, 'ruleToDelete:', ruleToDelete)}
                 <Modal
                     opened={isDeleteRuleModalOpen}
                     onClose={closeDeleteRuleModal}
@@ -1652,8 +1578,6 @@ const AdminDashboardPage = () => {
                         <Button
                             color="red"
                             onClick={() => {
-                                console.log('🔴 Xác nhận Xóa button clicked');
-                                console.log('🔴 About to call handleDeleteRule');
                                 handleDeleteRule();
                             }}
                             radius="md"

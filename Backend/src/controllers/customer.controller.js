@@ -11,6 +11,15 @@ const CustomerController = {
         }
     },
 
+    async getAllCustomers(req, res) {
+        try {
+            const customers = await CustomerService.getAllCustomers();
+            res.json(customers);
+        } catch (error) {
+            res.status(500).json(error.message)
+        }
+    },
+
     async updateProfile(req, res) {
         try {
             const updateData = req.body;

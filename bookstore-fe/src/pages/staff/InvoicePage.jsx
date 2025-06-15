@@ -27,10 +27,9 @@ import {
 } from '@mantine/core';
 import { IconTrash, IconFileInvoice, IconCheck, IconX, IconPlus, IconShoppingCart, IconCalendar, IconUser, IconBook, IconRefresh } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
-import { DatePickerInput } from '@mantine/dates';
 
 // --- InvoiceItemForm Component ---
-const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], setInvoiceItems, isSubmitting = false }) => {
+const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], setInvoiceItems, isSubmitting = false, rentalDays, setRentalDays }) => {
     const form = useForm({
         initialValues: { bookId: '', title: '', type: 'sale', quantity: 1, rentalDays: 7 },
     });
@@ -39,7 +38,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
 
     const handleAddToList = (selectedItem) => {
         console.log('🔍 Selected item:', selectedItem);
-        
+
         if (!selectedItem) return;
 
         let bookToAdd;
@@ -54,7 +53,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                 ...bookToAdd,
                 type: selectedType,
                 quantity: selectedType === 'sale' ? 1 : 1,
-                rentalDays: selectedType === 'rent' ? 7 : undefined,
+                // rentalDays: selectedType === 'rent' ? 7 : undefined,
                 unitPrice: selectedType === 'sale' ? bookToAdd.salePrice : bookToAdd.rentalPrice
             };
             setInvoiceItems([...invoiceItems, newItem]);
@@ -64,16 +63,16 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
 
     const handleQuantityChange = (itemId, type, quantity) => {
         setInvoiceItems(invoiceItems.map(item =>
-            item._id === itemId && item.type === type 
-                ? { ...item, quantity: quantity || 1 } 
+            item._id === itemId && item.type === type
+                ? { ...item, quantity: quantity || 1 }
                 : item
         ));
     };
 
     const handleRentalDaysChange = (itemId, days) => {
         setInvoiceItems(invoiceItems.map(item =>
-            item._id === itemId && item.type === 'rent' 
-                ? { ...item, rentalDays: days || 1 } 
+            item._id === itemId && item.type === 'rent'
+                ? { ...item, rentalDays: days || 1 }
                 : item
         ));
     };
@@ -84,9 +83,9 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
 
     const salesItems = invoiceItems.filter(item => item.type === 'sale');
     const rentalItems = invoiceItems.filter(item => item.type === 'rent');
-    
+
     const totalSales = salesItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    const totalRentals = rentalItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice * item.rentalDays), 0);
+    const totalRentals = rentalItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice * rentalDays), 0);
     const grandTotal = totalSales + totalRentals;
 
     const renderItemRows = (items, type) => items.map((item) => (
@@ -107,7 +106,8 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                     style={{ width: 80 }}
                 />
             </Table.Td>
-            <Table.Td>
+            {/* Khi render từng dòng, bỏ NumberInput số ngày thuê: */}
+            {/* <Table.Td>
                 {type === 'rent' ? (
                     <NumberInput
                         value={item.rentalDays}
@@ -119,7 +119,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                 ) : (
                     <Text size="sm" c="dimmed">-</Text>
                 )}
-            </Table.Td>
+            </Table.Td> */}
             <Table.Td>
                 <Text size="sm" fw={500} c="green">
                     {item.unitPrice?.toLocaleString('vi-VN')} ₫
@@ -127,7 +127,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
             </Table.Td>
             <Table.Td>
                 <Text size="sm" fw={500}>
-                    {type === 'sale' 
+                    {type === 'sale'
                         ? (item.quantity * item.unitPrice).toLocaleString('vi-VN')
                         : (item.quantity * item.unitPrice * item.rentalDays).toLocaleString('vi-VN')
                     } ₫
@@ -157,7 +157,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                             radius="md"
                             clearable
                             comboboxProps={{
-                                zIndex: 2000,
+                                zIndex: 12000,
                                 withinPortal: true,
                             }}
                         />
@@ -176,6 +176,20 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                     </div>
                 </Group>
 
+                {selectedType === 'rent' && (
+                    <Group>
+                        <Text size="sm" fw={500}>Số ngày thuê</Text>
+                        <NumberInput
+                            value={rentalDays}
+                            onChange={setRentalDays}
+                            min={1}
+                            step={1}
+                            style={{ width: 100 }}
+                            hideControls
+                        />
+                    </Group>
+                )}
+
                 {invoiceItems.length > 0 && (
                     <>
                         <div>
@@ -193,7 +207,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                                             <Table.Th>Tác giả</Table.Th>
                                             <Table.Th>Loại</Table.Th>
                                             <Table.Th>Số lượng</Table.Th>
-                                            <Table.Th>Số ngày thuê</Table.Th>
+                                            {/* <Table.Th>Số ngày thuê</Table.Th> */}
                                             <Table.Th>Đơn giá</Table.Th>
                                             <Table.Th>Thành tiền</Table.Th>
                                             <Table.Th>Xóa</Table.Th>
@@ -206,7 +220,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                                 </Table>
                             </div>
                         </div>
-                        
+
                         <Card withBorder>
                             <SimpleGrid cols={3}>
                                 <div>
@@ -394,12 +408,14 @@ const InvoicePage = () => {
     const [invoiceItems, setInvoiceItems] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomerInput, setSelectedCustomerInput] = useState('');
     const [notification, setNotification] = useState({ show: false, message: '', color: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // States for invoice list
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [rentalDays, setRentalDays] = useState(7); // mặc định 7 ngày
     const [invoices, setInvoices] = useState([]);
     const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -413,14 +429,14 @@ const InvoicePage = () => {
         const loadData = async () => {
             try {
                 const booksResponse = await API.books.getAllBooks();
-                setAllBooks(booksResponse.data.books.map(b => ({ 
-                    value: b._id, 
-                    label: b.title, 
+                setAllBooks(booksResponse.data.books.map(b => ({
+                    value: b._id,
+                    label: b.title,
                     salePrice: b.salePrice || 50000, // Fallback price if not set
                     rentalPrice: b.rentalPrice || 5000, // Fallback price if not set
-                    ...b 
+                    ...b
                 })));
-                
+
                 // Try to load customers, use mock data if API not available
                 try {
                     const customersResponse = await API.customer.getAllCustomers();
@@ -450,33 +466,33 @@ const InvoicePage = () => {
     const loadInvoices = async () => {
         try {
             setIsLoadingInvoices(true);
-            
+
             // Load both sales and rental invoices
             const [salesResponse, rentalResponse] = await Promise.all([
                 API.invoice.getSalesInvoice({ month: selectedMonth, year: selectedYear }),
                 API.invoice.getRentalInvoice({ month: selectedMonth, year: selectedYear })
             ]);
-            
+
             // Combine and format invoices
             const salesInvoices = (salesResponse.data.invoices || []).map(invoice => ({
                 ...invoice,
                 type: 'sale'
             }));
-            
+
             const rentalInvoices = (rentalResponse.data.invoices || []).map(invoice => ({
                 ...invoice,
                 type: 'rent'
             }));
-            
+
             const allInvoices = [...salesInvoices, ...rentalInvoices];
-            
+
             // Sort by creation date (newest first)
             allInvoices.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
+
             setInvoices(allInvoices);
         } catch (error) {
             console.error('Error loading invoices:', error);
-            
+
             // Use mock data as fallback
             const mockInvoices = [
                 {
@@ -488,7 +504,7 @@ const InvoicePage = () => {
                     items: []
                 },
                 {
-                    _id: 'inv002', 
+                    _id: 'inv002',
                     type: 'rent',
                     customer: { name: 'Trần Thị B' },
                     totalAmount: 75000,
@@ -509,37 +525,51 @@ const InvoicePage = () => {
     };
 
     const handleCreateInvoice = async () => {
-        if (!selectedCustomer || invoiceItems.length === 0) {
+        if (!selectedCustomerInput || invoiceItems.length === 0) {
             showNotification("Vui lòng chọn khách hàng và thêm sản phẩm.", "orange");
             return;
         }
 
         setIsSubmitting(true);
         try {
+            // Tìm khách hàng cũ
+            const matchedCustomer = customers.find(
+                c => `${c.name} (${c.email})` === selectedCustomerInput
+            );
+
+            // Nếu có, lấy thông tin cũ, nếu không thì tạo mới với tên nhập vào
+            const customer_name = matchedCustomer ? matchedCustomer.name : selectedCustomerInput;
+
             const salesItems = invoiceItems.filter(item => item.type === 'sale');
             const rentalItems = invoiceItems.filter(item => item.type === 'rent');
 
+            // Gửi hóa đơn bán
             if (salesItems.length > 0) {
                 const salesData = {
-                    customerId: selectedCustomer._id,
+                    customer_name: customer_name,
                     items: salesItems.map(item => ({
-                        bookId: item._id,
-                        quantity: item.quantity,
-                        unitPrice: item.unitPrice
+                        title: item.label, // dùng label là tên sách
+                        quantity: item.quantity
                     }))
                 };
                 await API.invoice.createSalesInvoice(salesData);
             }
 
+            // Gửi hóa đơn thuê
             if (rentalItems.length > 0) {
+                const today = new Date();
+                const dueDate = new Date(today);
+                dueDate.setDate(today.getDate() + rentalDays);
+
                 const rentalData = {
-                    customerId: selectedCustomer._id,
+                    customer_name: customer_name,
                     items: rentalItems.map(item => ({
-                        bookId: item._id,
-                        quantity: item.quantity,
-                        unitPrice: item.unitPrice,
-                        rentalDays: item.rentalDays
-                    }))
+                        title: item.label
+                    })),
+                    rent_info: {
+                        startDate: today.toISOString().slice(0, 10),
+                        dueDate: dueDate.toISOString().slice(0, 10),
+                    }
                 };
                 await API.invoice.createRentalInvoice(rentalData);
             }
@@ -550,7 +580,7 @@ const InvoicePage = () => {
             await loadInvoices();
         } catch (error) {
             console.error('Error creating invoice:', error);
-            showNotification(error.response?.data?.message || "Lỗi khi tạo hóa đơn.", "red");
+            showNotification(error.response?.data?.error || "Lỗi khi tạo hóa đơn.", "red");
         } finally {
             setIsSubmitting(false);
         }
@@ -559,6 +589,7 @@ const InvoicePage = () => {
     const resetInvoiceState = () => {
         setInvoiceItems([]);
         setSelectedCustomer(null);
+        setSelectedCustomerInput('');
         setIsSubmitting(false);
     };
 
@@ -576,7 +607,7 @@ const InvoicePage = () => {
         if (item.type === 'sale') {
             return sum + (item.quantity * item.unitPrice);
         } else {
-            return sum + (item.quantity * item.unitPrice * item.rentalDays);
+            return sum + (item.quantity * item.unitPrice * rentalDays);
         }
     }, 0);
 
@@ -598,7 +629,7 @@ const InvoicePage = () => {
                     icon={notification.color === 'red' ? <IconX /> : <IconCheck />}
                     color={notification.color}
                     onClose={() => setNotification({ show: false })}
-                    style={{ position: 'fixed', top: 80, right: 20, zIndex: 1000 }}
+                    style={{ position: 'fixed', top: 80, right: 20, zIndex: 12000 }}
                 >
                     {notification.message}
                 </Notification>
@@ -683,19 +714,61 @@ const InvoicePage = () => {
                 size="xl"
                 radius="lg"
                 shadow="xl"
+                zIndex={9999}
+                overlayProps={{
+                    backgroundOpacity: 0.75,
+                    blur: 1,
+                    zIndex: 9998
+                }}
+                styles={{
+                    root: {
+                        zIndex: 9999,
+                    },
+                    inner: {
+                        zIndex: 9999,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                    },
+                    modal: {
+                        backgroundColor: 'white',
+                        zIndex: 9999,
+                        position: 'relative',
+                        maxHeight: '90vh',
+                        overflow: 'auto'
+                    },
+                    header: {
+                        backgroundColor: '#f8f9fa',
+                        borderBottom: '1px solid #dee2e6',
+                        padding: '1rem 1.5rem',
+                        fontSize: '1.1rem',
+                        fontWeight: 600
+                    },
+                    overlay: {
+                        zIndex: 9998,
+                        backgroundColor: 'rgba(0, 0, 0, 0.75) !important'
+                    }
+                }}
+                portalProps={{
+                    target: document.body
+                }}
+
             >
                 <div style={{ marginBottom: '1rem' }}>
                     <Text size="md" fw={500} mb="xs">👤 Chọn khách hàng</Text>
-                    <Select
-                        placeholder="Chọn khách hàng..."
-                        data={customers.map(c => ({ value: c._id, label: `${c.name} (${c.email})` }))}
-                        value={selectedCustomer?._id}
-                        onChange={(value) => {
-                            const customer = customers.find(c => c._id === value);
-                            setSelectedCustomer(customer);
-                        }}
-                        searchable
+                    <Autocomplete
+                        placeholder="Nhập hoặc chọn khách hàng..."
+                        data={customers.map(c => `${c.name} (${c.email})`)}
+                        value={selectedCustomerInput ?? ''}
+                        onChange={setSelectedCustomerInput}
                         size="md"
+                        clearable
+                        comboboxProps={{
+                            zIndex: 12000,
+                            withinPortal: true,
+                        }}
                     />
                 </div>
                 <Divider my="md" />
@@ -706,6 +779,8 @@ const InvoicePage = () => {
                     invoiceItems={invoiceItems}
                     setInvoiceItems={setInvoiceItems}
                     isSubmitting={isSubmitting}
+                    rentalDays={rentalDays}           // thêm dòng này
+                    setRentalDays={setRentalDays}
                 />
             </Modal>
 
@@ -716,17 +791,135 @@ const InvoicePage = () => {
                 size="xl"
                 title="Chi Tiết Hóa Đơn"
                 centered
+                zIndex={9999}
+                overlayProps={{
+                    backgroundOpacity: 0.75,
+                    blur: 1,
+                    zIndex: 9998
+                }}
+                styles={{
+                    root: {
+                        zIndex: 9999,
+                    },
+                    inner: {
+                        zIndex: 9999,
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                    },
+                    modal: {
+                        backgroundColor: 'white',
+                        zIndex: 9999,
+                        position: 'relative',
+                        maxHeight: '90vh',
+                        overflow: 'auto'
+                    },
+                    header: {
+                        backgroundColor: '#f8f9fa',
+                        borderBottom: '1px solid #dee2e6',
+                        padding: '1rem 1.5rem',
+                        fontSize: '1.1rem',
+                        fontWeight: 600
+                    },
+                    overlay: {
+                        zIndex: 9998,
+                        backgroundColor: 'rgba(0, 0, 0, 0.75) !important'
+                    }
+                }}
+                portalProps={{
+                    target: document.body
+                }}
+
             >
                 {selectedInvoice && (
-                    <div>
-                        <Paper withBorder p="md" mb="md">
-                            <Text size="sm" c="dimmed">Mã hóa đơn: #{selectedInvoice._id}</Text>
-                            <Text size="sm" c="dimmed">Ngày tạo: {new Date(selectedInvoice.createdAt).toLocaleString('vi-VN')}</Text>
-                            <Text size="sm" c="dimmed">Khách hàng: {selectedInvoice.customer?.name}</Text>
-                            <Text size="sm" c="dimmed">Tổng tiền: {selectedInvoice.totalAmount?.toLocaleString('vi-VN')} ₫</Text>
-                        </Paper>
-                        <Button onClick={closeViewModal}>Đóng</Button>
-                    </div>
+                    <Paper withBorder p="xl" radius="md" shadow="sm" style={{ maxWidth: 700, margin: '0 auto' }}>
+                        <Group justify="space-between" mb="md">
+                            <Title order={3} c="dark">🧾 HÓA ĐƠN {selectedInvoice.type === 'sale' ? 'BÁN SÁCH' : 'THUÊ SÁCH'}</Title>
+                            <Badge color={selectedInvoice.type === 'sale' ? 'blue' : 'green'} size="lg">
+                                {selectedInvoice.type === 'sale' ? 'Mua' : 'Thuê'}
+                            </Badge>
+                        </Group>
+                        <SimpleGrid cols={2} spacing="xs" mb="md">
+                            <Text size="sm"><b>Mã hóa đơn:</b> #{selectedInvoice._id}</Text>
+                            <Text size="sm"><b>Ngày lập hóa đơn:</b> {new Date(selectedInvoice.createdAt).toLocaleDateString('vi-VN')}</Text>
+                            <Text size="sm"><b>Khách hàng:</b> {selectedInvoice.customer?.name || 'N/A'}</Text>
+                            {selectedInvoice.type === 'rent' && (
+                                <>
+                                    <Text size="sm"><b>Ngày bắt đầu thuê:</b> {selectedInvoice.startDate ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN') : '-'}</Text>
+                                    <Text size="sm"><b>Ngày trả dự kiến:</b> {selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN') : '-'}</Text>
+                                </>
+                            )}
+                        </SimpleGrid>
+                        <Divider mb="sm" />
+                        <Table withBorder highlightOnHover>
+                            <Table.Thead>
+                                <Table.Tr>
+                                    <Table.Th>STT</Table.Th>
+                                    <Table.Th>Sách</Table.Th>
+                                    <Table.Th>Thể loại</Table.Th>
+                                    <Table.Th>Số lượng</Table.Th>
+                                    {selectedInvoice.type === 'sale' ? (
+                                        <>
+                                            <Table.Th>Đơn giá</Table.Th>
+                                            <Table.Th>Thành tiền</Table.Th>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Table.Th>Ngày bắt đầu</Table.Th>
+                                            <Table.Th>Ngày trả dự kiến</Table.Th>
+                                        </>
+                                    )}
+                                </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                                {(selectedInvoice.items || []).map((item, idx) => (
+                                    <Table.Tr key={item._id || idx}>
+                                        <Table.Td>{idx + 1}</Table.Td>
+                                        <Table.Td>{item.book?.title || item.title || '-'}</Table.Td>
+                                        <Table.Td>{item.book?.category?.name || item.category?.name || item.book?.category || item.category || '-'}</Table.Td>
+                                        <Table.Td>{item.quantity || 1}</Table.Td>
+                                        {selectedInvoice.type === 'sale' ? (
+                                            <>
+                                                <Table.Td>
+                                                    {item.unitPrice != null
+                                                        ? item.unitPrice.toLocaleString('vi-VN') + ' ₫'
+                                                        : '-'}
+                                                </Table.Td>
+                                                <Table.Td>
+                                                    {(item.unitPrice && item.quantity)
+                                                        ? (item.unitPrice * item.quantity).toLocaleString('vi-VN') + ' ₫'
+                                                        : '-'}
+                                                </Table.Td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Table.Td>
+                                                    {selectedInvoice.startDate
+                                                        ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN')
+                                                        : '-'}
+                                                </Table.Td>
+                                                <Table.Td>
+                                                    {selectedInvoice.dueDate
+                                                        ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN')
+                                                        : '-'}
+                                                </Table.Td>
+                                            </>
+                                        )}
+                                    </Table.Tr>
+                                ))}
+                            </Table.Tbody>
+                        </Table>
+                        <Group justify="flex-end" mt="md">
+                            <Text size="lg" fw={700}>
+                                Tổng cộng: {selectedInvoice.totalAmount?.toLocaleString('vi-VN')} ₫
+                            </Text>
+                        </Group>
+                        <Group justify="flex-end" mt="md">
+                            <Button onClick={closeViewModal}>Đóng</Button>
+                        </Group>
+                    </Paper>
                 )}
             </Modal>
         </div>

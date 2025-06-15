@@ -67,7 +67,11 @@ const BookController = {
     // Lấy all sách
     async getAllBook(req, res) {
         try {
-            const books = await Book.find({})
+            // Lấy limit và sort từ query params (nếu có)
+            const limit = parseInt(req.query.limit) || 0;
+            const sort = req.query.sort || '-createdAt';
+
+            let query = Book.find({})
                 .populate({
                     path: 'author',
                     select: 'name'
@@ -75,8 +79,20 @@ const BookController = {
                 .populate({
                     path: 'category',
                     select: 'name'
-                })
-                .populate('availableStock')
+                });
+
+            // Áp dụng sort nếu có
+            if (sort) {
+                query = query.sort(sort);
+            }
+
+            // Áp dụng limit nếu có
+            if (limit > 0) {
+                query = query.limit(limit);
+            }
+
+            const books = await query;
+
             if (!books) {
                 return res.status(404).json({
                     success: false,

@@ -74,7 +74,7 @@ export const authAPI = {
 // ===== BOOKS APIs =====
 export const booksAPI = {
     // Lấy tất cả sách
-    getAllBooks: () => apiClient.get('/books'),
+    getAllBooks: (config = {}) => apiClient.get('/books', config),
 
     // Tìm kiếm sách
     searchBooks: (keyword) => apiClient.get(`/books/search?keyword=${encodeURIComponent(keyword)}`),
@@ -139,7 +139,7 @@ export const customerAPI = {
     updateProfile: (profileData) => apiClient.patch('/customer/profile', profileData),
 
     // Lấy tất cả khách hàng (Staff/Admin only)
-    getAllCustomers: () => apiClient.get('/customers')
+    getAllCustomers: () => apiClient.get('/customer')
 };
 
 // ===== CART APIs =====

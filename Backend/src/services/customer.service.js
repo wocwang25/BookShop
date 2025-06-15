@@ -32,6 +32,15 @@ const CustomerService = {
         return { customer };
     },
 
+    async getAllCustomers() {
+        const customers = await Customer.find({});
+        if (!customers) {
+            throw new Error("Không tìm thấy tài khoản khách hàng");
+        }
+        // Trả về thông tin tài khoản và khách hàng
+        return { customers };
+    },
+
     async updateCustomerProfile(userId, updateData) {
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -55,7 +64,7 @@ const CustomerService = {
                     throw new Error("Email này đã được sử dụng bởi tài khoản khác.");
                 }
             }
-            const customer_info = await Customer.findByIdAndUpdate(
+            await Customer.findByIdAndUpdate(
                 user.customerProfile,
                 { $set: updateData },
                 { new: true, session }
@@ -74,6 +83,8 @@ const CustomerService = {
             session.endSession();
         }
     },
+
+
 };
 
 module.exports = CustomerService;

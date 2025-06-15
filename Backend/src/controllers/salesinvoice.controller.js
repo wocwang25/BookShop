@@ -4,7 +4,7 @@ const SalesInvoiceController = {
     async getAllSalesInvoice(req, res) {
         try {
             const { month, year } = req.query;
-            const result = await SalesInvoiceService.getAllSalesInvoice(month, year);
+            const results = await SalesInvoiceService.getAllSalesInvoice(month, year);
 
             res.status(201).json(
                 {
