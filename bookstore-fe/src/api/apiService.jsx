@@ -1,9 +1,19 @@
 // src/api/apiClient.js
 import axios from 'axios';
 
+// Tự động chọn base URL dựa trên environment
+const getBaseURL = () => {
+    // Nếu đang ở production (deployed), sử dụng backend URL trên Render
+    if (import.meta.env.PROD) {
+        return import.meta.env.VITE_API_URL || 'https://bookshop-backend-tfzk.onrender.com/api';
+    }
+    // Nếu đang development, sử dụng localhost
+    return 'http://localhost:5000/api';
+};
+
 // Tạo một instance axios với cấu hình chung
 const apiClient = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',
     },
@@ -125,7 +135,10 @@ export const customerAPI = {
     getProfile: () => apiClient.get('/customer/profile'),
 
     // Cập nhật profile khách hàng
-    updateProfile: (profileData) => apiClient.patch('/customer/profile', profileData)
+    updateProfile: (profileData) => apiClient.patch('/customer/profile', profileData),
+
+    // Lấy tất cả khách hàng (Staff/Admin only)
+    getAllCustomers: () => apiClient.get('/customers')
 };
 
 // ===== CART APIs =====

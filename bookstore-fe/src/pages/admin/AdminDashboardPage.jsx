@@ -1058,7 +1058,7 @@ const AdminDashboardPage = () => {
             )}
 
             {/* CONTAINER CHÍNH SỬ DỤNG TOÀN BỘ MÀN HÌNH */}
-            <div style={{ width: '100%', maxWidth: '1200', margin: '0 auto' }}>
+            <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
                 {/* Header của Dashboard */}
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <Title order={1} mb="md" c="dark" style={{ fontWeight: 600 }}>
@@ -1298,6 +1298,48 @@ const AdminDashboardPage = () => {
                     centered
                     radius="lg"
                     shadow="xl"
+                    zIndex={10000}
+                    overlayProps={{
+                        backgroundOpacity: 0.55,
+                        blur: 3,
+                        zIndex: 9999
+                    }}
+                    styles={{
+                        root: {
+                            zIndex: 10000,
+                        },
+                        inner: {
+                            zIndex: 10000,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                        },
+                        modal: {
+                            backgroundColor: 'white',
+                            zIndex: 10000,
+                            position: 'relative',
+                            maxHeight: '90vh',
+                            overflow: 'auto',
+                            minWidth: '400px'
+                        },
+                        header: {
+                            backgroundColor: '#f8f9fa',
+                            borderBottom: '1px solid #dee2e6',
+                            padding: '1rem 1.5rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600
+                        },
+                        overlay: {
+                            zIndex: 9999,
+                            backgroundColor: 'rgba(0, 0, 0, 0.55) !important'
+                        }
+                    }}
+                    portalProps={{
+                        target: document.body
+                    }}
+
                 >
                     <Text size="md" mb="lg">
                         Bạn có chắc chắn muốn xóa sách <strong>"{bookToDelete?.title}"</strong> không?
@@ -1622,9 +1664,6 @@ const AdminDashboardPage = () => {
                         </Button>
                     </Group>
                 </Modal>
-
-
-
             </div>
         </div>
     );

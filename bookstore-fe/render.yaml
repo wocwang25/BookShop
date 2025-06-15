@@ -1,0 +1,20 @@
+services:
+  # Frontend Static Site
+  - type: web
+    name: bookstore-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://bookstore-backend.onrender.com/api
+
+  # Backend Web Service (chỉ để tham khảo, cần deploy riêng)
+  # - type: web
+  #   name: bookstore-backend
+  #   env: node
+  #   buildCommand: npm install
+  #   startCommand: npm start
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
