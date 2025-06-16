@@ -4,30 +4,34 @@ const PaymentReceipt = require('../models/PaymentReceipt');
 const mongoose = require('mongoose');
 
 const PaymentReceiptService = {
-    async getAllPaymentReceiptInCurrentMonth() {
+    async getAllPaymentReceipt(month, year) {
         try {
-            // Lấy ngày đầu và cuối tháng hiện tại
-            const now = new Date();
-            const startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-            const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+            console.log(month, year)
+            // Xác định ngày đầu và cuối tháng
+            const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+            const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
             // Lấy danh sách phiếu thu trong tháng hiện tại
             const receipts = await PaymentReceipt.find({
                 createdAt: { $gte: startDate, $lte: endDate }
-            }).populate('customer', 'name').populate('user', 'name');
+            })
+                .populate('customer', 'name email phone address ')
+                .populate('user', 'name email')
+                .lean();
 
             // Tính tổng tiền
-            const totalAmount = receipts.reduce((sum, r) => sum + (r.paymentAmount || 0), 0);
+            const totalAmount = Array.isArray(receipts)
+                ? receipts.reduce((sum, r) => sum + (r.paymentAmount || 0), 0)
+                : 0;
 
             return {
-                receipts,
+                receipts: receipts || [],
                 totalAmount
             };
         } catch (error) {
             throw error;
         }
     },
-
     async createPaymentReceipt(userId, data) {
         let { customer_name, customer_info, paymentAmount, note } = data;
 
@@ -45,7 +49,7 @@ const PaymentReceiptService = {
             if (!paymentAmount) {
                 paymentAmount = customer.debt;
             }
-            if (rule.is_active && paymentAmount > customer.debt) {
+            if (rule?.is_active && paymentAmount > customer.debt) {
                 throw new Error("Số tiền thu không được vượt quá số nợ của khách hàng.");
             }
             // Tạo phiếu thu

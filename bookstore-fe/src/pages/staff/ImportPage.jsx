@@ -337,7 +337,9 @@ const ImportSlipsList = ({ slips, onView, onPrint, isLoading, selectedMonth, set
     ];
 
     return (
-        <Paper withBorder p="md" radius="md">
+        <Paper withBorder p="md" radius="md" style={{
+            background: 'rgba(255,255,255,0.85)' // Nền trắng mờ
+        }}>
             <Group justify="space-between" mb="md">
                 <Title order={3}>📋 Danh Sách Phiếu Nhập</Title>
                 <Button
@@ -501,10 +503,10 @@ const ImportSlipDetails = ({ slip, onClose, onPrint }) => {
                         {slip.items.map((item, index) => (
                             <Table.Tr key={index}>
                                 <Table.Td>
-                                    {item.book?.title || 
-                                     (typeof item.book === 'string' ? 
-                                      allBooks.find(b => b._id === item.book)?.label || 'Không rõ' : 
-                                      'Không rõ')}
+                                    {item.book?.title ||
+                                        (typeof item.book === 'string' ?
+                                            allBooks.find(b => b._id === item.book)?.label || 'Không rõ' :
+                                            'Không rõ')}
                                 </Table.Td>
                                 <Table.Td>{item.quantity}</Table.Td>
                                 <Table.Td>{item.unitImportPrice.toLocaleString('vi-VN')} ₫</Table.Td>
@@ -590,69 +592,183 @@ const ImportPage = () => {
 
     const handlePrintSlip = (slip) => {
         const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            showNotification('Không thể mở cửa sổ in. Vui lòng cho phép popup.', 'red');
+            return;
+        }
+
         const slipTotalAmount = slip.items.reduce((sum, item) =>
             sum + (item.quantity * item.unitImportPrice), 0
         );
+        const totalQuantity = slip.items.reduce((sum, item) => sum + item.quantity, 0);
 
         const printContent = `
             <html>
                 <head>
                     <title>Phiếu Nhập #${slip._id}</title>
                     <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        .header { text-align: center; margin-bottom: 20px; }
-                        .info { margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #f5f5f5; }
-                        .total { text-align: right; font-weight: bold; }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            padding: 20px; 
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 30px; 
+                            border-bottom: 3px solid #4A90E2;
+                            padding-bottom: 20px;
+                        }
+                        .company-name {
+                            font-size: 28px;
+                            font-weight: bold;
+                            color: #4A90E2;
+                            margin-bottom: 10px;
+                        }
+                        .import-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #E74C3C;
+                            margin: 15px 0;
+                        }
+                        .info { 
+                            margin-bottom: 30px; 
+                            display: flex;
+                            justify-content: space-between;
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 8px;
+                        }
+                        .info-section {
+                            flex: 1;
+                            margin-right: 20px;
+                        }
+                        .info-section:last-child {
+                            margin-right: 0;
+                        }
+                        .info-section h3 {
+                            color: #4A90E2;
+                            margin-bottom: 10px;
+                            font-size: 16px;
+                        }
+                        .info-section p {
+                            margin: 5px 0;
+                            font-size: 14px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-bottom: 30px; 
+                        }
+                        th, td { 
+                            border: 1px solid #ddd; 
+                            padding: 12px 8px; 
+                            text-align: left; 
+                        }
+                        th { 
+                            background-color: #4A90E2; 
+                            color: white;
+                            font-weight: bold;
+                        }
+                        tr:nth-child(even) {
+                            background-color: #f8f9fa;
+                        }
+                        .total { 
+                            text-align: right; 
+                            font-weight: bold; 
+                            background: #E8F4FD;
+                            padding: 20px;
+                            border-radius: 8px;
+                            border-left: 5px solid #4A90E2;
+                        }
+                        .total-amount {
+                            font-size: 24px;
+                            color: #E74C3C;
+                            margin-top: 10px;
+                        }
+                        .footer {
+                            margin-top: 50px;
+                            text-align: center;
+                            padding-top: 20px;
+                            border-top: 2px solid #ddd;
+                            color: #666;
+                        }
                         @media print {
                             .no-print { display: none; }
+                            body { margin: 0; padding: 15px; }
                         }
                     </style>
                 </head>
                 <body>
                     <div class="header">
-                        <h1>PHIẾU NHẬP SÁCH</h1>
-                        <p>Mã phiếu: #${slip._id}</p>
-                        <p>Ngày: ${new Date(slip.createdAt).toLocaleString('vi-VN')}</p>
+                        <div class="company-name">📚 BOOKSTORE</div>
+                        <div style="font-size: 14px; color: #666;">Địa chỉ: Kí túc xá khu B, TP.HCM</div>
+                        <div style="font-size: 14px; color: #666;">Điện thoại: 0123 456 789 | Email: lolicute@bookstore.com</div>
+                        <div class="import-title">
+                            PHIẾU NHẬP SÁCH
+                        </div>
                     </div>
                     
                     <div class="info">
-                        <p>Tổng số loại sách: ${slip.items.length}</p>
-                        <p>Tổng số lượng: ${slip.items.reduce((sum, item) => sum + item.quantity, 0)} cuốn</p>
+                        <div class="info-section">
+                            <h3>📋 Thông tin phiếu nhập</h3>
+                            <p><strong>Mã phiếu:</strong> #${slip._id}</p>
+                            <p><strong>Ngày tạo:</strong> ${new Date(slip.createdAt).toLocaleDateString('vi-VN')}</p>
+                            <p><strong>Thời gian:</strong> ${new Date(slip.createdAt).toLocaleTimeString('vi-VN')}</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>📦 Thông tin nhập kho</h3>
+                            <p><strong>Tổng số loại sách:</strong> ${slip.items.length} loại</p>
+                            <p><strong>Tổng số lượng:</strong> ${totalQuantity.toLocaleString('vi-VN')} cuốn</p>
+                            <p><strong>Nhân viên nhập:</strong> Admin</p>
+                        </div>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
-                                <th>Tên sách</th>
-                                <th>Số lượng</th>
-                                <th>Đơn giá</th>
-                                <th>Thành tiền</th>
+                                <th style="width: 5%;">STT</th>
+                                <th style="width: 45%;">Tên sách</th>
+                                <th style="width: 15%;">Số lượng</th>
+                                <th style="width: 17%;">Đơn giá</th>
+                                <th style="width: 18%;">Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${slip.items.map(item => `
-                                <tr>
-                                    <td>${item.book?.title || 
-                                         (typeof item.book === 'string' ? 
-                                          allBooks.find(b => b._id === item.book)?.label || 'Không rõ' : 
-                                          'Không rõ')}</td>
-                                    <td>${item.quantity}</td>
-                                    <td>${item.unitImportPrice.toLocaleString('vi-VN')} ₫</td>
-                                    <td>${(item.quantity * item.unitImportPrice).toLocaleString('vi-VN')} ₫</td>
-                                </tr>
-                            `).join('')}
+                            ${slip.items.map((item, idx) => {
+                                const bookTitle = item.book?.title ||
+                                    (typeof item.book === 'string' ?
+                                        allBooks.find(b => b._id === item.book)?.label || 'Không rõ' :
+                                        'Không rõ');
+                                const total = item.quantity * item.unitImportPrice;
+                                return `
+                                    <tr>
+                                        <td style="text-align: center;">${idx + 1}</td>
+                                        <td>${bookTitle}</td>
+                                        <td style="text-align: center;">${item.quantity.toLocaleString('vi-VN')}</td>
+                                        <td style="text-align: right;">${item.unitImportPrice.toLocaleString('vi-VN')} ₫</td>
+                                        <td style="text-align: right;">${total.toLocaleString('vi-VN')} ₫</td>
+                                    </tr>
+                                `;
+                            }).join('')}
                         </tbody>
                     </table>
 
                     <div class="total">
-                        <p>Tổng tiền: ${slipTotalAmount.toLocaleString('vi-VN')} ₫</p>
+                        <p style="font-size: 16px; margin-bottom: 10px;">Tổng số mặt hàng: <strong>${slip.items.length} loại sách</strong></p>
+                        <p style="font-size: 16px; margin-bottom: 10px;">Tổng số lượng: <strong>${totalQuantity.toLocaleString('vi-VN')} cuốn</strong></p>
+                        <div class="total-amount">
+                            TỔNG CỘNG: ${slipTotalAmount.toLocaleString('vi-VN')} ₫
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <p><em>Phiếu nhập đã được kiểm tra và xác nhận chính xác!</em></p>
+                        <p style="margin-top: 10px; font-size: 12px;">In lúc: ${new Date().toLocaleString('vi-VN')}</p>
                     </div>
 
                     <div class="no-print" style="margin-top: 20px; text-align: center;">
-                        <button onclick="window.print()">In Phiếu</button>
+                        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; background: #4A90E2; color: white; border: none; border-radius: 5px; cursor: pointer;">In Phiếu Nhập</button>
                     </div>
                 </body>
             </html>
@@ -660,6 +776,7 @@ const ImportPage = () => {
 
         printWindow.document.write(printContent);
         printWindow.document.close();
+        showNotification('Đã mở cửa sổ in phiếu nhập', 'green');
     };
 
     // Hàm gọi API tạo phiếu nhập thủ công
@@ -702,11 +819,11 @@ const ImportPage = () => {
             console.log('✅ API response:', response);
 
             showNotification("Tạo phiếu nhập thành công!", "teal");
-            
+
             // Reset toàn bộ state
             setImportList([]);
             closeManualModal();
-            
+
             // Tự động refresh danh sách phiếu nhập
             await loadImportSlips();
         } catch (error) {
@@ -767,16 +884,16 @@ const ImportPage = () => {
             });
 
             showNotification(`Import thành công ${importedCount} sách!`, "teal");
-            
+
             // Tự động refresh danh sách phiếu nhập sau khi import thành công
             await loadImportSlips();
-            
+
             // Đóng modal và reset state sau 2 giây để user có thể thấy kết quả
             setTimeout(() => {
                 resetCSVImportState();
                 closeCsvModal();
             }, 2000);
-            
+
         } catch (error) {
             setImportProgress(100);
             setImportResult({
@@ -908,6 +1025,10 @@ const ImportPage = () => {
                 minHeight: '100vh',
                 width: '100vw',
                 backgroundImage: 'url("/images/1139490.png")',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center center',
+                backgroundAttachment: 'fixed',
                 padding: '1rem',
                 boxSizing: 'border-box',
                 overflow: 'auto',
@@ -1183,10 +1304,10 @@ const ImportPage = () => {
                                     {selectedSlip.items.map((item, index) => (
                                         <Table.Tr key={index}>
                                             <Table.Td>
-                                                {item.book?.title || 
-                                                 (typeof item.book === 'string' ? 
-                                                  allBooks.find(b => b._id === item.book)?.label || 'Không rõ' : 
-                                                  'Không rõ')}
+                                                {item.book?.title ||
+                                                    (typeof item.book === 'string' ?
+                                                        allBooks.find(b => b._id === item.book)?.label || 'Không rõ' :
+                                                        'Không rõ')}
                                             </Table.Td>
                                             <Table.Td>{item.quantity}</Table.Td>
                                             <Table.Td>{item.unitImportPrice.toLocaleString('vi-VN')} ₫</Table.Td>

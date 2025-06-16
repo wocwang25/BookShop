@@ -3,8 +3,12 @@ const PaymentReceiptService = require('../services/receipt.service');
 const PaymentReceiptController = {
     async getAllPaymentReceipt(req, res) {
         try {
-            const result = await PaymentReceiptService.getAllPaymentReceiptInCurrentMonth(userId, req.body);
-            res.status(201).json(result);
+            const { month, year } = req.query;
+            const result = await PaymentReceiptService.getAllPaymentReceipt(month, year);
+            res.status(201).json({
+                receipts: result.receipts,
+                totalAmount: result.totalAmount
+            });
         } catch (error) {
             res.status(400).json({ error: error.message });
         }

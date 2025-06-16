@@ -16,8 +16,8 @@ const RentalInvoiceService = {
         const invoices = await RentalInvoice.find({
             createdAt: { $gte: startDate, $lte: endDate }
         })
-            .populate('customer', 'name')
-            .populate('user', 'name')
+            .populate('customer', 'name email')
+            .populate('user', 'name email')
             .populate({
                 path: 'items.book',
                 select: 'title author category',
@@ -29,6 +29,10 @@ const RentalInvoiceService = {
             .populate({
                 path: 'items.bookCopy',
                 select: 'identifier status'
+            })
+            .populate({
+                path: 'items.category',
+                select: 'name'
             })
             .sort({ createdAt: -1 })
             .lean();

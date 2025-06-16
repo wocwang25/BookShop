@@ -25,7 +25,7 @@ import {
     SegmentedControl,
     Divider
 } from '@mantine/core';
-import { IconTrash, IconFileInvoice, IconCheck, IconX, IconPlus, IconShoppingCart, IconCalendar, IconUser, IconBook, IconRefresh } from '@tabler/icons-react';
+import { IconTrash, IconFileInvoice, IconCheck, IconX, IconPlus, IconShoppingCart, IconCalendar, IconUser, IconBook, IconRefresh, IconPrinter, IconDownload } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 
 // --- InvoiceItemForm Component ---
@@ -42,10 +42,17 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
         if (!selectedItem) return;
 
         let bookToAdd;
+
         if (typeof selectedItem === 'string') {
             bookToAdd = allBooks.find(b => b.value === selectedItem || b.label === selectedItem);
         } else {
             bookToAdd = allBooks.find(b => b.value === selectedItem.value);
+        }
+
+        if (!bookToAdd) {
+            // Có thể showNotification hoặc return
+            console.error('Không tìm thấy sách phù hợp!');
+            return;
         }
 
         if (bookToAdd && !invoiceItems.find(item => item._id === bookToAdd._id && item.type === selectedType)) {
@@ -129,7 +136,7 @@ const InvoiceItemForm = ({ onSave, onCancel, allBooks = [], invoiceItems = [], s
                 <Text size="sm" fw={500}>
                     {type === 'sale'
                         ? (item.quantity * item.unitPrice).toLocaleString('vi-VN')
-                        : (item.quantity * item.unitPrice * item.rentalDays).toLocaleString('vi-VN')
+                        : (item.quantity * item.unitPrice * rentalDays).toLocaleString('vi-VN')
                     } ₫
                 </Text>
             </Table.Td>
@@ -294,7 +301,9 @@ const InvoicesList = ({ invoices, onView, onPrint, isLoading, selectedMonth, set
     ];
 
     return (
-        <Paper withBorder p="md" radius="md">
+        <Paper withBorder p="md" radius="md" style={{
+            background: 'rgba(255,255,255,0.85)' // Nền trắng mờ
+        }}>
             <Group justify="space-between" mb="md">
                 <Title order={3}>📄 Danh Sách Hóa Đơn</Title>
                 <Button
@@ -386,6 +395,14 @@ const InvoicesList = ({ invoices, onView, onPrint, isLoading, selectedMonth, set
                                                 title="Xem chi tiết"
                                             >
                                                 <IconFileInvoice size="1rem" />
+                                            </ActionIcon>
+                                            <ActionIcon
+                                                variant="light"
+                                                color="green"
+                                                onClick={() => onPrint && onPrint(invoice)}
+                                                title="In hóa đơn"
+                                            >
+                                                <IconPrinter size="1rem" />
                                             </ActionIcon>
                                         </Group>
                                     </Table.Td>
@@ -603,6 +620,230 @@ const InvoicePage = () => {
         openViewModal();
     };
 
+    const handlePrintInvoice = (invoiceToPrint = null) => {
+        const invoice = invoiceToPrint || selectedInvoice;
+        console.log('🖨️ handlePrintInvoice called', invoice);
+
+        if (!invoice) {
+            console.error('❌ No invoice found');
+            showNotification('Không tìm thấy hóa đơn cần in', 'red');
+            return;
+        }
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            showNotification('Không thể mở cửa sổ in. Vui lòng cho phép popup.', 'red');
+            return;
+        }
+
+        const totalAmount = invoice.totalAmount || 0;
+        const items = invoice.items || [];
+
+        const printContent = `
+            <html>
+                <head>
+                    <title>Hóa đơn #${invoice._id}</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            padding: 20px; 
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 30px; 
+                            border-bottom: 3px solid #4A90E2;
+                            padding-bottom: 20px;
+                        }
+                        .company-name {
+                            font-size: 28px;
+                            font-weight: bold;
+                            color: #4A90E2;
+                            margin-bottom: 10px;
+                        }
+                        .invoice-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #E74C3C;
+                            margin: 15px 0;
+                        }
+                        .info { 
+                            margin-bottom: 30px; 
+                            display: flex;
+                            justify-content: space-between;
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 8px;
+                        }
+                        .info-section {
+                            flex: 1;
+                            margin-right: 20px;
+                        }
+                        .info-section:last-child {
+                            margin-right: 0;
+                        }
+                        .info-section h3 {
+                            color: #4A90E2;
+                            margin-bottom: 10px;
+                            font-size: 16px;
+                        }
+                        .info-section p {
+                            margin: 5px 0;
+                            font-size: 14px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-bottom: 30px; 
+                        }
+                        th, td { 
+                            border: 1px solid #ddd; 
+                            padding: 12px 8px; 
+                            text-align: left; 
+                        }
+                        th { 
+                            background-color: #4A90E2; 
+                            color: white;
+                            font-weight: bold;
+                        }
+                        tr:nth-child(even) {
+                            background-color: #f8f9fa;
+                        }
+                        .total { 
+                            text-align: right; 
+                            font-weight: bold; 
+                            background: #E8F4FD;
+                            padding: 20px;
+                            border-radius: 8px;
+                            border-left: 5px solid #4A90E2;
+                        }
+                        .total-amount {
+                            font-size: 24px;
+                            color: #E74C3C;
+                            margin-top: 10px;
+                        }
+                        .footer {
+                            margin-top: 50px;
+                            text-align: center;
+                            padding-top: 20px;
+                            border-top: 2px solid #ddd;
+                            color: #666;
+                        }
+                        @media print {
+                            .no-print { display: none; }
+                            body { margin: 0; padding: 15px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                                      <!-- Đặt trong phần header của phiếu thu tiền -->
+                    <div class="header">
+                        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                            <img src="/images/logo-navy.svg" alt="Readify" style="height:36px; margin-right:8px; object-fit:contain;" />
+                            <span style="font-size: 28px; font-weight: 700; font-family: 'Pacifico', cursive; color:rgb(5, 20, 36);">
+                                Readify
+                            </span>
+                        </div>
+                        <div style="font-size: 14px; color: #666;">Địa chỉ: Kí túc xá khu B, TP.HCM</div>
+                        <div style="font-size: 14px; color: #666;">Điện thoại: 0123 456 789 | Email: lolicute@readify.com</div>
+                        <div class="invoice-title">
+                            HÓA ĐƠN ${invoice.type === 'sale' ? 'BÁN SÁCH' : 'THUÊ SÁCH'}
+                        </div>
+                    </div>                    
+                    <div class="info">
+                        <div class="info-section">
+                            <h3>📋 Thông tin hóa đơn</h3>
+                            <p><strong>Mã hóa đơn:</strong> #${invoice._id}</p>
+                            <p><strong>Ngày lập:</strong> ${new Date(invoice.createdAt).toLocaleDateString('vi-VN')}</p>
+                            <p><strong>Loại hóa đơn:</strong> ${invoice.type === 'sale' ? 'Mua sách' : 'Thuê sách'}</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>👤 Thông tin khách hàng</h3>
+                            <p><strong>Tên khách hàng:</strong> ${invoice.customer?.name || 'N/A'}</p>
+                            <p><strong>Email:</strong> ${invoice.customer?.email || 'N/A'}</p>
+                            ${invoice.type === 'rent' ? `
+                            <p><strong>Ngày thuê:</strong> ${invoice.startDate ? new Date(invoice.startDate).toLocaleDateString('vi-VN') : '-'}</p>
+                            <p><strong>Ngày trả:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('vi-VN') : '-'}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">STT</th>
+                                <th style="width: 35%;">Tên sách</th>
+                                <th style="width: 20%;">Thể loại</th>
+                                <th style="width: 10%;">SL</th>
+                                ${invoice.type === 'sale' ? `
+                                <th style="width: 15%;">Đơn giá</th>
+                                <th style="width: 15%;">Thành tiền</th>
+                                ` : `
+                                <th style="width: 15%;">Ngày thuê</th>
+                                <th style="width: 15%;">Ngày trả</th>
+                                `}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map((item, idx) => {
+            const category = item.book?.category?.name || item.category?.name || item.book?.category || item.category || 'Không xác định';
+            const bookTitle = item.book?.title || item.title || 'Không có tên';
+            const quantity = item.quantity || 1;
+
+            if (invoice.type === 'sale') {
+                const unitPrice = item.unitPrice || 0;
+                const total = unitPrice * quantity;
+                return `
+                                        <tr>
+                                            <td style="text-align: center;">${idx + 1}</td>
+                                            <td>${bookTitle}</td>
+                                            <td>${category}</td>
+                                            <td style="text-align: center;">${quantity}</td>
+                                            <td style="text-align: right;">${unitPrice.toLocaleString('vi-VN')} ₫</td>
+                                            <td style="text-align: right;">${total.toLocaleString('vi-VN')} ₫</td>
+                                        </tr>
+                                    `;
+            } else {
+                return `
+                                        <tr>
+                                            <td style="text-align: center;">${idx + 1}</td>
+                                            <td>${bookTitle}</td>
+                                            <td>${category}</td>
+                                            <td style="text-align: center;">${quantity}</td>
+                                            <td>${invoice.startDate ? new Date(invoice.startDate).toLocaleDateString('vi-VN') : '-'}</td>
+                                            <td>${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('vi-VN') : '-'}</td>
+                                        </tr>
+                                    `;
+            }
+        }).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="total">
+                        <p style="font-size: 16px; margin-bottom: 10px;">Tổng số mặt hàng: <strong>${items.length}</strong></p>
+                        <div class="total-amount">
+                            TỔNG CỘNG: ${totalAmount.toLocaleString('vi-VN')} ₫
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <p><em>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!</em></p>
+                        <p style="margin-top: 10px; font-size: 12px;">In lúc: ${new Date().toLocaleString('vi-VN')}</p>
+                    </div>
+
+                    <div class="no-print" style="margin-top: 20px; text-align: center;">
+                        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; background: #4A90E2; color: white; border: none; border-radius: 5px; cursor: pointer;">In Hóa Đơn</button>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        showNotification('Đã mở cửa sổ in hóa đơn', 'green');
+    };
+
     const totalAmount = invoiceItems.reduce((sum, item) => {
         if (item.type === 'sale') {
             return sum + (item.quantity * item.unitPrice);
@@ -617,6 +858,10 @@ const InvoicePage = () => {
                 minHeight: '100vh',
                 width: '100vw',
                 backgroundImage: 'url("/images/1139490.png")',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center center',
+                backgroundAttachment: 'fixed',
                 padding: '1rem',
                 boxSizing: 'border-box',
                 overflow: 'auto',
@@ -697,6 +942,10 @@ const InvoicePage = () => {
             <InvoicesList
                 invoices={invoices}
                 onView={handleViewInvoice}
+                onPrint={(invoice) => {
+                    console.log('🖨️ Print from list:', invoice);
+                    handlePrintInvoice(invoice);
+                }}
                 isLoading={isLoadingInvoices}
                 selectedMonth={selectedMonth}
                 setSelectedMonth={setSelectedMonth}
@@ -789,12 +1038,17 @@ const InvoicePage = () => {
                 opened={isViewModalOpen}
                 onClose={closeViewModal}
                 size="xl"
-                title="Chi Tiết Hóa Đơn"
+                title={
+                    <Group gap="md">
+                        <IconFileInvoice size="1.5rem" color="#4A90E2" />
+                        <Text size="xl" fw={700} c="#4A90E2">Chi Tiết Hóa Đơn</Text>
+                    </Group>
+                }
                 centered
                 zIndex={9999}
                 overlayProps={{
-                    backgroundOpacity: 0.75,
-                    blur: 1,
+                    backgroundOpacity: 0.8,
+                    blur: 2,
                     zIndex: 9998
                 }}
                 styles={{
@@ -813,113 +1067,299 @@ const InvoicePage = () => {
                         backgroundColor: 'white',
                         zIndex: 9999,
                         position: 'relative',
-                        maxHeight: '90vh',
-                        overflow: 'auto'
+                        maxHeight: '95vh',
+                        overflow: 'hidden',
+                        borderRadius: '16px',
+                        boxShadow: '0 20px 40px rgba(74, 144, 226, 0.15)'
                     },
                     header: {
-                        backgroundColor: '#f8f9fa',
-                        borderBottom: '1px solid #dee2e6',
-                        padding: '1rem 1.5rem',
-                        fontSize: '1.1rem',
-                        fontWeight: 600
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        borderBottom: 'none',
+                        padding: '1.5rem 2rem',
+                        borderRadius: '16px 16px 0 0'
+                    },
+                    body: {
+                        padding: 0,
+                        maxHeight: 'calc(95vh - 80px)',
+                        overflow: 'auto'
                     },
                     overlay: {
                         zIndex: 9998,
-                        backgroundColor: 'rgba(0, 0, 0, 0.75) !important'
+                        background: 'rgba(74, 144, 226, 0.15) !important'
                     }
                 }}
                 portalProps={{
                     target: document.body
                 }}
-
             >
                 {selectedInvoice && (
-                    <Paper withBorder p="xl" radius="md" shadow="sm" style={{ maxWidth: 700, margin: '0 auto' }}>
-                        <Group justify="space-between" mb="md">
-                            <Title order={3} c="dark">🧾 HÓA ĐƠN {selectedInvoice.type === 'sale' ? 'BÁN SÁCH' : 'THUÊ SÁCH'}</Title>
-                            <Badge color={selectedInvoice.type === 'sale' ? 'blue' : 'green'} size="lg">
-                                {selectedInvoice.type === 'sale' ? 'Mua' : 'Thuê'}
-                            </Badge>
-                        </Group>
-                        <SimpleGrid cols={2} spacing="xs" mb="md">
-                            <Text size="sm"><b>Mã hóa đơn:</b> #{selectedInvoice._id}</Text>
-                            <Text size="sm"><b>Ngày lập hóa đơn:</b> {new Date(selectedInvoice.createdAt).toLocaleDateString('vi-VN')}</Text>
-                            <Text size="sm"><b>Khách hàng:</b> {selectedInvoice.customer?.name || 'N/A'}</Text>
-                            {selectedInvoice.type === 'rent' && (
-                                <>
-                                    <Text size="sm"><b>Ngày bắt đầu thuê:</b> {selectedInvoice.startDate ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN') : '-'}</Text>
-                                    <Text size="sm"><b>Ngày trả dự kiến:</b> {selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN') : '-'}</Text>
-                                </>
-                            )}
-                        </SimpleGrid>
-                        <Divider mb="sm" />
-                        <Table withBorder highlightOnHover>
-                            <Table.Thead>
-                                <Table.Tr>
-                                    <Table.Th>STT</Table.Th>
-                                    <Table.Th>Sách</Table.Th>
-                                    <Table.Th>Thể loại</Table.Th>
-                                    <Table.Th>Số lượng</Table.Th>
-                                    {selectedInvoice.type === 'sale' ? (
-                                        <>
-                                            <Table.Th>Đơn giá</Table.Th>
-                                            <Table.Th>Thành tiền</Table.Th>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Table.Th>Ngày bắt đầu</Table.Th>
-                                            <Table.Th>Ngày trả dự kiến</Table.Th>
-                                        </>
-                                    )}
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                                {(selectedInvoice.items || []).map((item, idx) => (
-                                    <Table.Tr key={item._id || idx}>
-                                        <Table.Td>{idx + 1}</Table.Td>
-                                        <Table.Td>{item.book?.title || item.title || '-'}</Table.Td>
-                                        <Table.Td>{item.book?.category?.name || item.category?.name || item.book?.category || item.category || '-'}</Table.Td>
-                                        <Table.Td>{item.quantity || 1}</Table.Td>
-                                        {selectedInvoice.type === 'sale' ? (
-                                            <>
-                                                <Table.Td>
-                                                    {item.unitPrice != null
-                                                        ? item.unitPrice.toLocaleString('vi-VN') + ' ₫'
-                                                        : '-'}
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    {(item.unitPrice && item.quantity)
-                                                        ? (item.unitPrice * item.quantity).toLocaleString('vi-VN') + ' ₫'
-                                                        : '-'}
-                                                </Table.Td>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Table.Td>
-                                                    {selectedInvoice.startDate
-                                                        ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN')
-                                                        : '-'}
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    {selectedInvoice.dueDate
-                                                        ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN')
-                                                        : '-'}
-                                                </Table.Td>
-                                            </>
-                                        )}
-                                    </Table.Tr>
-                                ))}
-                            </Table.Tbody>
-                        </Table>
-                        <Group justify="flex-end" mt="md">
-                            <Text size="lg" fw={700}>
-                                Tổng cộng: {selectedInvoice.totalAmount?.toLocaleString('vi-VN')} ₫
-                            </Text>
-                        </Group>
-                        <Group justify="flex-end" mt="md">
-                            <Button onClick={closeViewModal}>Đóng</Button>
-                        </Group>
-                    </Paper>
+                    <div style={{
+                        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                        minHeight: '100%',
+                        padding: '2rem'
+                    }}>
+                        <Paper
+                            withBorder
+                            radius="xl"
+                            shadow="xl"
+                            style={{
+                                maxWidth: 1000,
+                                margin: '0 auto',
+                                background: 'white',
+                                border: 'none',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {/* Header với gradient đẹp */}
+                            <div style={{
+                                background: `linear-gradient(135deg, ${selectedInvoice.type === 'sale' ? '#667eea 0%, #764ba2 100%' : '#11998e 0%, #38ef7d 100%'})`,
+                                padding: '2rem',
+                                color: 'white',
+                                textAlign: 'center',
+                                position: 'relative'
+                            }}>
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '1rem',
+                                    right: '1.5rem'
+                                }}>
+                                    <Badge
+                                        size="xl"
+                                        variant="white"
+                                        color={selectedInvoice.type === 'sale' ? 'blue' : 'green'}
+                                        style={{
+                                            fontSize: '16px',
+                                            padding: '0.5rem 1rem'
+                                        }}
+                                    >
+                                        {selectedInvoice.type === 'sale' ? '🛒 MUA' : '📅 THUÊ'}
+                                    </Badge>
+                                </div>
+
+                                <Text size="2.5rem" fw={700} mb="xs" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                                    📚 BOOKSTORE
+                                </Text>
+                                <Text size="lg" opacity={0.9} mb="lg">
+                                    Hệ thống quản lý sách chuyên nghiệp
+                                </Text>
+                                <Title order={1} size="2rem" fw={700} style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                                    HÓA ĐƠN {selectedInvoice.type === 'sale' ? 'BÁN SÁCH' : 'THUÊ SÁCH'}
+                                </Title>
+                            </div>
+
+                            {/* Thông tin hóa đơn */}
+                            <div style={{ padding: '2rem' }}>
+                                <SimpleGrid cols={2} spacing="xl" mb="xl">
+                                    <Card withBorder radius="lg" p="xl" style={{
+                                        maxWidth: 1000,
+                                        margin: '0 auto',
+                                        background: 'rgba(255,255,255,0.85)', // Nền trắng mờ
+                                        border: 'none',
+                                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <Group mb="md">
+                                            <IconFileInvoice size="1.5rem" color="#4A90E2" />
+                                            <Text size="lg" fw={700} c="#4A90E2">Thông tin hóa đơn</Text>
+                                        </Group>
+                                        <Stack gap="sm">
+                                            <Group justify="space-between">
+                                                <Text size="sm" c="dimmed">Mã hóa đơn:</Text>
+                                                <Text size="sm" fw={600}>#{selectedInvoice._id}</Text>
+                                            </Group>
+                                            <Group justify="space-between">
+                                                <Text size="sm" c="dimmed">Ngày lập:</Text>
+                                                <Text size="sm" fw={600}>{new Date(selectedInvoice.createdAt).toLocaleDateString('vi-VN')}</Text>
+                                            </Group>
+                                            <Group justify="space-between">
+                                                <Text size="sm" c="dimmed">Loại giao dịch:</Text>
+                                                <Badge color={selectedInvoice.type === 'sale' ? 'blue' : 'green'}>
+                                                    {selectedInvoice.type === 'sale' ? 'Mua sách' : 'Thuê sách'}
+                                                </Badge>
+                                            </Group>
+                                        </Stack>
+                                    </Card>
+
+                                    <Card withBorder radius="lg" p="xl" style={{ background: '#f0fff4', border: '2px solid #c6f6d5' }}>
+                                        <Group mb="md">
+                                            <IconUser size="1.5rem" color="#38A169" />
+                                            <Text size="lg" fw={700} c="#38A169">Thông tin khách hàng</Text>
+                                        </Group>
+                                        <Stack gap="sm">
+                                            <Group justify="space-between">
+                                                <Text size="sm" c="dimmed">Tên khách hàng:</Text>
+                                                <Text size="sm" fw={600}>{selectedInvoice.customer?.name || 'N/A'}</Text>
+                                            </Group>
+                                            <Group justify="space-between">
+                                                <Text size="sm" c="dimmed">Email:</Text>
+                                                <Text size="sm" fw={600}>{selectedInvoice.customer?.email || 'N/A'}</Text>
+                                            </Group>
+                                            {selectedInvoice.type === 'rent' && (
+                                                <>
+                                                    <Group justify="space-between">
+                                                        <Text size="sm" c="dimmed">Ngày thuê:</Text>
+                                                        <Text size="sm" fw={600}>
+                                                            {selectedInvoice.startDate ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN') : '-'}
+                                                        </Text>
+                                                    </Group>
+                                                    <Group justify="space-between">
+                                                        <Text size="sm" c="dimmed">Ngày trả:</Text>
+                                                        <Text size="sm" fw={600}>
+                                                            {selectedInvoice.dueDate ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN') : '-'}
+                                                        </Text>
+                                                    </Group>
+                                                </>
+                                            )}
+                                        </Stack>
+                                    </Card>
+                                </SimpleGrid>
+
+                                {/* Bảng chi tiết */}
+                                <Card withBorder radius="lg" mb="xl" style={{ overflow: 'hidden' }}>
+                                    <div style={{
+                                        background: 'linear-gradient(90deg, #4A90E2 0%, #357ABD 100%)',
+                                        padding: '1rem 1.5rem',
+                                        color: 'white'
+                                    }}>
+                                        <Group>
+                                            <IconBook size="1.2rem" />
+                                            <Text size="lg" fw={700}>Chi tiết sản phẩm</Text>
+                                        </Group>
+                                    </div>
+
+                                    <Table
+                                        highlightOnHover
+                                        style={{ fontSize: '14px' }}
+                                        striped
+                                    >
+                                        <Table.Thead style={{ background: '#f8f9fa' }}>
+                                            <Table.Tr>
+                                                <Table.Th style={{ textAlign: 'center', width: '60px' }}>STT</Table.Th>
+                                                <Table.Th style={{ width: '20%' }}>Tên sách</Table.Th>
+                                                <Table.Th style={{ width: '30%' }}>Thể loại</Table.Th>
+                                                <Table.Th style={{ textAlign: 'center', width: '10%' }}>SL</Table.Th>
+                                                {selectedInvoice.type === 'sale' ? (
+                                                    <>
+                                                        <Table.Th style={{ textAlign: 'right', width: '15%' }}>Đơn giá</Table.Th>
+                                                        <Table.Th style={{ textAlign: 'right', width: '20%' }}>Thành tiền</Table.Th>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Table.Th style={{ width: '17.5%' }}>Ngày thuê</Table.Th>
+                                                        <Table.Th style={{ width: '17.5%' }}>Ngày trả</Table.Th>
+                                                    </>
+                                                )}
+                                            </Table.Tr>
+                                        </Table.Thead>
+                                        <Table.Tbody>
+                                            {(selectedInvoice.items || []).map((item, idx) => (
+                                                <Table.Tr key={item._id || idx}>
+                                                    <Table.Td style={{ textAlign: 'center', fontWeight: 600 }}>{idx + 1}</Table.Td>
+                                                    <Table.Td style={{ fontWeight: 500 }}>{item.book?.title || item.title || '-'}</Table.Td>
+                                                    <Table.Td>
+                                                        <Badge variant="light" size="sm">
+                                                            {item.book?.category?.name
+                                                                || item.category?.name
+                                                                || item.book?.category
+                                                                || item.category
+                                                                || '-'}
+                                                        </Badge>
+                                                    </Table.Td>
+                                                    <Table.Td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity || 1}</Table.Td>
+                                                    {selectedInvoice.type === 'sale' ? (
+                                                        <>
+                                                            <Table.Td style={{ textAlign: 'right', fontWeight: 500, color: '#4A90E2' }}>
+                                                                {item.unitPrice != null
+                                                                    ? item.unitPrice.toLocaleString('vi-VN') + ' ₫'
+                                                                    : '-'}
+                                                            </Table.Td>
+                                                            <Table.Td style={{ textAlign: 'right', fontWeight: 600, color: '#E74C3C' }}>
+                                                                {(item.unitPrice && item.quantity)
+                                                                    ? (item.unitPrice * item.quantity).toLocaleString('vi-VN') + ' ₫'
+                                                                    : '-'}
+                                                            </Table.Td>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Table.Td>
+                                                                {selectedInvoice.startDate
+                                                                    ? new Date(selectedInvoice.startDate).toLocaleDateString('vi-VN')
+                                                                    : '-'}
+                                                            </Table.Td>
+                                                            <Table.Td>
+                                                                {selectedInvoice.dueDate
+                                                                    ? new Date(selectedInvoice.dueDate).toLocaleDateString('vi-VN')
+                                                                    : '-'}
+                                                            </Table.Td>
+                                                        </>
+                                                    )}
+                                                </Table.Tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </Table>
+                                </Card>
+
+                                {/* Tổng tiền */}
+                                <Card
+                                    withBorder
+                                    radius="lg"
+                                    p="xl"
+                                    mb="xl"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        color: 'white',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    <Group justify="center" mb="md">
+                                        <IconShoppingCart size="2rem" />
+                                        <div>
+                                            <Text size="sm" opacity={0.9}>Tổng số mặt hàng</Text>
+                                            <Text size="xl" fw={700}>{(selectedInvoice.items || []).length} sản phẩm</Text>
+                                        </div>
+                                    </Group>
+                                    <Divider color="rgba(255,255,255,0.3)" mb="md" />
+                                    <Text size="sm" opacity={0.9} mb="xs">TỔNG CỘNG</Text>
+                                    <Text size="3rem" fw={700} style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                                        {selectedInvoice.totalAmount?.toLocaleString('vi-VN')} ₫
+                                    </Text>
+                                </Card>
+
+                                {/* Nút thao tác */}
+                                <Group justify="center" gap="lg">
+                                    <Button
+                                        leftSection={<IconPrinter size="1.2rem" />}
+                                        onClick={() => handlePrintInvoice(selectedInvoice)}
+                                        variant="gradient"
+                                        gradient={{ from: 'blue', to: 'cyan' }}
+                                        size="lg"
+                                        radius="lg"
+                                        style={{
+                                            boxShadow: '0 4px 12px rgba(74, 144, 226, 0.3)',
+                                            minWidth: '140px'
+                                        }}
+                                    >
+                                        In hóa đơn
+                                    </Button>
+                                    <Button
+                                        onClick={closeViewModal}
+                                        variant="gradient"
+                                        gradient={{ from: 'gray', to: 'dark' }}
+                                        size="lg"
+                                        radius="lg"
+                                        style={{
+                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                                            minWidth: '100px'
+                                        }}
+                                    >
+                                        Đóng
+                                    </Button>
+                                </Group>
+                            </div>
+                        </Paper>
+                    </div>
                 )}
             </Modal>
         </div>

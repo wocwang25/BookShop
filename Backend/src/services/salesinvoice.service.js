@@ -15,11 +15,18 @@ const SalesInvoiceService = {
         const invoices = await SalesInvoice.find({
             createdAt: { $gte: startDate, $lte: endDate }
         })
-            .populate('customer', 'name')
-            .populate('user', 'name')
+            .populate('customer', 'name email')
+            .populate('user', 'name email')
             .populate({
                 path: 'items.book',
-                select: 'title author category'
+                select: 'title author category',
+                populate: [
+                    { path: 'category', select: 'name' }
+                ]
+            })
+            .populate({
+                path: 'items.category',
+                select: 'name'
             })
             .sort({ createdAt: -1 })
             .lean();

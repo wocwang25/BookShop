@@ -82,7 +82,16 @@ export const useDashboardData = () => {
                 API.rules.getRuleByCode('QD1').catch(err => {
                     console.warn('Rule QD1 API failed:', err);
                     return { data: null };
+                }),
+                API.invoice.getSalesInvoice(timeData).catch(err => {
+                    console.warn('Sales invoices API failed:', err);
+                    return { data: { totalAmount: 0, invoices: [] } };
+                }),
+                API.invoice.getRentalInvoice(timeData).catch(err => {
+                    console.warn('Rental invoices API failed:', err);
+                    return { data: { totalAmount: 0, invoices: [] } };
                 })
+
             ]);
 
             // Timeout sau 10 giây
@@ -116,8 +125,8 @@ export const useDashboardData = () => {
             const rentalInvoiceData = rentalInvoiceResponse?.data || { totalAmount: 0, invoices: [] };
 
             // Kiểm tra xem có dữ liệu thực tế không
-            const hasRealData = books.length > 0 || importSlipsData.length > 0 || 
-                               salesInvoiceData.invoices.length > 0 || rentalInvoiceData.invoices.length > 0;
+            const hasRealData = books.length > 0 || importSlipsData.length > 0 ||
+                salesInvoiceData.invoices.length > 0 || rentalInvoiceData.invoices.length > 0;
             console.log('Books data:', books);
             console.log('Has real data:', hasRealData);
 
