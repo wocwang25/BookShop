@@ -41,6 +41,17 @@ const CustomerService = {
         return { customers };
     },
 
+    async getCustomerById(customerId) {
+        console.log('customerId:', customerId);
+        const customer = await Customer.findById(customerId)
+            .populate('salesInvoices')
+            .populate('rentalInvoices');
+        if (!customer) {
+            throw new Error("Không tìm thấy khách hàng");
+        }
+        return { customer };
+    },
+
     async updateCustomerProfile(userId, updateData) {
         const session = await mongoose.startSession();
         session.startTransaction();

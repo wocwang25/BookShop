@@ -135,6 +135,9 @@ export const customerAPI = {
     // Lấy profile khách hàng
     getProfile: () => apiClient.get('/customer/profile'),
 
+    // Lấy profile khách hàng
+    getCustomerById: (customerId) => apiClient.get(`/customer/${customerId}`),
+
     // Cập nhật profile khách hàng
     updateProfile: (profileData) => apiClient.patch('/customer/profile', profileData),
 

@@ -115,6 +115,7 @@ const SalesInvoiceService = {
 
             // Cập nhật nợ
             customer.debt += totalAmount;
+            customer.salesInvoices.push(salesInvoice._id);
             await customer.save({ session });
 
             await session.commitTransaction();

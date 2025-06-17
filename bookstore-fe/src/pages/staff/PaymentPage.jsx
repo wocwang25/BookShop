@@ -35,14 +35,20 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
             customer_name: '',
             paymentAmount: 0,
             note: '',
+            invoiceId: '',
             customer_info: {
                 phone: '',
                 address: ''
-            }
+            },
+            type: ''
         },
     });
 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [customerInvoices, setCustomerInvoices] = useState([]);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [loadingInvoices, setLoadingInvoices] = useState(false);
+    const [invoiceType, setInvoiceType] = useState('');
 
     const handleCustomerSelect = (value) => {
         const customer = customers.find(c => `${c.name} (${c.email})` === value);
@@ -66,13 +72,116 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
         }
     };
 
+    // Load customer invoices
+    const loadCustomerInvoices = async (customerId) => {
+        try {
+            setLoadingInvoices(true);
+
+            // Get customer details with populated invoices
+            const response = await API.customer.getCustomerById(customerId);
+            console.log('🔍 Full API response:', response);
+
+            // Try different possible response structures
+            const customer = response.data.customer || response.data;
+            console.log('👤 Customer data:', customer);
+
+            const allInvoices = [];
+
+            // Add sales invoices
+            if (customer.salesInvoices && customer.salesInvoices.length > 0) {
+                console.log('📊 Sales invoices found:', customer.salesInvoices.length);
+                customer.salesInvoices.forEach((invoice, index) => {
+                    console.log(`💰 Sale invoice ${index}:`, invoice);
+
+                    // Handle different invoice ID formats
+                    const invoiceId = invoice._id || invoice.id || `sale-${index}`;
+                    const amount = invoice.totalAmount || invoice.amount || 0;
+
+                    allInvoices.push({
+                        ...invoice,
+                        _id: invoiceId, // Ensure _id exists
+                        type: 'sale',
+                        displayName: `Hóa đơn bán #${invoiceId.toString().slice(-6)} - ${amount.toLocaleString('vi-VN')} ₫`
+                    });
+                });
+            }
+
+            // Add rental invoices
+            if (customer.rentalInvoices && customer.rentalInvoices.length > 0) {
+                console.log('📚 Rental invoices found:', customer.rentalInvoices.length);
+                customer.rentalInvoices.forEach((invoice, index) => {
+                    console.log(`📖 Rent invoice ${index}:`, invoice);
+
+                    // Handle different invoice ID formats
+                    const invoiceId = invoice._id || invoice.id || `rent-${index}`;
+                    const amount = invoice.totalAmount || invoice.amount || 0;
+
+                    allInvoices.push({
+                        ...invoice,
+                        _id: invoiceId, // Ensure _id exists
+                        type: 'rent',
+                        displayName: `Hóa đơn thuê #${invoiceId.toString().slice(-6)} - ${amount.toLocaleString('vi-VN')} ₫`
+                    });
+                });
+            }
+
+            console.log('📋 Final allInvoices array:', allInvoices);
+            console.log('📋 AllInvoices length:', allInvoices.length);
+
+            setCustomerInvoices(allInvoices);
+        } catch (error) {
+            console.error('Error loading customer invoices:', error);
+            // If API fails, show empty list
+            setCustomerInvoices([]);
+        } finally {
+            setLoadingInvoices(false);
+        }
+    };
+
+    const handleInvoiceSelect = (invoiceId) => {
+        const invoice = customerInvoices.find(inv => String(inv._id) === String(invoiceId));
+        if (invoice) {
+            setSelectedInvoice(invoice);
+            setInvoiceType(invoice.type);
+            form.setFieldValue('invoiceId', String(invoiceId));
+            form.setFieldValue('type', invoice.type);
+            form.setFieldValue('paymentAmount', invoice.totalAmount || 0);
+        } else {
+            setSelectedInvoice(null);
+            setInvoiceType('');
+            form.setFieldValue('invoiceId', '');
+            form.setFieldValue('type', '');
+            form.setFieldValue('paymentAmount', selectedCustomer?.debt || 0);
+        }
+    };
+
     const handleSubmit = () => {
         const values = form.values;
         if (!values.customer_name || values.paymentAmount <= 0) {
             return;
         }
-        console.log('💰 Payment data before submit:', values);
+        
+        // Log chi tiết dữ liệu sẽ gửi
+        console.log('💰 Payment data before submit:', {
+            customer_name: values.customer_name,
+            paymentAmount: values.paymentAmount,
+            note: values.note,
+            invoiceId: values.invoiceId,
+            type: values.type,
+            customer_info: values.customer_info,
+            hasInvoice: !!values.invoiceId,
+            selectedInvoiceType: invoiceType
+        });
+        
         onSave(values);
+    };
+
+    const resetForm = () => {
+        form.reset();
+        setSelectedCustomer(null);
+        setCustomerInvoices([]);
+        setSelectedInvoice(null);
+        setInvoiceType('');
     };
 
     return (
@@ -91,14 +200,18 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
                             // Nếu xóa hết thì reset selectedCustomer và form
                             if (!value) {
                                 setSelectedCustomer(null);
+                                setCustomerInvoices([]);
+                                setSelectedInvoice(null);
                                 form.setFieldValue('paymentAmount', 0);
+                                form.setFieldValue('invoiceId', '');
                                 form.setFieldValue('customer_info', {
                                     phone: '',
                                     address: ''
                                 });
+                                form.setFieldValue('type', '');
                             }
                         }}
-                        onOptionSubmit={(value) => {
+                        onOptionSubmit={async (value) => {
                             const customer = customers.find(c => `${c.name} (${c.email})` === value);
                             if (customer) {
                                 setSelectedCustomer(customer);
@@ -108,12 +221,20 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
                                     phone: customer.phone || '',
                                     address: customer.address || ''
                                 });
+
+                                // Load invoices for this customer
+                                await loadCustomerInvoices(customer._id);
                             } else {
                                 // Khách hàng mới - chỉ lấy tên nếu có định dạng "Tên (email)"
                                 setSelectedCustomer(null);
+                                setCustomerInvoices([]);
+                                setSelectedInvoice(null);
+                                setInvoiceType('');
                                 const nameOnly = value.includes('(') ? value.split('(')[0].trim() : value;
                                 form.setFieldValue('customer_name', nameOnly);
                                 form.setFieldValue('paymentAmount', 0);
+                                form.setFieldValue('invoiceId', '');
+                                form.setFieldValue('type', '');
                                 form.setFieldValue('customer_info', {
                                     phone: '',
                                     address: ''
@@ -139,6 +260,67 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
                                 <Text size="sm" c="dimmed">{selectedCustomer.email}</Text>
                                 <Text size="sm" fw={500} c="red">
                                     Nợ hiện tại: {(selectedCustomer.debt || 0).toLocaleString('vi-VN')} ₫
+                                </Text>
+                            </div>
+                        </Group>
+                    </Card>
+                )}
+
+                {selectedCustomer && (
+                    <div>
+                        <Text size="md" fw={500} mb="xs">📄 Chọn hóa đơn cần thanh toán (tùy chọn)</Text>
+
+
+                        {loadingInvoices ? (
+                            <Group>
+                                <Loader size="sm" />
+                                <Text size="sm" c="dimmed">Đang tải danh sách hóa đơn...</Text>
+                            </Group>
+                        ) : customerInvoices.length > 0 ? (
+                            <Select
+                                key={`invoice-select-${selectedCustomer._id}-${customerInvoices.length}`}
+                                placeholder="Chọn hóa đơn hoặc để trống để thu toàn bộ nợ"
+                                data={[
+                                    { value: '', label: 'Thu toàn bộ nợ của khách hàng' },
+                                    ...customerInvoices.map(invoice => ({
+                                        value: String(invoice._id),
+                                        label: String(invoice.displayName)
+                                    }))
+                                ]}
+                                value={form.values.invoiceId || ''}
+                                onChange={(value) => handleInvoiceSelect(value || '')}
+                                size="md"
+                                clearable
+                                allowDeselect
+                                checkIconPosition="right"
+                                comboboxProps={{
+                                    withinPortal: true,
+                                    zIndex: 12000,
+                                    transitionProps: { transition: 'pop', duration: 200 }
+                                }}
+                            />
+                        ) : (
+                            <Alert color="yellow" title="Không có hóa đơn">
+                                Khách hàng này chưa có hóa đơn nào cần thanh toán
+                            </Alert>
+                        )}
+                    </div>
+                )}
+
+                {selectedInvoice && (
+                    <Card withBorder p="md" style={{ background: '#fff9e6', border: '2px solid #ffd43b' }}>
+                        <Group>
+                            <IconFileInvoice size="1.5rem" color="#fd7e14" />
+                            <div>
+                                <Text size="sm" c="dimmed">Thông tin hóa đơn được chọn:</Text>
+                                <Text size="lg" fw={600}>
+                                    {selectedInvoice.type === 'sale' ? 'Hóa đơn bán' : 'Hóa đơn thuê'} #{selectedInvoice._id}
+                                </Text>
+                                <Text size="sm" c="dimmed">
+                                    Ngày tạo: {new Date(selectedInvoice.createdAt).toLocaleDateString('vi-VN')}
+                                </Text>
+                                <Text size="sm" fw={500} c="orange">
+                                    Tổng tiền: {(selectedInvoice.totalAmount || 0).toLocaleString('vi-VN')} ₫
                                 </Text>
                             </div>
                         </Group>
@@ -233,7 +415,10 @@ const PaymentForm = ({ onSave, onCancel, customers = [], isSubmitting = false })
             <Group justify="flex-end" mt="xl" gap="md">
                 <Button
                     variant="default"
-                    onClick={onCancel}
+                    onClick={() => {
+                        resetForm();
+                        onCancel();
+                    }}
                     size="md"
                     radius="md"
                     disabled={isSubmitting}
@@ -339,6 +524,7 @@ const PaymentList = ({ receipts, onView, onPrint, isLoading, selectedMonth, setS
                                 <Table.Th>Ngày</Table.Th>
                                 <Table.Th>Mã phiếu</Table.Th>
                                 <Table.Th>Khách hàng</Table.Th>
+                                <Table.Th>Hóa đơn</Table.Th>
                                 <Table.Th>Số tiền</Table.Th>
                                 <Table.Th>Ghi chú</Table.Th>
                                 <Table.Th>Thao tác</Table.Th>
@@ -350,6 +536,24 @@ const PaymentList = ({ receipts, onView, onPrint, isLoading, selectedMonth, setS
                                     <Table.Td>{new Date(receipt.createdAt).toLocaleDateString('vi-VN')}</Table.Td>
                                     <Table.Td>#{receipt._id}</Table.Td>
                                     <Table.Td>{receipt.customer?.name || 'N/A'}</Table.Td>
+                                    <Table.Td>
+                                        {receipt.invoice ? (
+                                            <div>
+                                                <Badge
+                                                    color={receipt.invoice.type === 'sale' ? 'blue' : 'green'}
+                                                    size="sm"
+                                                    mb="xs"
+                                                >
+                                                    {receipt.invoice.type === 'sale' ? 'Bán' : 'Thuê'}
+                                                </Badge>
+                                                <Text size="xs" c="dimmed">
+                                                    #{receipt.invoice._id.slice(-6)}
+                                                </Text>
+                                            </div>
+                                        ) : (
+                                            <Text size="sm" c="dimmed">Thu tổng nợ</Text>
+                                        )}
+                                    </Table.Td>
                                     <Table.Td>
                                         <Text fw={600} c="green">
                                             {receipt.paymentAmount?.toLocaleString('vi-VN')} ₫
@@ -622,6 +826,7 @@ const PaymentPage = () => {
                             <p><strong>Ngày lập:</strong> ${new Date(receipt.createdAt).toLocaleDateString('vi-VN')}</p>
                             <p><strong>Thời gian:</strong> ${new Date(receipt.createdAt).toLocaleTimeString('vi-VN')}</p>
                             <p><strong>Nhân viên lập:</strong> ${receipt.user?.name || 'Admin'}</p>
+                            <p><strong>Loại thu tiền:</strong> ${receipt.invoice ? 'Thu theo hóa đơn' : 'Thu tổng nợ'}</p>
                         </div>
                         <div class="info-section">
                             <h3>👤 Thông tin khách hàng</h3>
@@ -630,6 +835,19 @@ const PaymentPage = () => {
                             <p><strong>Điện thoại:</strong> ${receipt.customer?.phone || 'N/A'}</p>
                             <p><strong>Địa chỉ:</strong> ${receipt.customer?.address || 'N/A'}</p>
                         </div>
+                        ${receipt.invoice ? `
+                        <div class="info-section">
+                            <h3>📄 Thông tin hóa đơn</h3>
+                            <p><strong>Mã hóa đơn:</strong> #${receipt.invoice._id}</p>
+                            <p><strong>Loại hóa đơn:</strong> ${receipt.invoice.type === 'sale' ? 'Hóa đơn bán' : 'Hóa đơn thuê'}</p>
+                            <p><strong>Ngày tạo HĐ:</strong> ${new Date(receipt.invoice.createdAt).toLocaleDateString('vi-VN')}</p>
+                            <p><strong>Tổng tiền HĐ:</strong> ${(receipt.invoice.totalAmount || 0).toLocaleString('vi-VN')} ₫</p>
+                            ${receipt.invoice.type === 'rent' ? `
+                            <p><strong>Ngày thuê:</strong> ${receipt.invoice.startDate ? new Date(receipt.invoice.startDate).toLocaleDateString('vi-VN') : 'N/A'}</p>
+                            <p><strong>Ngày trả:</strong> ${receipt.invoice.dueDate ? new Date(receipt.invoice.dueDate).toLocaleDateString('vi-VN') : 'N/A'}</p>
+                            ` : ''}
+                        </div>
+                        ` : ''}
                     </div>
 
                     <div class="amount">
@@ -859,7 +1077,7 @@ const PaymentPage = () => {
                             </Button>
                         </Group>
 
-                        <SimpleGrid cols={2} spacing="xl" mb="xl">
+                        <SimpleGrid cols={selectedReceipt.invoice ? 3 : 2} spacing="xl" mb="xl">
                             <Card withBorder p="lg" style={{ background: '#f8f9ff' }}>
                                 <Group mb="md">
                                     <IconReceipt size="1.5rem" color="#4A90E2" />
@@ -879,6 +1097,12 @@ const PaymentPage = () => {
                                     <Group justify="space-between">
                                         <Text size="sm" c="dimmed">Nhân viên lập:</Text>
                                         <Text size="sm" fw={600}>{selectedReceipt.user?.name || 'Admin'}</Text>
+                                    </Group>
+                                    <Group justify="space-between">
+                                        <Text size="sm" c="dimmed">Loại thu tiền:</Text>
+                                        <Text size="sm" fw={600}>
+                                            {selectedReceipt.invoice ? 'Thu theo hóa đơn' : 'Thu tổng nợ'}
+                                        </Text>
                                     </Group>
                                 </Stack>
                             </Card>
@@ -907,6 +1131,61 @@ const PaymentPage = () => {
                                     </Group>
                                 </Stack>
                             </Card>
+
+                            {selectedReceipt.invoice && (
+                                <Card withBorder p="lg" style={{ background: '#fff9e6' }}>
+                                    <Group mb="md">
+                                        <IconFileInvoice size="1.5rem" color="#fd7e14" />
+                                        <Text size="lg" fw={700} c="#fd7e14">Thông tin hóa đơn</Text>
+                                    </Group>
+                                    <Stack gap="sm">
+                                        <Group justify="space-between">
+                                            <Text size="sm" c="dimmed">Mã hóa đơn:</Text>
+                                            <Text size="sm" fw={600}>#{selectedReceipt.invoice._id}</Text>
+                                        </Group>
+                                        <Group justify="space-between">
+                                            <Text size="sm" c="dimmed">Loại hóa đơn:</Text>
+                                            <Badge color={selectedReceipt.invoice.type === 'sale' ? 'blue' : 'green'}>
+                                                {selectedReceipt.invoice.type === 'sale' ? 'Hóa đơn bán' : 'Hóa đơn thuê'}
+                                            </Badge>
+                                        </Group>
+                                        <Group justify="space-between">
+                                            <Text size="sm" c="dimmed">Ngày tạo:</Text>
+                                            <Text size="sm" fw={600}>
+                                                {new Date(selectedReceipt.invoice.createdAt).toLocaleDateString('vi-VN')}
+                                            </Text>
+                                        </Group>
+                                        <Group justify="space-between">
+                                            <Text size="sm" c="dimmed">Tổng tiền HĐ:</Text>
+                                            <Text size="sm" fw={600} c="orange">
+                                                {(selectedReceipt.invoice.totalAmount || 0).toLocaleString('vi-VN')} ₫
+                                            </Text>
+                                        </Group>
+                                        {selectedReceipt.invoice.type === 'rent' && (
+                                            <>
+                                                <Group justify="space-between">
+                                                    <Text size="sm" c="dimmed">Ngày thuê:</Text>
+                                                    <Text size="sm" fw={600}>
+                                                        {selectedReceipt.invoice.startDate ?
+                                                            new Date(selectedReceipt.invoice.startDate).toLocaleDateString('vi-VN') :
+                                                            'N/A'
+                                                        }
+                                                    </Text>
+                                                </Group>
+                                                <Group justify="space-between">
+                                                    <Text size="sm" c="dimmed">Ngày trả:</Text>
+                                                    <Text size="sm" fw={600}>
+                                                        {selectedReceipt.invoice.dueDate ?
+                                                            new Date(selectedReceipt.invoice.dueDate).toLocaleDateString('vi-VN') :
+                                                            'N/A'
+                                                        }
+                                                    </Text>
+                                                </Group>
+                                            </>
+                                        )}
+                                    </Stack>
+                                </Card>
+                            )}
                         </SimpleGrid>
 
                         <Card withBorder p="xl" mb="xl" style={{

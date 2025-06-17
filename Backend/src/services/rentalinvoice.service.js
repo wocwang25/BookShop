@@ -141,6 +141,7 @@ const RentalInvoiceService = {
 
             // Cập nhật nợ
             customer.debt += rentalInvoice.totalAmount;
+            customer.rentalInvoices.push(rentalInvoice._id);
             await customer.save({ session });
 
             await session.commitTransaction();
