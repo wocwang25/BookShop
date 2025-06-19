@@ -15,11 +15,11 @@ class ApiService {
         try {
             const response = await fetch(url, config);
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.error || data.message || 'API request failed');
             }
-            
+
             return data;
         } catch (error) {
             console.error('API request failed:', error);
@@ -32,7 +32,7 @@ class ApiService {
         const queryParams = new URLSearchParams();
         if (limit > 0) queryParams.append('limit', limit);
         if (sort) queryParams.append('sort', sort);
-        
+
         const endpoint = `/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
         return this.request(endpoint);
     }
@@ -44,7 +44,7 @@ class ApiService {
     static async searchBooks(keyword) {
         const queryParams = new URLSearchParams();
         if (keyword) queryParams.append('keyword', keyword);
-        
+
         return this.request(`/books/search?${queryParams.toString()}`);
     }
 

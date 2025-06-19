@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
   <link rel="shortcut icon" href="../assets/images/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
   <link rel="stylesheet" href="../assets/css/home.css">
@@ -41,33 +44,39 @@
   </script>
   <style>
     .book-cover-detail {
-      box-shadow: 0 2px 16px 0 rgba(45,90,160,0.10);
+      box-shadow: 0 2px 16px 0 rgba(45, 90, 160, 0.10);
       border-radius: 20px;
       background: #f3f4f6;
-      object-fit: cover;
+      object-fit: contain;
     }
+
     .wishlist-btn.faved i {
       color: #f59e0b !important;
     }
+
     .wishlist-btn.faved {
       background: #fffbe6 !important;
       border: 1.5px solid #f59e0b;
     }
+
     .wishlist-btn {
       background: #f5f5dc;
       color: #f59e0b;
       border: 1.5px solid #f5f5dc;
       transition: background 0.2s, color 0.2s, border 0.2s;
     }
+
     .add-to-cart-btn {
       background: #2d5aa0;
       color: #fff;
       border-radius: 8px;
       transition: background 0.2s, color 0.2s;
     }
+
     .add-to-cart-btn:active {
       background: #1e3a5c;
     }
+
     .qty-btn {
       background: #e6e6e6;
       color: #2d5aa0;
@@ -80,25 +89,29 @@
       outline: none;
       transition: background 0.2s, color 0.2s;
     }
+
     .qty-btn:active {
       background: #2d5aa0;
       color: #fff;
     }
+
     .desc-section {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 2px 8px 0 rgba(45,90,160,0.06);
+      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
       padding: 32px;
       margin-top: 32px;
     }
   </style>
 </head>
+
 <body class="bg-light">
   <div id="header-placeholder"></div>
   <main class="container mx-auto px-4 py-12">
     <div class="flex flex-col md:flex-row gap-12">
       <div class="md:w-2/5 flex justify-center items-start">
-        <img id="bookImage" src="" alt="Book cover" class="book-cover-detail w-[320px] h-[480px] md:w-[340px] md:h-[520px]" />
+        <img id="bookImage" src="" alt="Book cover"
+          class="book-cover-detail w-[320px] h-[480px] md:w-[340px] md:h-[520px]" />
       </div>
       <div class="md:w-3/5 flex flex-col gap-4">
         <div class="text-sm text-gray-500 mb-1" id="bookCategory"></div>
@@ -111,11 +124,13 @@
         <div class="flex items-center gap-4 mb-6">
           <div class="flex items-center gap-2">
             <button class="qty-btn" id="qtyMinus">-</button>
-            <input type="text" id="qtyInput" value="1" class="w-12 text-center border border-gray-200 rounded py-1" readonly />
+            <input type="text" id="qtyInput" value="1" class="w-12 text-center border border-gray-200 rounded py-1"
+              readonly />
             <button class="qty-btn" id="qtyPlus">+</button>
           </div>
           <button class="add-to-cart-btn px-8 py-3 font-semibold text-lg" id="addToCartBtn">ADD TO CART</button>
-          <button class="wishlist-btn w-10 h-10 flex items-center justify-center rounded-full ml-2" id="wishlistBtn" title="Add to wishlist">
+          <button class="wishlist-btn w-10 h-10 flex items-center justify-center rounded-full ml-2" id="wishlistBtn"
+            title="Add to wishlist">
             <i class="ri-heart-line text-2xl"></i>
           </button>
         </div>
@@ -123,7 +138,8 @@
         <div class="mt-6">
           <span class="text-green-600 font-medium">Available to order, ships in 1-3 business days</span>
         </div>
-        <div class="mt-2 text-sm text-gray-500">Format: Paperback &nbsp;|&nbsp; Pages: <span id="bookPages">---</span></div>
+        <div class="mt-2 text-sm text-gray-500">Format: Paperback &nbsp;|&nbsp; Pages: <span id="bookPages">---</span>
+        </div>
       </div>
     </div>
     <section class="desc-section" id="descSection">
@@ -279,7 +295,7 @@
       qtyInput.value = val + 1;
     };
     // Add to cart
-    document.getElementById('addToCartBtn').onclick = function() {
+    document.getElementById('addToCartBtn').onclick = function () {
       this.innerText = '✔ Đã thêm';
       this.classList.add('bg-green-500', 'text-white');
       setTimeout(() => {
@@ -289,7 +305,7 @@
     };
     // Wishlist
     const wishlistBtn = document.getElementById('wishlistBtn');
-    wishlistBtn.onclick = function() {
+    wishlistBtn.onclick = function () {
       wishlistBtn.classList.toggle('faved');
       const icon = wishlistBtn.querySelector('i');
       if (wishlistBtn.classList.contains('faved')) {
@@ -302,4 +318,5 @@
     };
   </script>
 </body>
+
 </html>

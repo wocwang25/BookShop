@@ -317,6 +317,169 @@
       transform: translateY(-1px);
     }
 
+    /* Search Dropdown Styles */
+    .hero-search {
+      position: relative;
+    }
+
+    .hero-search.search-focused {
+      border-color: var(--primary-blue);
+      box-shadow: var(--shadow-large);
+    }
+
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      border: 1px solid var(--border-light);
+      z-index: 1000;
+      max-height: 400px;
+      overflow-y: auto;
+      animation: searchDropdownSlideIn 0.3s ease;
+      margin-top: 8px;
+    }
+
+    @keyframes searchDropdownSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .search-results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-light);
+      background: var(--bg-light);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .search-results-list {
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .search-result-item:hover {
+      background-color: var(--bg-light);
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-image {
+      width: 48px;
+      height: 64px;
+      margin-right: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .search-result-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .search-result-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .search-result-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .search-result-author {
+      font-size: 12px;
+      color: var(--text-medium);
+      margin-bottom: 4px;
+    }
+
+    .search-result-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-blue);
+    }
+
+    .search-highlight {
+      background-color: #fef3cd;
+      color: #d69e2e;
+      padding: 1px 2px;
+      border-radius: 2px;
+      font-weight: 600;
+    }
+
+    .search-results-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-light);
+      background: var(--bg-light);
+      border-radius: 0 0 12px 12px;
+    }
+
+    .search-view-all-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-view-all-btn:hover {
+      background: var(--primary-navy);
+    }
+
+    .search-no-results {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-medium);
+    }
+
+    .search-no-results i {
+      display: block;
+      margin: 0 auto 16px;
+    }
+
+    .search-no-results p {
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
     .hero-stats {
       display: flex;
       gap: 32px;
@@ -467,6 +630,36 @@
       .featured-books {
         transform: none;
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Mobile Search Dropdown */
+      .search-dropdown {
+        left: -20px;
+        right: -20px;
+        border-radius: 12px;
+        max-height: 350px;
+      }
+      
+      .search-result-item {
+        padding: 10px 16px;
+      }
+      
+      .search-result-image {
+        width: 40px;
+        height: 56px;
+        margin-right: 10px;
+      }
+      
+      .search-result-title {
+        font-size: 13px;
+      }
+      
+      .search-result-author {
+        font-size: 11px;
+      }
+      
+      .search-result-price {
+        font-size: 12px;
       }
 
       .floating-element {

@@ -58,6 +58,9 @@ app.get('/books', (req, res) => {
 app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, 'Frontend/pages', 'aboutUs.html'));
 });
+app.get('/bookDetail', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend/pages', 'bookDetail.html'));
+});
 
 // 404 fallback
 app.use((req, res) => {

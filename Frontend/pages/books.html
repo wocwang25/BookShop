@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <title>Danh mục Sách | Readify</title>
@@ -8,11 +9,14 @@
   <link rel="stylesheet" href="./assets/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
- <link rel="stylesheet" href="./assets/css/home.css">
-  <script src="./assets/js/home.js"></script>
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/books.js"></script>
   <script src="./assets/js/callHeaderFooter.js"></script>
   <script>
     tailwind.config = {
@@ -21,7 +25,8 @@
           colors: {
             primary: '#f5f5dc',
             secondary: '#e6e6e6',
-            primarynavy: '#2d5aa0'
+            primarynavy: '#2d5aa0',
+            light: '#f8fafc'
           },
           borderRadius: {
             'none': '0px',
@@ -40,7 +45,6 @@
     }
   </script>
   <style>
-    
     .book-card:nth-child(2) {
       transform: translateY(0px);
     }
@@ -48,66 +52,77 @@
     .header {
       background: #fff;
       border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
       position: sticky;
       top: 0;
       z-index: 50;
     }
+
     .main-content {
       padding-top: 80px;
     }
+
     @media (max-width: 768px) {
       .main-content {
         padding-top: 90px;
       }
     }
+
     /* Book card style */
     .book-img-rect {
       width: 100%;
       height: 256px;
-      object-fit: cover;
+      object-fit: contain;
       border-radius: 16px 16px 0 0;
       background: #f3f4f6;
       transition: transform 0.2s;
       display: block;
     }
+
     .book-card {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 2px 8px 0 rgba(45,90,160,0.06);
+      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
       transition: box-shadow 0.2s, transform 0.2s;
       display: flex;
       flex-direction: column;
       height: 100%;
     }
+
     .book-card:hover {
-      box-shadow: 0 6px 24px 0 rgba(45,90,160,0.12);
+      box-shadow: 0 6px 24px 0 rgba(45, 90, 160, 0.12);
       transform: translateY(-4px) scale(1.02);
     }
+
     .fav-btn {
       background: #f5f5dc;
       color: #f59e0b;
       border: 1.5px solid #f5f5dc;
       transition: background 0.2s, color 0.2s, border 0.2s;
     }
+
     .fav-btn.faved {
       background: #fffbe6 !important;
       color: #f59e0b !important;
       border: 1.5px solid #f59e0b;
     }
+
     .fav-btn.faved i {
       color: #f59e0b !important;
     }
+
     .add-to-cart-btn {
       background: #e6e6e6;
       color: #2d5aa0;
       border-radius: 8px;
       transition: background 0.2s, color 0.2s;
     }
+
     .add-to-cart-btn:hover {
       background: #2d5aa0;
       color: #fff;
     }
+
     /* Pagination style */
     .pagination {
       display: flex;
@@ -118,9 +133,10 @@
       background: #fff;
       border-radius: 12px;
       padding: 8px 0;
-      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.03);
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.03);
       transition: background 0.2s;
     }
+
     .pagination-btn {
       min-width: 44px;
       height: 44px;
@@ -134,6 +150,7 @@
       cursor: pointer;
       outline: none;
     }
+
     .pagination-btn.active,
     .pagination-btn:focus,
     .pagination-btn:hover:not(:disabled) {
@@ -141,421 +158,147 @@
       color: #fff;
       border-color: #2d5aa0;
     }
+
     .pagination-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+
     /* Hiệu ứng chuyển trang */
     .fadeout {
       opacity: 0;
       transition: opacity 0.3s;
     }
+
     .fadein {
       opacity: 1;
       transition: opacity 0.3s;
     }
+
     #booksGrid {
-  align-items: end !important;
-}
-    /* Ẩn mũi tên tăng giảm trên input[type=number] */
-    #gotoPageInput::-webkit-outer-spin-button,
-    #gotoPageInput::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+      align-items: end !important;
     }
-    #gotoPageInput[type=number] {
-      appearance: textfield;
-      -moz-appearance: textfield;
+
+    /* Search bar styles */
+    .search-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 2rem;
     }
-    /* Bỏ border đen, chỉ giữ border màu xám và focus màu xanh */
-    #gotoPageInput {
-      border: 1.5px solid #d1d5db !important;
-      box-shadow: none !important;
+
+    .search-input {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 16px;
+      transition: border-color 0.2s;
     }
-    #gotoPageInput:focus {
-      border-color: #2d5aa0 !important;
-      outline: none !important;
+
+    .search-input:focus {
+      outline: none;
+      border-color: #2d5aa0;
+    }
+
+    .search-button {
+      background: #2d5aa0;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-button:hover {
+      background: #1e3a8a;
     }
   </style>
 </head>
-<body class="bg-[#fafaf3]">
+
+<body class="bg-light">
   <!-- Header -->
   <div id="header-placeholder"></div>
 
-  
-
-  <!-- Main Content -->
+  <!-- Search Section -->
   <div class="main-content container mx-auto px-4 py-8">
+    <div class="search-container">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <input type="text" id="searchInput" class="search-input w-full"
+            placeholder="Tìm kiếm sách, tác giả hoặc thể loại...">
+        </div>
+        <div>
+          <button id="searchButton" class="search-button">
+            <i class="ri-search-line mr-2"></i>
+            Tìm kiếm
+          </button>
+        </div>
+      </div>
+      <div class="result-count text-gray-600 text-sm mt-2"></div>
+    </div>
+
     <div class="flex flex-col md:flex-row gap-8">
-    
+      <!-- Sidebar Filter -->
+      <div class="w-full md:w-1/4">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 transition hover:shadow-xl">
+          <h2 class="text-xl font-semibold text-gray-800 mb-6">Bộ lọc</h2>
+          <!-- Categories -->
+          <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">Thể loại</h3>
+            <div class="space-y-3" id="categoryRadios">
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="all" checked>
+                <span class="text-gray-700">Tất cả thể loại</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Phiêu lưu">
+                <span class="text-gray-700">Phiêu lưu</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Tiểu sử">
+                <span class="text-gray-700">Tiểu sử</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Sách dạy nấu ăn">
+                <span class="text-gray-700">Sách dạy nấu ăn</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Bí ẩn và Kinh dị">
+                <span class="text-gray-700">Bí ẩn và Kinh dị</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Tiểu thuyết">
+                <span class="text-gray-700">Tiểu thuyết</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" value="Phát triển bản thân">
+                <span class="text-gray-700">Phát triển bản thân</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Book Listings -->
-      <section class="w-full">
+      <section class="w-full md:w-3/4">
         <div class="mb-6">
           <h1 class="text-2xl font-bold text-gray-800 mb-2">Sách</h1>
-          <p class="text-gray-600">Hơn 1k+ sách có sẵn tại đây, tìm ngay!</p>
+          <p class="text-gray-600">Khám phá thư viện sách phong phú của chúng tôi</p>
         </div>
-        <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch fadein">
-          <!-- Book cards sẽ được render ở đây -->
+        <div id="booksGrid"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch fadein">
+          <!-- Book cards will be rendered here -->
         </div>
         <div class="pagination" id="pagination"></div>
       </section>
     </div>
-
-    <!-- Section: Bestselling books -->
-    <section class="mb-12">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold">Bestselling books</h2>
-        <a href="#" class="text-primarynavy text-sm font-medium hover:underline">Xem tất cả &rarr;</a>
-      </div>
-      <div id="bestsellerBooksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6"></div>
-    </section>
-    <!-- Section: Highly Recommended books -->
-    <section class="mb-12">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold">Highly Recommended</h2>
-        <a href="#" class="text-primarynavy text-sm font-medium hover:underline">Xem tất cả &rarr;</a>
-      </div>
-      <div id="recommendedBooksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6"></div>
-    </section>
-    <!-- Section: New Fiction -->
-    <section class="mb-12">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-      <div>
-        <h2 class="text-2xl font-bold text-primarynavy mb-1 flex items-center gap-2">
-          <i class="ri-book-open-line text-xl text-[#2563eb]"></i> New Fiction
-        </h2>
-        <p class="text-gray-600 text-sm max-w-xl">Khám phá những cuốn sách mới nhất vừa ra mắt, cập nhật liên tục các tác phẩm nổi bật từ nhiều thể loại khác nhau.</p>
-      </div>
-      <a href="#" class="text-primarynavy text-sm font-medium hover:underline whitespace-nowrap">Xem tất cả &rarr;</a>
-    </div>
-    <div id="newFictionBooksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch"></div>
-  </section>
   </div>
 
-    <div id="header-placeholder"></div>
-
-  <script>
-    // User popover logic
-    document.addEventListener('DOMContentLoaded', function() {
-      const userBtn = document.getElementById('userBtn');
-      const userPopover = document.getElementById('userPopover');
-      userBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        userPopover.classList.toggle('hidden');
-      });
-      document.addEventListener('click', function(e) {
-        if (!userPopover.contains(e.target) && e.target !== userBtn) {
-          userPopover.classList.add('hidden');
-        }
-      });
-    });
-
-    // Lấy dữ liệu sách từ backend (đọc từ file CSV)
-    let books = [];
-    const PAGE_SIZE = 12;
-    let currentPage = 1;
-    let currentCategory = "all";
-    let filteredBooks = books;
-
-    async function fetchBooksFromBackend() {
-      try {
-        const response = await fetch('http://localhost:3000/api/books');
-        if (!response.ok) throw new Error('Lỗi khi lấy dữ liệu sách');
-        const data = await response.json();
-        // Nếu backend trả về { success: true, books: [...] }
-        const rawBooks = Array.isArray(data) ? data : (data.books || []);
-        books = rawBooks.map((book, idx) => ({
-          id: book['id'] || book.id || idx + 1, // Sử dụng id từ backend hoặc tạo id tạm
-          title: book['title'] || book.title || book.TITLE || '',
-          author: book['authors'] || book.authors || (book.author?.name) || book.author || '',
-          category: book['category'] || book.category || (book.category?.name) || '',
-          price: Number(book['current_price'] || book.current_price || book.price) || 0,
-          oldPrice: Number(book['original_price'] || book.original_price) || undefined,
-          image: book['cover_link'] || book.cover_link || book.image || '',
-          rating: Number(book['avg_rating'] || book.avg_rating || book.rating) || 0,
-          n_review: Number(book['n_review'] || book.n_review) || 0,
-          quantity: Number(book['quantity'] || book.quantity) || 0
-        }));
-        filteredBooks = books;
-        renderBooks(currentCategory, 1);
-        renderSpecialBookSections();
-        renderNewFictionSection();
-      } catch (error) {
-        document.getElementById("booksGrid").innerHTML = `<div class=\"text-center text-gray-500 py-12 text-lg col-span-full\">Không thể tải danh sách sách!</div>`;
-        document.getElementById("pagination").innerHTML = "";
-      }
-    }
-
-    function renderBooks(category, page = 1) {
-      const grid = document.getElementById("booksGrid");
-      grid.classList.remove("fadein");
-      grid.classList.add("fadeout");
-      setTimeout(() => {
-        currentCategory = category;
-        filteredBooks = (category && category !== "all") ? books.filter(b => b.category === category) : books;
-        const totalPages = Math.ceil(filteredBooks.length / PAGE_SIZE);
-        currentPage = Math.min(page, totalPages) || 1;
-        grid.innerHTML = "";
-
-        if (filteredBooks.length === 0) {
-          grid.innerHTML = `<div class="text-center text-gray-500 py-12 text-lg col-span-full">Không có sách nào thuộc thể loại này.</div>`;
-          document.getElementById("pagination").innerHTML = "";
-          grid.classList.remove("fadeout");
-          grid.classList.add("fadein");
-          return;
-        }
-
-        const start = (currentPage - 1) * PAGE_SIZE;
-        const end = start + PAGE_SIZE;
-  filteredBooks.slice(start, end).forEach(book => {
-  grid.innerHTML += `
-    <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}">
-      <div class="relative h-96 w-full flex-shrink-0">
-        <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover object-top">
-        <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center fav-btn bg-[#eaeaea]/90 rounded-full transition shadow-sm" title="Yêu thích">
-          <i class="ri-star-line text-gray-800"></i>
-        </button>
-        <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
-            <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
-        </span>
-      </div>
-      <div class="p-4 flex flex-col flex-1">
-        <div class="text-xs text-gray-500 mb-1">${book.category}</div>
-        <h3 class="font-semibold text-gray-800 mb-1">${book.title}</h3>
-        <p class="text-sm text-gray-600 mb-3">${book.author}</p>
-        <div class="flex justify-between items-center mt-auto">
-          <div>
-            <span class="font-semibold text-gray-800">${book.price.toLocaleString()}₫</span>
-            ${book.oldPrice ? `<span class="text-sm text-gray-500 line-through ml-2">${book.oldPrice.toLocaleString()}₫</span>` : ""}
-          </div>
-          <button class="add-to-cart-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-[8px] whitespace-nowrap transition">Thêm vào giỏ</button>
-        </div>
-      </div>
-    </div>
-  `;
-});
-        // Thêm sự kiện click cho card sách để chuyển sang trang chi tiết
-        setTimeout(() => {
-          document.querySelectorAll('.book-card-item').forEach(card => {
-            card.addEventListener('click', function(e) {
-              // Không chuyển trang nếu bấm vào nút yêu thích hoặc thêm vào giỏ
-              if (e.target.closest('.fav-btn') || e.target.closest('.add-to-cart-btn')) return;
-              const id = this.getAttribute('data-id');
-              const book = books.find(b => b.id == id);
-              if (!book) return;
-              // Tạo slug từ tên sách (không dùng unicode regex để tránh lỗi trình duyệt)
-              function toSlug(str) {
-                return str
-                  .toLowerCase()
-                  .normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '') // loại bỏ dấu tiếng Việt
-                  .replace(/đ/g, 'd')
-                  .replace(/[^a-z0-9\s-]/g, '') // loại ký tự đặc biệt
-                  .replace(/\s+/g, '-') // thay khoảng trắng bằng -
-                  .replace(/-+/g, '-') // loại trừ nhiều dấu - liên tiếp
-                  .replace(/^-+|-+$/g, ''); // loại bỏ - ở đầu/cuối
-              }
-              const slug = `${book.id}-${toSlug(book.title)}`;
-              // Đảm bảo chuyển hướng đúng cả khi chạy local hoặc deploy subfolder
-              window.location.href = `${window.location.origin}/books/${slug}`;
-            });
-          });
-        }, 0);
-
-        // Hiệu ứng khi bấm "Thêm vào giỏ"
-        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Ngăn click lan ra ngoài làm lệch layout
-            const originalWidth = btn.offsetWidth;
-            btn.innerHTML = "✔ Đã thêm";
-            btn.classList.add("bg-green-500", "text-white");
-
-            btn.style.width = originalWidth + "px";
-            btn.style.minWidth = originalWidth + "px";
-            setTimeout(() => {
-              btn.innerHTML = "Thêm vào giỏ";
-              btn.classList.remove("bg-green-500", "text-white");
-              btn.style.width = "";
-              btn.style.minWidth = "";
-            }, 1200);
-          });
-        });
-
-        // Hiệu ứng khi bấm "Yêu thích"
-        document.querySelectorAll('.fav-btn').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            btn.classList.toggle("faved");
-            const icon = btn.querySelector("i");
-            if (btn.classList.contains("faved")) {
-              icon.classList.remove("ri-star-line");
-              icon.classList.add("ri-star-fill");
-            } else {
-              icon.classList.remove("ri-star-fill");
-              icon.classList.add("ri-star-line");
-            }
-          });
-        });
-
-        // Render phân trang
-        renderPagination(totalPages);
-
-        grid.classList.remove("fadeout");
-        grid.classList.add("fadein");
-      }, 200);
-    }
-
-    function renderPagination(totalPages) {
-      const pag = document.getElementById("pagination");
-      pag.innerHTML = "";
-      if (totalPages <= 1) return;
-      // Prev
-      pag.innerHTML += `<button class="pagination-btn" ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}"><i class="ri-arrow-left-s-line"></i></button>`;
-
-      // Hiển thị rút gọn phân trang với input tìm trang
-      let pageList = [];
-      if (totalPages <= 9) {
-        for (let i = 1; i <= totalPages; i++) pageList.push(i);
-      } else {
-        pageList = [1];
-        if (currentPage > 4) pageList.push('...');
-        for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
-          pageList.push(i);
-        }
-        if (currentPage < totalPages - 3) pageList.push('...');
-        pageList.push(totalPages);
-      }
-      pageList.forEach(i => {
-        if (i === '...') {
-          pag.innerHTML += `<span class="pagination-ellipsis">...</span>`;
-        } else {
-          pag.innerHTML += `<button class="pagination-btn${i === currentPage ? " active" : ""}" data-page="${i}">${i}</button>`;
-        }
-      });
-      // Next
-      pag.innerHTML += `<button class="pagination-btn" ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}"><i class="ri-arrow-right-s-line"></i></button>`;
-
-      // Thêm input tìm trang
-      pag.innerHTML += `<span class="ml-4 flex items-center gap-1"><input id="gotoPageInput" type="number" min="1" max="${totalPages}" placeholder="Tới trang..." class="border border-gray-300 rounded px-2 py-1 w-20 text-center text-sm focus:ring-2 focus:ring-primarynavy" style="margin-left:8px;"/><button id="gotoPageBtn" class="ml-1 px-2 py-1 rounded bg-primarynavy text-white text-sm">Tìm</button></span>`;
-
-      document.querySelectorAll('.pagination-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const page = Number(this.getAttribute('data-page'));
-          if (!isNaN(page) && page >= 1 && page <= totalPages && page !== currentPage) {
-            renderBooks(currentCategory, page);
-            window.scrollTo({top: 0, behavior: "smooth"});
-          }
-        });
-      });
-      // Xử lý tìm trang
-      const gotoInput = document.getElementById('gotoPageInput');
-      const gotoBtn = document.getElementById('gotoPageBtn');
-      gotoBtn.addEventListener('click', function() {
-        const val = Number(gotoInput.value);
-        if (!isNaN(val) && val >= 1 && val <= totalPages) {
-          renderBooks(currentCategory, val);
-          window.scrollTo({top: 0, behavior: "smooth"});
-        } else {
-          gotoInput.classList.add('ring-2', 'ring-red-400');
-          setTimeout(()=>gotoInput.classList.remove('ring-2', 'ring-red-400'), 1200);
-        }
-      });
-      gotoInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') gotoBtn.click();
-      });
-    }
-
-    // Fetch và render category động
-async function fetchAndRenderCategories() {
-  try {
-    const res = await fetch('http://localhost:3000/api/books/categories');
-    const data = await res.json();
-    const categories = data.categories || [];
-    const radios = document.getElementById('categoryRadios');
-    radios.innerHTML = `<label class="flex items-center space-x-3">
-      <input type="radio" name="category" value="all" checked>
-      <span class="text-gray-700">Tất cả thể loại</span>
-    </label>`;
-    categories.forEach(cat => {
-      radios.innerHTML += `<label class="flex items-center space-x-3">
-        <input type="radio" name="category" value="${cat}">
-        <span class="text-gray-700">${cat}</span>
-      </label>`;
-    });
-    // Gắn lại sự kiện lọc
-    document.querySelectorAll('#categoryRadios input[type=radio]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        renderBooks(this.value, 1);
-      });
-    });
-  } catch (e) {
-    // fallback nếu lỗi
-  }
-}
-
-    document.addEventListener('DOMContentLoaded', function() {
-      fetchAndRenderCategories();
-      // Lấy danh sách sách từ backend
-      fetchBooksFromBackend();
-    });
-
-    // Lọc theo radio
-    document.querySelectorAll('#categoryRadios input[type=radio]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        renderBooks(this.value, 1);
-      });
-    });
-
-    function renderSpecialBookCard(book, section) {
-  return `
-    <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}">
-      <div class="relative h-96 w-full flex-shrink-0">
-        <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover object-top">
-        <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center fav-btn bg-[#eaeaea]/90 rounded-full transition shadow-sm" title="Yêu thích">
-          <i class="ri-star-line text-gray-800"></i>
-        </button>
-        <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
-            <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
-        </span>
-      </div>
-      <div class="p-4 flex flex-col flex-1">
-        <div class="text-xs text-gray-500 mb-1">${book.category}</div>
-        <h3 class="font-semibold text-gray-800 mb-1">${book.title}</h3>
-        <p class="text-sm text-gray-600 mb-3">${book.author}</p>
-        <div class="flex justify-between items-center mt-auto">
-          <div>
-            <span class="font-semibold text-gray-800">${book.price.toLocaleString()}₫</span>
-            ${book.oldPrice ? `<span class="text-sm text-gray-500 line-through ml-2">${book.oldPrice.toLocaleString()}₫</span>` : ""}
-          </div>
-          <button class="add-to-cart-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-[8px] whitespace-nowrap transition">Thêm vào giỏ</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-    // Đảm bảo các section sử dụng bookcard mới
-function renderSpecialBookSections() {
-  // Bestselling: lấy sách có n_review > 20, sắp xếp theo n_review giảm dần
-  const bestsellers = books.filter(b => b.n_review > 20).sort((a,b) => b.n_review - a.n_review).slice(0, 8);
-  const bestsellerGrid = document.getElementById('bestsellerBooksGrid');
-  if (bestsellerGrid) {
-    bestsellerGrid.innerHTML = bestsellers.map(book => renderSpecialBookCard(book, 'bestseller')).join('');
-  }
-  // Recommended: rating > 4.9
-  const recommended = books.filter(b => b.rating >= 4.9).slice(0, 8);
-  const recommendedGrid = document.getElementById('recommendedBooksGrid');
-  if (recommendedGrid) {
-    recommendedGrid.innerHTML = recommended.map(book => renderSpecialBookCard(book, 'recommended')).join('');
-  }
-}
-function renderNewFictionSection() {
-  let newFictionBooks = books.slice().reverse().slice(0, 8); // Lấy 8 sách mới nhất theo thứ tự xuất hiện
-  const grid = document.getElementById('newFictionBooksGrid');
-  if (grid) {
-    grid.innerHTML = newFictionBooks.map(book => renderSpecialBookCard(book, 'new')).join('');
-  }
-}
-  </script>
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
 </body>
+
 </html>

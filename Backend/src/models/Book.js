@@ -17,9 +17,11 @@ const Book_Schema = mongoose.Schema(
             ref: 'Category',
             required: true
         },
-        publicationYear: Number,
         price: Number,
-        description: String
+        description: String,
+        publicationYear: Number,
+        manufacturer: String,
+        imageUrl: String
     },
     {
         timestamps: true,

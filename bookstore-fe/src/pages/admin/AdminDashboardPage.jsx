@@ -964,8 +964,11 @@ const AdminDashboardPage = () => {
             style={{
                 minHeight: '100vh',
                 width: '100vw',
-                // backgroundColor: '#f8f9fa',
                 backgroundImage: 'url("/images/1139490.png")',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center center',
+                backgroundAttachment: 'fixed',
                 padding: '1rem',
                 boxSizing: 'border-box',
                 overflow: 'auto',

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Search</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        .search-input { border: 1px solid #ccc; padding: 10px; margin: 10px; }
+        .search-btn-hero { background: blue; color: white; padding: 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Search Test</h1>
+    
+    <div class="hero-search">
+        <input type="text" class="search-input" placeholder="Tìm kiếm sách...">
+        <button class="search-btn-hero">
+            <i class="ri-search-line mr-2"></i>
+            Tìm kiếm
+        </button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script src="./assets/js/api.js"></script>
+    <script>
+        console.log('Test page loaded');
+        console.log('ApiService available:', typeof ApiService);
+        
+        // Test search functionality
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn-hero');
+        const results = document.getElementById('results');
+        
+        console.log('Search input found:', searchInput);
+        console.log('Search button found:', searchBtn);
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', async () => {
+                const query = searchInput.value;
+                console.log('Testing search for:', query);
+                results.innerHTML = 'Searching...';
+                
+                try {
+                    const response = await ApiService.searchBooks(query);
+                    console.log('Search response:', response);
+                    results.innerHTML = '<pre>' + JSON.stringify(response, null, 2) + '</pre>';
+                } catch (error) {
+                    console.error('Search error:', error);
+                    results.innerHTML = 'Error: ' + error.message;
+                }
+            });
+        }
+        
+        // Test API directly
+        setTimeout(async () => {
+            console.log('Testing direct API call...');
+            try {
+                const testResponse = await ApiService.getAllBooks(1);
+                console.log('Direct API test:', testResponse);
+            } catch (error) {
+                console.error('Direct API error:', error);
+            }
+        }, 1000);
+    </script>
+</body>
+</html> 

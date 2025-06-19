@@ -30,7 +30,8 @@ const BookService = {
             category,
             description,
             price,
-            publicationYear
+            publicationYear,
+            imageUrl
         } = data;
 
         if (!title || !author || !category) {
@@ -52,7 +53,8 @@ const BookService = {
             category: categoryDoc._id,
             description,
             price,
-            publicationYear
+            publicationYear,
+            imageUrl
         });
 
         await book.save();

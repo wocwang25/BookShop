@@ -15,18 +15,22 @@
         </ul>
       </nav>
       <div class="header-actions relative">
-        <button class="search-btn w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Search">
+        <!-- <button id="headerSearchBtn" class="search-btn w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Search">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
-        </button>
-       
-        <button id="cartBtn" class="cart-btn cart-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Shopping Cart">
+        </button> -->
+
+        <button id="cartBtn"
+          class="cart-btn cart-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
+          aria-label="Shopping Cart">
           <i class="ri-shopping-cart-2-line text-xl"></i>
         </button>
-    
-         <button id="userBtn" class="user-btn ml-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="User">
+
+        <button id="userBtn"
+          class="user-btn ml-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
+          aria-label="User">
           <i class="ri-user-line text-xl"></i>
         </button>
 
@@ -34,9 +38,27 @@
     </div>
   </div>
 </header>
+
+<!-- Header Search Modal -->
+<div id="headerSearchModal" class="fixed inset-0 bg-black bg-opacity-50 z-[9998] hidden items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96 overflow-hidden">
+    <div class="p-4 border-b">
+      <div class="flex items-center space-x-4">
+        <input type="text" id="headerSearchInput" class="flex-1 text-lg border-none outline-none"
+          placeholder="Tìm kiếm sách, tác giả hoặc thể loại..." autocomplete="off">
+        <button id="closeHeaderSearch" class="text-gray-500 hover:text-gray-700">
+          <i class="ri-close-line text-xl"></i>
+        </button>
+      </div>
+    </div>
+    <div id="headerSearchResults" class="max-h-80 overflow-y-auto">
+      <!-- Search results will be populated here -->
+    </div>
+  </div>
+</div>
+
 <!-- Slide-in user panel -->
-<div id="userPanel"
-  class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
+<div id="userPanel" class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
   translate-x-full hidden transition-transform duration-300 ease-in-out
   flex flex-col">
   <div class="flex items-center justify-between p-5 border-b">
@@ -44,26 +66,33 @@
     <button id="closeUserPanel" class="text-gray-500 hover:text-primarynavy text-2xl">&times;</button>
   </div>
   <div class="p-5 space-y-4 flex-1 flex flex-col">
-    <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+    <a href="profile"
+      class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-user-3-line text-xl"></i> Thông tin cá nhân
     </a>
-    <a href="orders" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+    <a href="orders"
+      class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-file-list-3-line text-xl"></i> Đơn hàng của tôi
     </a>
-    <a href="wishlist" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+    <a href="wishlist"
+      class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-heart-line text-xl"></i> Sách yêu thích
     </a>
-  
-    <a href="settings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+
+    <a href="settings"
+      class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-settings-3-line text-xl"></i> Cài đặt tài khoản
     </a>
-    <a href="login" class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mt-auto">Đăng nhập</a>
-    <a href="register" class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Tạo tài khoản</a>
+    <a href="login"
+      class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mt-auto">Đăng
+      nhập</a>
+    <a href="register"
+      class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Tạo
+      tài khoản</a>
   </div>
 </div>
 <!-- Slide-in cart panel -->
-<div id="cartPanel"
-    class="fixed top-0 right-0 h-full w-96 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
+<div id="cartPanel" class="fixed top-0 right-0 h-full w-96 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
   translate-x-full hidden transition-transform duration-300 ease-in-out
   flex flex-col">
   <div class="flex items-center justify-between p-5 border-b">
@@ -73,7 +102,9 @@
   <div class="flex-1 overflow-y-auto p-5 space-y-4" id="cartItems">
     <!-- Hiển thị sản phẩm trong giỏ hàng, ví dụ: -->
     <div class="flex items-center gap-3" id="cartItemExample">
-      <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1495635816i/32521178.jpg" alt="Sách" class="w-14 h-20 object-cover rounded border" />
+      <img
+        src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1495635816i/32521178.jpg"
+        alt="Sách" class="w-14 h-20 object-cover rounded border" />
       <div class="flex-1">
         <div class="font-medium text-gray-800">Tuổi trẻ đáng giá bao nhiêu</div>
         <div class="text-sm text-gray-500">Rosie Nguyễn</div>
@@ -83,21 +114,27 @@
         </div>
         <div class="flex items-center gap-2 mt-2">
           <button class="px-2 py-1 border rounded">-</button>
-          <input type="number" min="1" value="1" class="w-12 text-center border rounded focus:outline-none focus:ring-2 focus:ring-primarynavy no-spinner" />
+          <input type="number" min="1" value="1"
+            class="w-12 text-center border rounded focus:outline-none focus:ring-2 focus:ring-primarynavy no-spinner" />
           <button class="px-2 py-1 border rounded">+</button>
           <button class="ml-2 text-red-500 hover:underline text-l">Xóa</button>
         </div>
       </div>
     </div>
-    <div class="text-gray-500 text-center" id="cartEmptyMsg" style="display: none;">Chưa có sản phẩm nào trong giỏ hàng.</div>
+    <div class="text-gray-500 text-center" id="cartEmptyMsg" style="display: none;">Chưa có sản phẩm nào trong giỏ hàng.
+    </div>
   </div>
   <div class="p-5 border-t">
     <div class="flex justify-between items-center mb-4">
       <span class="font-medium text-gray-700">Tạm tính:</span>
       <span class="font-bold text-lg text-primarynavy" id="cartTotal">0đ</span>
     </div>
-    <a href="cart" class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mb-2">Xem giỏ hàng</a>
-    <a href="checkout" class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Thanh toán</a>
+    <a href="cart"
+      class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mb-2">Xem giỏ
+      hàng</a>
+    <a href="checkout"
+      class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Thanh
+      toán</a>
   </div>
 </div>
 
@@ -109,4 +146,225 @@
     appearance: none;
     margin: 0;
   }
+
+  /* Header Search Modal Styles */
+  #headerSearchModal {
+    backdrop-filter: blur(4px);
+  }
+
+  #headerSearchModal.show {
+    display: flex !important;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
 </style>
+
+<script>
+  // Header search functionality
+  document.addEventListener('DOMContentLoaded', function () {
+    const headerSearchBtn = document.getElementById('headerSearchBtn');
+    const headerSearchModal = document.getElementById('headerSearchModal');
+    const headerSearchInput = document.getElementById('headerSearchInput');
+    const closeHeaderSearch = document.getElementById('closeHeaderSearch');
+    const headerSearchResults = document.getElementById('headerSearchResults');
+
+    let headerSearchTimeout;
+    let isHeaderSearching = false;
+
+    // Open search modal
+    if (headerSearchBtn) {
+      headerSearchBtn.addEventListener('click', () => {
+        headerSearchModal.classList.remove('hidden');
+        headerSearchModal.classList.add('show');
+        setTimeout(() => {
+          headerSearchInput.focus();
+        }, 100);
+      });
+    }
+
+    // Close search modal
+    function closeSearchModal() {
+      headerSearchModal.classList.add('hidden');
+      headerSearchModal.classList.remove('show');
+      headerSearchInput.value = '';
+      headerSearchResults.innerHTML = '';
+    }
+
+    if (closeHeaderSearch) {
+      closeHeaderSearch.addEventListener('click', closeSearchModal);
+    }
+
+    // Close on backdrop click
+    headerSearchModal.addEventListener('click', (e) => {
+      if (e.target === headerSearchModal) {
+        closeSearchModal();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && headerSearchModal.classList.contains('show')) {
+        closeSearchModal();
+      }
+    });
+
+    // Search functionality
+    if (headerSearchInput) {
+      headerSearchInput.addEventListener('input', (e) => {
+        clearTimeout(headerSearchTimeout);
+        const query = e.target.value.trim();
+
+        if (query.length >= 2) {
+          headerSearchTimeout = setTimeout(() => {
+            performHeaderSearch(query);
+          }, 300);
+        } else {
+          headerSearchResults.innerHTML = '';
+        }
+      });
+
+      headerSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const query = headerSearchInput.value.trim();
+          if (query) {
+            closeSearchModal();
+            window.location.href = `/books?search=${encodeURIComponent(query)}`;
+          }
+        }
+      });
+    }
+
+    // Perform header search
+    async function performHeaderSearch(query) {
+      if (isHeaderSearching) return;
+      isHeaderSearching = true;
+
+      try {
+        headerSearchResults.innerHTML = '<div class="p-4 text-center"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primarynavy"></div></div>';
+
+        // Use the same API service as homepage
+        if (typeof ApiService !== 'undefined') {
+          const response = await ApiService.searchBooks(query);
+          if (response.success && response.books) {
+            renderHeaderSearchResults(response.books.slice(0, 5), query);
+          } else {
+            showHeaderNoResults(query);
+          }
+        } else {
+          // Fallback if ApiService is not available
+          showHeaderNoResults(query);
+        }
+      } catch (error) {
+        console.error('Header search failed:', error);
+        showHeaderNoResults(query);
+      } finally {
+        isHeaderSearching = false;
+      }
+    }
+
+    // Render header search results
+    function renderHeaderSearchResults(books, query) {
+      if (books.length === 0) {
+        showHeaderNoResults(query);
+        return;
+      }
+
+      const booksHtml = books.map(book => `
+      <div class="p-3 border-b hover:bg-gray-50 cursor-pointer" onclick="viewBookFromHeader('${book._id}')">
+        <div class="flex items-center space-x-3">
+          <img src="${getBookImageUrl(book)}" alt="${escapeHtml(book.title)}" 
+               class="w-12 h-16 object-cover rounded" onerror="this.src='/assets/images/default_image.jpg'">
+          <div class="flex-1 min-w-0">
+            <h4 class="font-medium text-gray-900 truncate">${highlightSearchTerm(book.title, query)}</h4>
+            <p class="text-sm text-gray-500 truncate">${escapeHtml(book.author?.name || book.author || 'Unknown Author')}</p>
+            <p class="text-sm font-medium text-primarynavy">${formatPrice(book.price)}</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+      headerSearchResults.innerHTML = `
+      ${booksHtml}
+      <div class="p-3 border-t bg-gray-50">
+        <button onclick="viewAllSearchResults('${query}')" class="w-full text-center text-primarynavy hover:underline font-medium">
+          Xem tất cả kết quả cho "${query}" →
+        </button>
+      </div>
+    `;
+    }
+
+    // Show no results
+    function showHeaderNoResults(query) {
+      headerSearchResults.innerHTML = `
+      <div class="p-6 text-center">
+        <i class="ri-search-line text-3xl text-gray-400 mb-2"></i>
+        <p class="text-gray-500 mb-3">Không tìm thấy sách nào với từ khóa "${query}"</p>
+        <button onclick="viewAllSearchResults('${query}')" class="text-primarynavy hover:underline">
+          Tìm kiếm tất cả →
+        </button>
+      </div>
+    `;
+    }
+
+    // Global functions for header search
+    window.viewBookFromHeader = function (bookId) {
+      closeSearchModal();
+      window.location.href = `/bookDetail?id=${bookId}`;
+    };
+
+    window.viewAllSearchResults = function (query) {
+      closeSearchModal();
+      window.location.href = `/books?search=${encodeURIComponent(query)}`;
+    };
+
+    // Helper functions
+    function getBookImageUrl(book) {
+      if (!book.imageUrl || book.imageUrl.trim() === '') {
+        return '/assets/images/default_image.jpg';
+      }
+
+      // Convert Google Drive link if needed
+      if (book.imageUrl.includes('drive.google.com/file/d/')) {
+        const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+        const match = book.imageUrl.match(driveRegex);
+        if (match && match[1]) {
+          return `https://drive.google.com/uc?id=${match[1]}&export=view`;
+        }
+      }
+
+      return book.imageUrl;
+    }
+
+    function formatPrice(price) {
+      if (!price) return 'Liên hệ';
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(price);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function highlightSearchTerm(text, term) {
+      if (!term) return escapeHtml(text);
+
+      const regex = new RegExp(`(${term})`, 'gi');
+      return escapeHtml(text).replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+    }
+  });
+</script>
