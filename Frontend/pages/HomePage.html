@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Readify | Cửa hàng sách trực tuyến</title>
+  <meta name="title" content="Readify | Cửa hàng sách trực tuyến">
+
+
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/home.js"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
+
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f5f5dc',
+            secondary: '#e6e6e6',
+            primarynavy: '#2d5aa0',
+            light : '#f8fafc',
+
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-light">
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+
+ 
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Bộ sưu tập bán chạy nhất
+          </div>
+          
+          <h1 class="hero-title">Khám phá thế giới qua từng trang sách</h1>
+          
+          <p class="hero-subtitle">
+            Readify - nơi những câu chuyện bắt đầu và trí tưởng tượng không có giới hạn.
+          </p>
+          <p class="hero-subtitle mt-2">
+              Khám phá hàng triệu cuốn sách, từ tiểu thuyết bán chạy nhất đến những viên ngọc ẩn.
+          </p>
+          <div class="hero-search">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Tìm kiếm sách, tác giả hoặc thể loại..."
+            >
+            <button class="search-btn-hero">Tìm kiếm</button>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number">1k+</span>
+              <span class="stat-label">Quyển sách</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">500+</span>
+              <span class="stat-label">Tác giả</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">5k+</span>
+              <span class="stat-label">Độc giả</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="featured-books">
+            <!-- Loading placeholder -->
+            <div class="book-card loading-placeholder">
+              <div class="book-cover bg-gray-200 animate-pulse">
+                <div class="w-full h-full bg-gray-300 rounded-t-md"></div>
+              </div>
+              <div class="book-info">
+                <div class="book-title bg-gray-200 h-4 mb-2 animate-pulse"></div>
+                <div class="book-author bg-gray-200 h-3 mb-2 animate-pulse"></div>
+                <div class="book-rating">
+                  <span class="stars">★★★★★</span>
+                  <span class="rating-text">...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</body>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-['Lora'] font-bold text-gray-800 mb-4">Tại sao chọn Readify?</h2>
+        <p class="text-xl text-gray-600">Chúng tôi mang đến trải nghiệm đọc sách tốt nhất cho bạn</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-primarynavy rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-truck-line ri-2x text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Giao hàng miễn phí</h3>
+          <p class="text-gray-600">Miễn phí giao hàng cho đơn hàng từ 200.000₫</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-primarynavy rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-shield-check-line ri-2x text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Đảm bảo chất lượng</h3>
+          <p class="text-gray-600">Sách chính hãng từ các nhà xuất bản uy tín</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-16 h-16 bg-primarynavy rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ri-customer-service-2-line ri-2x text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Hỗ trợ 24/7</h3>
+          <p class="text-gray-600">Đội ngũ hỗ trợ nhiệt tình, chuyên nghiệp</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Books Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-['Lora'] font-bold text-gray-800 mb-4">Sách nổi bật</h2>
+        <p class="text-xl text-gray-600">Khám phá những cuốn sách được yêu thích nhất</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-stretch">
+        <!-- Loading placeholders will be replaced by dynamic content -->
+        <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full loading-placeholder">
+           <div class="relative h-96 w-full flex-shrink-0 bg-gray-200 animate-pulse">
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="bg-gray-200 h-4 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-5 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-4 mb-3 animate-pulse"></div>
+            <div class="flex justify-between items-center mt-auto">
+              <div class="bg-gray-200 h-5 w-20 animate-pulse"></div>
+              <div class="bg-gray-200 h-8 w-24 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full loading-placeholder">
+           <div class="relative h-96 w-full flex-shrink-0 bg-gray-200 animate-pulse">
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="bg-gray-200 h-4 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-5 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-4 mb-3 animate-pulse"></div>
+            <div class="flex justify-between items-center mt-auto">
+              <div class="bg-gray-200 h-5 w-20 animate-pulse"></div>
+              <div class="bg-gray-200 h-8 w-24 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full loading-placeholder">
+           <div class="relative h-96 w-full flex-shrink-0 bg-gray-200 animate-pulse">
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="bg-gray-200 h-4 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-5 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-4 mb-3 animate-pulse"></div>
+            <div class="flex justify-between items-center mt-auto">
+              <div class="bg-gray-200 h-5 w-20 animate-pulse"></div>
+              <div class="bg-gray-200 h-8 w-24 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full loading-placeholder">
+           <div class="relative h-96 w-full flex-shrink-0 bg-gray-200 animate-pulse">
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="bg-gray-200 h-4 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-5 mb-2 animate-pulse"></div>
+            <div class="bg-gray-200 h-4 mb-3 animate-pulse"></div>
+            <div class="flex justify-between items-center mt-auto">
+              <div class="bg-gray-200 h-5 w-20 animate-pulse"></div>
+              <div class="bg-gray-200 h-8 w-24 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-12">
+        <a href="books" class="inline-block bg-white text-gray-800 px-8 py-3 font-medium !rounded-button whitespace-nowrap border border-gray-200">Xem tất cả sách</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-['Lora'] font-bold text-gray-800 mb-4">Khách hàng nói gì về chúng tôi?</h2>
+        <p class="text-xl text-gray-600">Trải nghiệm của độc giả tại Readify</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-50 p-6 rounded">
+          <div class="flex items-center mb-4">
+            <img src="https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20young%20Vietnamese%20woman%20in%20business%20attire%20with%20a%20warm%20smile&width=100&height=100&seq=11&orientation=squarish" alt="Nguyễn Thị Minh Tâm" class="w-9 h-9 rounded-full object-cover">
+            <div class="ml-4">
+              <h4 class="font-semibold text-gray-800">Nguyễn Thị Minh Tâm</h4>
+              <p class="text-gray-500">Giáo viên</p>
+            </div>
+          </div>
+          <p class="text-gray-600">"Tôi rất hài lòng với chất lượng sách và dịch vụ tại Readify. Giao hàng nhanh chóng và sách được đóng gói cẩn thận."</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded">
+          <div class="flex items-center mb-4">
+            <img src="https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20middle-aged%20Vietnamese%20man%20wearing%20glasses%20with%20a%20confident%20expression&width=100&height=100&seq=12&orientation=squarish" alt="Trần Văn Quang" class="w-9 h-9 rounded-full object-cover">
+            <div class="ml-4">
+              <h4 class="font-semibold text-gray-800">Trần Văn Quang</h4>
+              <p class="text-gray-500">Kỹ sư phần mềm</p>
+            </div>
+          </div>
+          <p class="text-gray-600">"Readify có bộ sưu tập sách công nghệ rất phong phú. Tôi thường xuyên mua sách ở đây để cập nhật kiến thức mới."</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded">
+          <div class="flex items-center mb-4">
+            <img src="https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20young%20Vietnamese%20woman%20with%20long%20black%20hair%20and%20natural%20makeup&width=100&height=100&seq=13&orientation=squarish" alt="Phạm Thu Hương" class="w-9 h-9 rounded-full object-cover">
+            <div class="ml-4">
+              <h4 class="font-semibold text-gray-800">Phạm Thu Hương</h4>
+              <p class="text-gray-500">Nhà văn</p>
+            </div>
+          </div>
+          <p class="text-gray-600">"Là một người yêu sách, tôi rất ấn tượng với cách Readify chăm sóc từng cuốn sách và khách hàng của mình."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <div class="flex flex-col md:flex-row gap-8">
+      <!-- Sidebar Filter -->
+      <div class="w-full md:w-1/4">
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 transition hover:shadow-xl">          <h2 class="text-xl font-semibold text-gray-800 mb-6">Bộ lọc</h2>
+          <!-- Categories -->
+          <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-4">Thể loại</h3>
+            <div class="space-y-3">
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category" checked>
+                <span class="text-gray-700">Tất cả thể loại</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Phiêu lưu</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Tiểu sử</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Sách dạy nấu ăn</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Bí ẩn và Kinh dị</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Tiểu thuyết</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="radio" name="category">
+                <span class="text-gray-700">Phát triển bản thân</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Book Listings -->
+      <div class="w-full md:w-3/4 ">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-800 mb-2">Sách</h1>
+          <p class="text-gray-600">Hơn 1k+ sách có sẵn tại đây, tìm ngay!</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+          <!-- Book Card -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20with%20dark%20blue%20background%20and%20pink%20text%20saying%20Such%20a%20Fun%20Age%2C%20literary%20fiction%20book%20cover%20with%20award%20medal&width=400&height=600&seq=1&orientation=portrait" alt="Such a Fun Age" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-sm text-gray-500 mb-2">Tiểu sử</div>
+              <h3 class="font-['Playfair_Display'] font-semibold text-gray-800 mb-2 text-lg">Một Thời Đại Vui Vẻ</h3>
+              <p class="text-gray-600 mb-3">Kiley Reid</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">329.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 2 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20Treasure%20Island%20by%20Robert%20Louis%20Stevenson%2C%20classic%20adventure%20novel%20with%20pirate%20ship%20illustration&width=400&height=600&seq=2&orientation=portrait" alt="Treasure Island" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Phiêu lưu</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Đảo Châu Báu</h3>
+              <p class="text-sm text-gray-600 mb-3">Robert Louis Stevenson</p>
+              <div class="flex justify-between items-center mt-auto">
+                <div>
+                  <span class="font-semibold text-gray-800">375.000₫</span>
+                  <span class="text-sm text-gray-500 line-through ml-2">450.000₫</span>
+                </div>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 3 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20Atomic%20Habits%20by%20James%20Clear%2C%20bestselling%20self-help%20book%20with%20simple%20geometric%20design%20and%20orange%20color%20scheme&width=400&height=600&seq=3&orientation=portrait" alt="Atomic Habits" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Phát triển bản thân</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Thói Quen Nguyên Tử</h3>
+              <p class="text-sm text-gray-600 mb-3">James Clear</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">289.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 4 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20Reminders%20of%20Him%20by%20Colleen%20Hoover%2C%20contemporary%20romance%20novel%20with%20light%20blue%20background%20and%20purple%20typography&width=400&height=600&seq=4&orientation=portrait" alt="Reminders of Him" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Tiểu thuyết</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Những Kỷ Niệm Về Anh</h3>
+              <p class="text-sm text-gray-600 mb-3">Colleen Hoover</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">299.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 5 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20A%20Flicker%20in%20the%20Dark%20by%20Stacy%20Willingham%2C%20psychological%20thriller%20with%20dark%20background%20and%20minimal%20text%20design&width=400&height=600&seq=5&orientation=portrait" alt="A Flicker in the Dark" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Bí ẩn & Kinh dị</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Ánh Sáng Trong Bóng Tối</h3>
+              <p class="text-sm text-gray-600 mb-3">Stacy Willingham</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">315.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 6 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20The%20Subtle%20Art%20of%20Not%20Giving%20a%20F%2Ack%20by%20Mark%20Manson%2C%20self-help%20book%20with%20bright%20orange%20background%20and%20bold%20typography&width=400&height=600&seq=6&orientation=portrait" alt="The Subtle Art of Not Giving a F*ck" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Phát triển bản thân</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Nghệ Thuật Tinh Tế Của Việc Đếch Quan Tâm</h3>
+              <p class="text-sm text-gray-600 mb-3">Mark Manson</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">259.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 7 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20And%20There%20Was%20Light:%20Abraham%20Lincoln%20biography%20by%20Jon%20Meacham%20with%20professional%20design%20and%20historical%20portrait&width=400&height=600&seq=7&orientation=portrait" alt="And There Was Light" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Tiểu sử</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Và Ánh Sáng Đã Đến: Abraham Lincoln</h3>
+              <p class="text-sm text-gray-600 mb-3">Jon Meacham</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">420.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 8 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20One%20Simple%20One-Pan%20Wonders%20by%20Jamie%20Oliver%2C%20cookbook%20with%20bright%20turquoise%20background%20and%20food%20photography&width=400&height=600&seq=8&orientation=portrait" alt="One Simple One-Pan Wonders" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Sách dạy nấu ăn</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Món Ngon Đơn Giản Chỉ Với Một Chảo</h3>
+              <p class="text-sm text-gray-600 mb-3">Jamie Oliver</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">550.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+          <!-- Book 9 -->
+          <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
+           <div class="relative h-96 w-full flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=Book%20cover%20of%20No%20Plan%20B%20by%20Lee%20Child%20and%20Andrew%20Child%2C%20thriller%20novel%20with%20minimalist%20design%20and%20bold%20typography&width=400&height=600&seq=9&orientation=portrait" alt="No Plan B" class="w-full h-full object-cover object-top">
+              <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full">
+                <i class="ri-star-line text-gray-800"></i>
+              </button>
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+              <div class="text-xs text-gray-500 mb-1">Bí ẩn & Kinh dị</div>
+              <h3 class="font-semibold text-gray-800 mb-1">Không Có Kế Hoạch B</h3>
+              <p class="text-sm text-gray-600 mb-3">Lee Child & Andrew Child</p>
+              <div class="flex justify-between items-center mt-auto">
+                <span class="font-semibold text-gray-800">315.000₫</span>
+                <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap">Thêm vào giỏ</button>
+              </div>
+            </div>
+          </div>
+            <div class="col-span-1 md:col-span-3 flex justify-center mt-6">
+               <a href="books" class="inline-block bg-white text-gray-800 px-8 py-3 font-medium !rounded-button whitespace-nowrap border border-gray-200">Xem tất cả sách</a>
+            </div>
+        </div>
+      
+      </div>
+    </div>
+  </main>
+
+  
+ <!-- Newsletter -->
+  <section class="bg-white py-10 border-t">
+    <div class="container mx-auto px-4">
+      <div class="max-w-xl mx-auto text-center mb-8">
+        <h2 class="text-3xl font-['Playfair_Display'] font-semibold text-gray-800 mb-3">Đăng ký nhận bản tin</h2>
+        <p class="text-gray-600 text-lg">Nhận thông tin cập nhật về sách mới nhất</p>
+      </div>
+      <div class="max-w-md mx-auto">
+        <form class="flex">
+          <input type="email" placeholder="Nhập email của bạn" class="flex-1 px-4 py-3 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-primary">
+          <button type="submit" class="bg-primarynavy text-white px-6 py-3 font-medium !rounded-r-button whitespace-nowrap">Đăng ký</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+   <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+
+</body>
+</html>

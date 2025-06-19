@@ -1,0 +1,70 @@
+:where([class^="ri-"])::before { content: "\f3c2"; }
+    html, body {
+            height: 100%;
+            min-height: 100%;
+        }
+    body {
+            background-color: #F5F1EC;
+            height: 100vh;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+    }
+    .gradient-bg {
+            background: linear-gradient(135deg, #F5F1EC 0%, #F0EBE3 100%);
+        }
+    .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+    .input-field {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+    .input-field:focus {
+            background-color: #fff;
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 0 2px rgba(255, 154, 139, 0.2);
+        }
+    .social-btn {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+    .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    .quote-card {
+            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+        }
+    .cta-card {
+            background: linear-gradient(135deg, #FFF5F7 0%, #FEEEF2 100%);
+        }
+    .custom-checkbox {
+    background: #f5f5f5;
+    transition: background 0.2s, border 0.2s, box-shadow 0.2s;
+}
+input[type="checkbox"].peer:checked + .custom-checkbox {
+    background: #1a365d;
+    border-color: #1a365d;
+    box-shadow: 0 2px 8px rgba(26,54,93,0.15);
+}
+input[type="checkbox"].peer:focus + .custom-checkbox {
+    box-shadow: 0 0 0 2px #FF9A8B33;
+}
+input[type="checkbox"].peer:checked + .custom-checkbox i {
+    opacity: 1 !important;
+}
+.custom-checkbox i {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* Thêm hiệu ứng mượt mà cho form */
+#login-form, #register-form {
+    transition: opacity 0.3s cubic-bezier(.4,0,.2,1);
+}
+.opacity-0 {
+    opacity: 0 !important;
+    pointer-events: none;
+}

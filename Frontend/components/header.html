@@ -1,0 +1,112 @@
+<header class="header" id="header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="logo flex items-center space-x-2">
+        <img src="../assets/images/logo-navy.svg" alt="Readify" class="h-8 w-8 object-contain" />
+        <span class="logo">Readify</span>
+      </a>
+      <nav class="nav">
+        <ul class="nav-menu">
+          <li><a href="/" class="nav-link">Trang chủ</a></li>
+          <li><a href="books" class="nav-link">Cửa Hàng</a></li>
+          <li><a href="categories" class="nav-link">Thể loại</a></li>
+          <li><a href="reviews" class="nav-link">Đánh giá</a></li>
+          <li><a href="about" class="nav-link">Về chúng tôi</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions relative">
+        <button class="search-btn w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+       
+        <button id="cartBtn" class="cart-btn cart-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Shopping Cart">
+          <i class="ri-shopping-cart-2-line text-xl"></i>
+        </button>
+    
+         <button id="userBtn" class="user-btn ml-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="User">
+          <i class="ri-user-line text-xl"></i>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</header>
+<!-- Slide-in user panel -->
+<div id="userPanel"
+  class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
+  translate-x-full hidden transition-transform duration-300 ease-in-out
+  flex flex-col">
+  <div class="flex items-center justify-between p-5 border-b">
+    <span class="font-bold text-lg text-gray-800">Tài khoản</span>
+    <button id="closeUserPanel" class="text-gray-500 hover:text-primarynavy text-2xl">&times;</button>
+  </div>
+  <div class="p-5 space-y-4 flex-1 flex flex-col">
+    <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+      <i class="ri-user-3-line text-xl"></i> Thông tin cá nhân
+    </a>
+    <a href="orders" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+      <i class="ri-file-list-3-line text-xl"></i> Đơn hàng của tôi
+    </a>
+    <a href="wishlist" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+      <i class="ri-heart-line text-xl"></i> Sách yêu thích
+    </a>
+  
+    <a href="settings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
+      <i class="ri-settings-3-line text-xl"></i> Cài đặt tài khoản
+    </a>
+    <a href="login" class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mt-auto">Đăng nhập</a>
+    <a href="register" class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Tạo tài khoản</a>
+  </div>
+</div>
+<!-- Slide-in cart panel -->
+<div id="cartPanel"
+    class="fixed top-0 right-0 h-full w-96 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
+  translate-x-full hidden transition-transform duration-300 ease-in-out
+  flex flex-col">
+  <div class="flex items-center justify-between p-5 border-b">
+    <span class="font-bold text-lg text-gray-800">Giỏ hàng của bạn</span>
+    <button id="closeCartPanel" class="text-gray-500 hover:text-primarynavy text-2xl">&times;</button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-5 space-y-4" id="cartItems">
+    <!-- Hiển thị sản phẩm trong giỏ hàng, ví dụ: -->
+    <div class="flex items-center gap-3" id="cartItemExample">
+      <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1495635816i/32521178.jpg" alt="Sách" class="w-14 h-20 object-cover rounded border" />
+      <div class="flex-1">
+        <div class="font-medium text-gray-800">Tuổi trẻ đáng giá bao nhiêu</div>
+        <div class="text-sm text-gray-500">Rosie Nguyễn</div>
+        <div class="flex items-center gap-2 mt-1">
+          <span class="text-primarynavy font-semibold">120.000đ</span>
+          <span class="text-xs text-gray-400 line-through">150.000đ</span>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <button class="px-2 py-1 border rounded">-</button>
+          <input type="number" min="1" value="1" class="w-12 text-center border rounded focus:outline-none focus:ring-2 focus:ring-primarynavy no-spinner" />
+          <button class="px-2 py-1 border rounded">+</button>
+          <button class="ml-2 text-red-500 hover:underline text-l">Xóa</button>
+        </div>
+      </div>
+    </div>
+    <div class="text-gray-500 text-center" id="cartEmptyMsg" style="display: none;">Chưa có sản phẩm nào trong giỏ hàng.</div>
+  </div>
+  <div class="p-5 border-t">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-medium text-gray-700">Tạm tính:</span>
+      <span class="font-bold text-lg text-primarynavy" id="cartTotal">0đ</span>
+    </div>
+    <a href="cart" class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mb-2">Xem giỏ hàng</a>
+    <a href="checkout" class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Thanh toán</a>
+  </div>
+</div>
+
+<style>
+  /* Ẩn mũi tên tăng giảm mặc định trên input[type=number] cho Chrome, Safari, Edge */
+  input[type=number].no-spinner::-webkit-inner-spin-button,
+  input[type=number].no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+</style>

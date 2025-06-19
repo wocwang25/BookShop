@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết Sách | Readify</title>
+  <link rel="shortcut icon" href="../assets/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <link rel="stylesheet" href="../assets/css/home.css">
+  <script src="../assets/js/home.js"></script>
+  <script src="../assets/js/callHeaderFooter.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f5f5dc',
+            secondary: '#e6e6e6',
+            primarynavy: '#2d5aa0',
+            light: '#f8fafc',
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .book-cover-detail {
+      box-shadow: 0 2px 16px 0 rgba(45,90,160,0.10);
+      border-radius: 20px;
+      background: #f3f4f6;
+      object-fit: cover;
+    }
+    .wishlist-btn.faved i {
+      color: #f59e0b !important;
+    }
+    .wishlist-btn.faved {
+      background: #fffbe6 !important;
+      border: 1.5px solid #f59e0b;
+    }
+    .wishlist-btn {
+      background: #f5f5dc;
+      color: #f59e0b;
+      border: 1.5px solid #f5f5dc;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+    .add-to-cart-btn {
+      background: #2d5aa0;
+      color: #fff;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .add-to-cart-btn:active {
+      background: #1e3a5c;
+    }
+    .qty-btn {
+      background: #e6e6e6;
+      color: #2d5aa0;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .qty-btn:active {
+      background: #2d5aa0;
+      color: #fff;
+    }
+    .desc-section {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px 0 rgba(45,90,160,0.06);
+      padding: 32px;
+      margin-top: 32px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div id="header-placeholder"></div>
+  <main class="container mx-auto px-4 py-12">
+    <div class="flex flex-col md:flex-row gap-12">
+      <div class="md:w-2/5 flex justify-center items-start">
+        <img id="bookImage" src="" alt="Book cover" class="book-cover-detail w-[320px] h-[480px] md:w-[340px] md:h-[520px]" />
+      </div>
+      <div class="md:w-3/5 flex flex-col gap-4">
+        <div class="text-sm text-gray-500 mb-1" id="bookCategory"></div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2" id="bookTitle"></h1>
+        <div class="text-lg text-gray-700 mb-2">by <span id="bookAuthor"></span></div>
+        <div class="flex items-center gap-4 mb-4">
+          <span class="text-2xl font-semibold text-primarynavy" id="bookPrice"></span>
+          <span class="text-lg text-gray-400 line-through" id="bookOldPrice"></span>
+        </div>
+        <div class="flex items-center gap-4 mb-6">
+          <div class="flex items-center gap-2">
+            <button class="qty-btn" id="qtyMinus">-</button>
+            <input type="text" id="qtyInput" value="1" class="w-12 text-center border border-gray-200 rounded py-1" readonly />
+            <button class="qty-btn" id="qtyPlus">+</button>
+          </div>
+          <button class="add-to-cart-btn px-8 py-3 font-semibold text-lg" id="addToCartBtn">ADD TO CART</button>
+          <button class="wishlist-btn w-10 h-10 flex items-center justify-center rounded-full ml-2" id="wishlistBtn" title="Add to wishlist">
+            <i class="ri-heart-line text-2xl"></i>
+          </button>
+        </div>
+        <div class="text-gray-600" id="bookShortDesc"></div>
+        <div class="mt-6">
+          <span class="text-green-600 font-medium">Available to order, ships in 1-3 business days</span>
+        </div>
+        <div class="mt-2 text-sm text-gray-500">Format: Paperback &nbsp;|&nbsp; Pages: <span id="bookPages">---</span></div>
+      </div>
+    </div>
+    <section class="desc-section" id="descSection">
+      <h2 class="text-2xl font-bold mb-4">Giới thiệu sách</h2>
+      <div class="text-gray-700 leading-relaxed" id="bookDesc"></div>
+    </section>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script>
+    // Sample data (should be replaced with fetch from backend)
+    const books = [
+      {
+        id: 1,
+        title: "Một Thời Đại Vui Vẻ",
+        author: "Kiley Reid",
+        category: "Tiểu sử",
+        price: 329000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20with%20dark%20blue%20background%20and%20pink%20text%20saying%20Such%20a%20Fun%20Age%2C%20literary%20fiction%20book%20cover%20with%20award%20medal&width=400&height=600&seq=1&orientation=portrait",
+        rating: 4.6,
+        pages: 320,
+        desc: "Một tiểu thuyết sắc sảo về chủng tộc, đặc quyền và sự trưởng thành, kể về một bảo mẫu trẻ và gia đình cô làm việc cùng.",
+        shortDesc: "Một tiểu thuyết sắc sảo về chủng tộc, đặc quyền và sự trưởng thành."
+      },
+      {
+        id: 2,
+        title: "Đảo Châu Báu",
+        author: "Robert Louis Stevenson",
+        category: "Phiêu lưu",
+        price: 375000,
+        oldPrice: 450000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20of%20Treasure%20Island%20by%20Robert%20Louis%20Stevenson%2C%20classic%20adventure%20novel%20with%20pirate%20ship%20illustration&width=400&height=600&seq=2&orientation=portrait",
+        rating: 4.8,
+        pages: 280,
+        desc: "Một cuộc phiêu lưu kinh điển với cướp biển, kho báu và những bí ẩn trên biển cả.",
+        shortDesc: "Cuộc phiêu lưu kinh điển với cướp biển và kho báu."
+      },
+      {
+        id: 3,
+        title: "Thói Quen Nguyên Tử",
+        author: "James Clear",
+        category: "Phát triển bản thân",
+        price: 289000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20of%20Atomic%20Habits%20by%20James%20Clear%2C%20bestselling%20self-help%20book%20with%20simple%20geometric%20design%20and%20orange%20color%20scheme&width=400&height=600&seq=3&orientation=portrait",
+        rating: 4.9,
+        pages: 350,
+        desc: "Hướng dẫn thực tế để hình thành thói quen tốt và phá bỏ thói quen xấu.",
+        shortDesc: "Hướng dẫn thực tế để hình thành thói quen tốt."
+      },
+      {
+        id: 4,
+        title: "Những Kỷ Niệm Về Anh",
+        author: "Colleen Hoover",
+        category: "Tiểu thuyết",
+        price: 299000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20of%20Reminders%20of%20Him%20by%20Colleen%20Hoover%2C%20contemporary%20romance%20novel%20with%20light%20blue%20background%20and%20purple%20typography&width=400&height=600&seq=4&orientation=portrait",
+        rating: 4.7,
+        pages: 310,
+        desc: "Một câu chuyện cảm động về tình yêu, sự tha thứ và hy vọng.",
+        shortDesc: "Câu chuyện cảm động về tình yêu và hy vọng."
+      },
+      {
+        id: 5,
+        title: "Ánh Sáng Trong Bóng Tối",
+        author: "Stacy Willingham",
+        category: "Bí ẩn và Kinh dị",
+        price: 315000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20of%20A%20Flicker%20in%20the%20Dark%20by%20Stacy%20Willingham%2C%20psychological%20thriller%20with%20dark%20background%20and%20minimal%20text%20design&width=400&height=600&seq=5&orientation=portrait",
+        rating: 4.5,
+        pages: 290,
+        desc: "Một thriller tâm lý với những bí ẩn đen tối và bất ngờ.",
+        shortDesc: "Thriller tâm lý với nhiều bí ẩn đen tối."
+      },
+      {
+        id: 6,
+        title: "Món Ngon Đơn Giản Chỉ Với Một Chảo",
+        author: "Jamie Oliver",
+        category: "Sách dạy nấu ăn",
+        price: 550000,
+        image: "https://readdy.ai/api/search-image?query=Book%20cover%20of%20One%20Simple%20One-Pan%20Wonders%20by%20Jamie%20Oliver%2C%20cookbook%20with%20bright%20turquoise%20background%20and%20food%20photography&width=400&height=600&seq=8&orientation=portrait",
+        rating: 4.6,
+        pages: 200,
+        desc: "Công thức nấu ăn đơn giản, tiết kiệm thời gian chỉ với một chảo.",
+        shortDesc: "Công thức nấu ăn đơn giản, tiết kiệm thời gian."
+      },
+      {
+        id: 7,
+        title: "Dám Nghĩ Lớn",
+        author: "David J. Schwartz",
+        category: "Phát triển bản thân",
+        price: 210000,
+        image: "https://cdn0.fahasa.com/media/catalog/product/d/a/dam-nghi-lon.jpg",
+        rating: 4.7,
+        pages: 250,
+        desc: "Khám phá sức mạnh của tư duy lớn để thành công.",
+        shortDesc: "Khám phá sức mạnh của tư duy lớn."
+      },
+      {
+        id: 8,
+        title: "Bí Mật Của Phan Thiên Ân",
+        author: "Og Mandino",
+        category: "Tiểu thuyết",
+        price: 185000,
+        image: "https://cdn0.fahasa.com/media/catalog/product/b/i/bi-mat-cua-phan-thien-an.jpg",
+        rating: 4.8,
+        pages: 220,
+        desc: "Câu chuyện truyền cảm hứng về nghị lực và thành công.",
+        shortDesc: "Câu chuyện truyền cảm hứng về nghị lực."
+      },
+      {
+        id: 9,
+        title: "Totto-chan Bên Cửa Sổ",
+        author: "Kuroyanagi Tetsuko",
+        category: "Tiểu sử",
+        price: 175000,
+        image: "https://cdn0.fahasa.com/media/catalog/product/t/o/tottochan.jpg",
+        rating: 4.9,
+        pages: 180,
+        desc: "Hồi ký nổi tiếng về tuổi thơ và giáo dục khác biệt.",
+        shortDesc: "Hồi ký nổi tiếng về tuổi thơ và giáo dục."
+      }
+    ];
+    // Get book ID from URL
+    function getBookIdFromUrl() {
+      // Match /books/1-slug or /books/1-slug.html
+      const match = window.location.pathname.match(/books\/(\d+)-/);
+      if (match) return parseInt(match[1]);
+      // fallback for local file or direct open
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('id')) return parseInt(params.get('id'));
+      return 1;
+    }
+    const bookId = getBookIdFromUrl();
+    const book = books.find(b => b.id === bookId) || books[0];
+    // Fill data
+    document.getElementById('bookImage').src = book.image;
+    document.getElementById('bookImage').alt = book.title;
+    document.getElementById('bookCategory').innerText = book.category;
+    document.getElementById('bookTitle').innerText = book.title;
+    document.getElementById('bookAuthor').innerText = book.author;
+    document.getElementById('bookPrice').innerText = book.price.toLocaleString() + '₫';
+    document.getElementById('bookOldPrice').innerText = book.oldPrice ? book.oldPrice.toLocaleString() + '₫' : '';
+    document.getElementById('bookPages').innerText = book.pages || '---';
+    document.getElementById('bookShortDesc').innerText = book.shortDesc || '';
+    document.getElementById('bookDesc').innerText = book.desc || '';
+    // Quantity logic
+    const qtyInput = document.getElementById('qtyInput');
+    document.getElementById('qtyMinus').onclick = () => {
+      let val = parseInt(qtyInput.value);
+      if (val > 1) qtyInput.value = val - 1;
+    };
+    document.getElementById('qtyPlus').onclick = () => {
+      let val = parseInt(qtyInput.value);
+      qtyInput.value = val + 1;
+    };
+    // Add to cart
+    document.getElementById('addToCartBtn').onclick = function() {
+      this.innerText = '✔ Đã thêm';
+      this.classList.add('bg-green-500', 'text-white');
+      setTimeout(() => {
+        this.innerText = 'ADD TO CART';
+        this.classList.remove('bg-green-500', 'text-white');
+      }, 1200);
+    };
+    // Wishlist
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    wishlistBtn.onclick = function() {
+      wishlistBtn.classList.toggle('faved');
+      const icon = wishlistBtn.querySelector('i');
+      if (wishlistBtn.classList.contains('faved')) {
+        icon.classList.remove('ri-heart-line');
+        icon.classList.add('ri-heart-fill');
+      } else {
+        icon.classList.remove('ri-heart-fill');
+        icon.classList.add('ri-heart-line');
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Về chúng tôi | Readify</title>
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f5f5dc',
+            secondary: '#e6e6e6',
+            primarynavy: '#2d5aa0'
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Header -->   
+    <div id="header-placeholder"></div>
+
+  <!-- About Us Main Content -->
+  <main class="bg-[#f7f8fa] min-h-screen pt-16 pb-24">
+    <!-- Hero Section -->
+    <section class="bg-white py-16 shadow-sm">
+      <div class="max-w-5xl mx-auto text-center px-4">
+        <h1 class="text-5xl md:text-6xl font-bold text-primarynavy font-['Lora'] mb-4 tracking-tight">Về Chúng Tôi</h1>
+        <div class="w-24 h-1 bg-primarynavy mx-auto mb-6 rounded"></div>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto font-light">
+          Readify là nơi khởi nguồn của cảm hứng, tri thức và kết nối cộng đồng yêu sách Việt Nam.
+        </p>
+      </div>
+    </section>
+
+    <section class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-4">
+        <!-- Logo và nội dung bên trái -->
+        <div>
+          <img src="assets/images/logoblue.svg" alt="Readify Logo" class="w-40 h-40 mb-6 mx-auto md:mx-0">
+          <h2 class="text-xl md:text-2xl font-bold text-primarynavy mb-4" style="font-family: 'Montserrat', Arial, sans-serif;">
+            Readify - Nơi tri thức khai mở tâm hồn
+          </h2>
+          
+          <p class="text-base md:text-lg text-gray-700  mb-4" style="font-family: 'Montserrat', Arial, sans-serif;">
+            Với chúng tôi, đọc không đơn thuần là hành động, mà là một phong cách sống - nuôi dưỡng tâm hồn, mở rộng thế giới quan và kết nối con người với tri thức sâu sắc nhất
+          </p>
+          <p class="text-base md:text-lg text-gray-700  mb-4" style="font-family: 'Montserrat', Arial, sans-serif;">
+            Chúng tôi không chỉ là nơi bán sách, mà là nơi khơi gợi thói quen đọc, thắp lên tình yêu tri thức và đồng hành cùng bạn trên hành trình trưởng thành. Tại Readify, mỗi trang sách là một cánh cửa dẫn đến những khám phá mới, một nguồn cảm hứng bất tận để bạn không ngừng phát triển bản thân
+          </p>
+          <a href="mailto:contact@readify.vn"
+             class="inline-block bg-primarynavy text-white px-6 py-2 rounded hover:bg-blue-800 transition text-base"
+             style="font-family: 'Montserrat', Arial, sans-serif;">
+            Liên hệ ngay
+          </a>
+        </div>
+        <!-- Ảnh bên phải -->
+        <div class="flex justify-center">
+          <img src="https://i.pinimg.com/736x/6e/92/39/6e9239961fd097afec16dbfbc26569b1.jpg"
+               alt="Sách Readify"
+               class="rounded-2xl shadow-lg w-full max-w-xs md:max-w-xs lg:max-w-sm object-cover">
+        </div>
+      </div>
+    </section>
+
+    <!-- Giá trị cốt lõi -->
+    <section class="py-20 bg-white border-y border-gray-200">
+      <div class="max-w-6xl mx-auto px-4">
+        <span class="uppercase text-primarynavy font-semibold tracking-widest text-sm mb-2 block text-center">Giá trị cốt lõi</span>
+        <h2 class="text-3xl md:text-4xl font-bold text-primarynavy text-center mb-12 tracking-tight">Chúng tôi mang lại điều gì?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div class="bg-[#f7f8fa] rounded-2xl shadow p-8 flex flex-col items-center hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full bg-primarynavy mb-6 shadow-lg">
+              <i class="ri-book-open-line text-white text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-primarynavy mb-2">Lan tỏa tri thức</h3>
+            <p class="text-gray-600 text-center">Mỗi cuốn sách là một hạt giống tri thức, chúng tôi giúp bạn gieo trồng và lan tỏa những hạt giống đó đến cộng đồng.</p>
+          </div>
+          <div class="bg-[#f7f8fa] rounded-2xl shadow p-8 flex flex-col items-center hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full bg-primarynavy mb-6 shadow-lg">
+              <i class="ri-team-line text-white text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-primarynavy mb-2">Kết nối cộng đồng</h3>
+            <p class="text-gray-600 text-center">Tạo không gian để độc giả có cùng sở thích, đam mê gặp gỡ, chia sẻ và phát triển cùng nhau.</p>
+          </div>
+          <div class="bg-[#f7f8fa] rounded-2xl shadow p-8 flex flex-col items-center hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+            <div class="w-16 h-16 flex items-center justify-center rounded-full bg-primarynavy mb-6 shadow-lg">
+              <i class="ri-lightbulb-flash-line text-white text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-primarynavy mb-2">Đổi mới & Sáng tạo</h3>
+            <p class="text-gray-600 text-center">Không ngừng sáng tạo để mang lại trải nghiệm đọc sách hiện đại, tiện lợi và đầy cảm hứng.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Đội ngũ -->
+    <section class="py-16 bg-[#e6eaf3]" style="font-family: 'Montserrat', Arial, sans-serif;">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <span class="uppercase text-primarynavy font-semibold tracking-widest text-sm mb-2 block">Đội ngũ</span>
+          <h2 class="text-4xl md:text-5xl font-bold text-primarynavy tracking-tight font-['Lora'] mb-3">Những người đứng sau Readify</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <!-- Card 1 -->
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-7 flex flex-col items-center text-center">
+            <img src="https://img.freepik.com/psd-premium/renderizacao-3d-do-estilo-de-cabelo-para-o-design-do-avatar_23-2151869171.jpg?semt=ais_items_boosted&w=740" alt="Lê Tiến Tài" class="w-24 h-24 rounded-full object-cover border-4 border-primarynavy/10 shadow mb-4">
+            <h3 class="font-bold text-xl text-primarynavy mb-1">Lê Tiến Tài</h3>
+            <div class="text-primarynavy font-semibold mb-2">Lead Designer</div>
+            <p class="text-gray-500 text-sm mb-4">Định hướng & phát triển sản phẩm</p>
+            <div class="flex space-x-2 mt-auto">
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-facebook-fill text-xl"></i></a>
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-linkedin-box-fill text-xl"></i></a>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-7 flex flex-col items-center text-center">
+            <img src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg" alt="Lê Quang Vĩnh Quyền" class="w-24 h-24 rounded-full object-cover border-4 border-primarynavy/10 shadow mb-4">
+            <h3 class="font-bold text-xl text-primarynavy mb-1">Lê Quang Vĩnh Quyền</h3>
+            <div class="text-primarynavy font-semibold mb-2">Designer</div>
+            <p class="text-gray-500 text-sm mb-4">Công nghệ & trải nghiệm người dùng</p>
+            <div class="flex space-x-2 mt-auto">
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-facebook-fill text-xl"></i></a>
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-linkedin-box-fill text-xl"></i></a>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-7 flex flex-col items-center text-center">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYnnJW8wej_itmO0OyODGhtbzOL3DINt0uvQ&s" alt="Lê Hoàng Sơn" class="w-24 h-24 rounded-full object-cover border-4 border-primarynavy/10 shadow mb-4">
+            <h3 class="font-bold text-xl text-primarynavy mb-1">Lê Hoàng Sơn</h3>
+            <div class="text-primarynavy font-semibold mb-2">Backend & Tester</div>
+            <p class="text-gray-500 text-sm mb-4">Thiết kế giao diện & nhận diện thương hiệu</p>
+            <div class="flex space-x-2 mt-auto">
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-facebook-fill text-xl"></i></a>
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-linkedin-box-fill text-xl"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-center gap-8 mt-8 flex-wrap">
+          <!-- Card 4 -->
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-7 flex flex-col items-center text-center w-[370px]">
+            <img src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671122.jpg?semt=ais_hybrid&w=740" alt="Võ Quốc Quang" class="w-24 h-24 rounded-full object-cover border-4 border-primarynavy/10 shadow mb-4">
+            <h3 class="font-bold text-xl text-primarynavy mb-1">Võ Quốc Quang</h3>
+            <div class="text-primarynavy font-semibold mb-2">Lead Backend</div>
+            <p class="text-gray-500 text-sm mb-4">Chiến lược tiếp thị & truyền thông</p>
+            <div class="flex space-x-2 mt-auto">
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-facebook-fill text-xl"></i></a>
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-linkedin-box-fill text-xl"></i></a>
+            </div>
+          </div>
+          <!-- Card 5 -->
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition p-7 flex flex-col items-center text-center w-[420px]">
+            <img src="https://img.freepik.com/free-psd/3d-illustration-with-online-avatar_23-2151303045.jpg?semt=ais_hybrid&w=740" alt="Trần Doãn Thanh Quý" class="w-24 h-24 rounded-full object-cover border-4 border-primarynavy/10 shadow mb-4">
+            <h3 class="font-bold text-xl text-primarynavy mb-1">Trần Doãn Thanh Quý</h3>
+            <div class="text-primarynavy font-semibold mb-2">Backend & Tester</div>
+            <p class="text-gray-500 text-sm mb-4">Chiến lược tiếp thị & truyền thông</p>
+            <div class="flex space-x-2 mt-auto">
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-facebook-fill text-xl"></i></a>
+              <a href="#" class="text-primarynavy hover:text-blue-700"><i class="ri-linkedin-box-fill text-xl"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  
+  </main>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+</body>
+</html>

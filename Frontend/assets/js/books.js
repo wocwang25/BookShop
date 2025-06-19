@@ -1,0 +1,3 @@
+document.addEventListener('DOMContentLoaded', function() {
+  // ...existing code from books.html script, move here...
+});
