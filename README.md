@@ -2,6 +2,12 @@
 
 A Node.js backend project organized with **feature-based MVC architecture** for a bookshop, supporting both book sales and rentals.
 
+**Note:** This project branch provides **two separate user interfaces**:
+
+- The **Customer UI** (HTML/CSS/JS static pages) is served directly by the backend at [http://localhost:5000/](http://localhost:5000/) and is intended for end-users to browse and shop for books.
+- The **Admin/Staff UI** (React, Vite) is a modern web application for administrators and staff, running independently at [http://localhost:5173/](http://localhost:5173/). To use this interface, navigate to the `bookstore-fe` folder, install dependencies, and start the development server as described below.
+
+Each interface is developed and deployed separately to best serve its target
 ---
 
 ## 🚀 Getting Started
@@ -10,6 +16,12 @@ A Node.js backend project organized with **feature-based MVC architecture** for 
 
 ```bash
 git clone https://github.com/wocwang25/BookShop.git
+
+git branch -a
+
+git checkout testing_branch
+
+git pull origin testing_branch
 ```
 
 ### 2. Setup environment variables
