@@ -3,11 +3,17 @@ const CustomerService = require('../services/customer.service');
 const CustomerController = {
     async getProfile(req, res) {
         try {
-            const { customerId } = req.user.id;
-            const customer = await CustomerService.getCustomerProfile(customerId);
-            res.json(customer);
+            const customerId = req.user.id;
+            const result = await CustomerService.getCustomerProfile(customerId);
+            res.json({
+                success: true,
+                user: result.user
+            });
         } catch (error) {
-            res.status(500).json(error.message)
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
         }
     },
 
@@ -35,10 +41,17 @@ const CustomerController = {
             const updateData = req.body;
             const customerId = req.user.id;
             const result = await CustomerService.updateCustomerProfile(customerId, updateData);
-            res.json(result);
+            res.json({
+                success: true,
+                message: "Cập nhật thông tin thành công!",
+                user: result.user
+            });
 
         } catch (error) {
-            res.status(500).json(error.message)
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
         }
     }
 }

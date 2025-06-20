@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thanh toán</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+}
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.quantity-input {
+-moz-appearance: textfield;
+}
+</style>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="payment.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
+  
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#f5f5dc',
+            secondary: '#e6e6e6',
+            primarynavy: '#2d5aa0'
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
+          }
+        }
+      }
+    }
+  </script>
+
+
+<script>tailwind.config={theme:{extend:{colors:{primary:'#1e3a8a',secondary:'#64748b'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+  <style>
+    .v451_2330 {
+      padding-top: 64px;
+    }
+    /* Hiệu ứng cho popup */
+    #success-popup .popup-content {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #success-popup.show .popup-content {
+      opacity: 1;
+      transform: scale(1);
+    }
+  </style>
+
+</head>
+<body class="bg-[#F5F1EC]">
+  <!-- Header đặt ngoài checkout-section để luôn hiển thị -->
+  <div id="header-placeholder"></div>
+
+  <!-- Chỉ ẩn phần này khi hiện popup -->
+  <div class="container mx-auto p-4 max-w-6xl pt-24 relative" id="checkout-section">
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- Cột trái - Tóm tắt đơn hàng -->
+      <div class="w-full md:w-1/3 bg-white pt-6 p-6 rounded-lg shadow-sm">
+        <h2 class="font-bold text-xl mb-6 text-center">Đơn hàng</h2>
+        <div class="space-y-4 mb-6" id="product-list">
+          
+          <!-- Sản phẩm 1 -->
+          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="15500">
+            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=book%20cover%20with%20red%20background%20and%20white%20text%2C%20minimalist%20design&width=64&height=80&seq=1&orientation=portrait" alt="Book cover" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">It ends with us</h3>
+                  <p class="text-sm text-gray-500">By Colleen Hoover</p>
+                </div>
+                <button class="remove-item text-gray-400 hover:text-red-500">
+                  <i class="ri-close-line"></i>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center border rounded-md">
+                  <button class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
+                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
+                  <button class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
+                </div>
+                <span class="item-total font-medium">15.500 VNĐ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sản phẩm 2 -->
+          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="12800">
+            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=book%20cover%20with%20pet%20theme%2C%20minimalist%20design%20with%20silhouette%20of%20a%20dog%20or%20cat&width=64&height=80&seq=2&orientation=portrait" alt="Book cover" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">Pet</h3>
+                  <p class="text-sm text-gray-500">By Akwaeke Emezi</p>
+                </div>
+                <button class="remove-item text-gray-400 hover:text-red-500">
+                  <i class="ri-close-line"></i>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center border rounded-md">
+                  <button class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
+                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
+                  <button class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
+                </div>
+                <span class="item-total font-medium">12.800 VNĐ</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sản phẩm 3 -->
+          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="10000">
+            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
+              <img src="https://readdy.ai/api/search-image?query=book%20cover%20with%20blue%20background%20and%20abstract%20design%2C%20contemporary%20fiction%20book%20cover&width=64&height=80&seq=3&orientation=portrait" alt="Book cover" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-grow">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">Yinka, where is your husband?</h3>
+                  <p class="text-sm text-gray-500">By Lizzie Damilola Blackburn</p>
+                </div>
+                <button class="remove-item text-gray-400 hover:text-red-500">
+                  <i class="ri-close-line"></i>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center border rounded-md">
+                  <button class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
+                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
+                  <button class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
+                </div>
+                <span class="item-total font-medium">10.000 VNĐ</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- Tổng tiền -->
+        <div class="space-y-3 text-sm mt-8" id="totals">
+          <div class="flex justify-between">
+            <span>Tạm tính</span>
+            <span id="subtotal">0 VNĐ</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Phí vận chuyển</span>
+            <span>0 VNĐ</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Thuế</span>
+            <span id="tax">0 VNĐ</span>
+          </div>
+          <div class="flex justify-between font-bold text-lg pt-3 border-t border-gray-200">
+            <span>Tổng cộng</span>
+            <span id="total">0 VNĐ</span>
+          </div>
+        </div>
+      </div>
+      <!-- Cột phải - Thông tin giao hàng -->
+      <div class="w-full md:w-2/3 bg-white p-6 pt-6 rounded-lg shadow-sm">
+        <h2 class="font-bold text-xl mb-6 text-center">Thông tin giao hàng</h2>
+        <!-- Thanh tiến trình -->
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center">
+              <i class="ri-truck-line"></i>
+            </div>
+            <span class="text-sm mt-1 text-primary font-medium">Giao hàng</span>
+          </div>
+          <div class="flex-1 h-1 mx-2 bg-primary">
+            <div class="h-full w-full bg-primary"></div>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+              <i class="ri-bank-card-line"></i>
+            </div>
+            <span class="text-sm mt-1 text-primary font-medium">Thanh toán</span>
+          </div>
+          <div class="flex-1 h-1 mx-2 bg-gray-200">
+            <div class="h-full w-0 bg-primary"></div>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+              <i class="ri-check-line"></i>
+            </div>
+            <span class="text-sm mt-1 text-gray-400">Xác nhận</span>
+          </div>
+        </div>
+        <!-- Thông tin giao hàng và Thanh toán -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Tóm tắt thông tin giao hàng -->
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <h3 class="font-medium text-lg mb-4">Thông tin giao hàng</h3>
+            <div class="space-y-3" id="shipping-info">
+              <div>
+                <p class="text-sm text-gray-500">Người nhận</p>
+                <p class="font-medium" id="display-name"></p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Số điện thoại</p>
+                <p class="font-medium" id="display-phone"></p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-medium" id="display-email"></p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">Địa chỉ</p>
+                <p class="font-medium" id="display-address"></p>
+              </div>
+            </div>
+            <a href="/settings" class="mt-4 text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1">
+              <i class="ri-edit-line"></i>
+              <span>Chỉnh sửa</span>
+            </a>
+          </div>
+          <!-- Phương thức thanh toán -->
+          <div class="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 class="font-medium text-lg mb-4 text-center">Quét mã để thanh toán</h3>
+            <div class="flex flex-col items-center">
+              <div class="w-48 h-48 bg-white border-2 border-primary p-2 rounded-lg mb-4">
+                <img src="https://readdy.ai/api/search-image?query=QR%20code%20payment%20interface%2C%20simple%20and%20clean%20design&width=192&height=192&seq=1&orientation=squarish" alt="QR Code" class="w-full h-full object-cover">
+              </div>
+              <p class="text-sm text-gray-500 mb-2">Tổng thanh toán</p>
+              <p class="text-2xl font-bold text-primary mb-4">43.500 VNĐ</p>
+              <div class="flex gap-4 items-center justify-center">
+                <img src="https://readdy.ai/api/search-image?query=momo%20logo%2C%20simple%20icon&width=32&height=32&seq=2&orientation=squarish" alt="Momo" class="w-8 h-8">
+                <img src="https://readdy.ai/api/search-image?query=zalopay%20logo%2C%20simple%20icon&width=32&height=32&seq=3&orientation=squarish" alt="ZaloPay" class="w-8 h-8">
+                <img src="https://readdy.ai/api/search-image?query=vnpay%20logo%2C%20simple%20icon&width=32&height=32&seq=4&orientation=squarish" alt="VNPay" class="w-8 h-8">
+              </div>
+
+              <button type="button" class="mt-6 bg-primary text-white px-8 py-3 rounded !rounded-button font-medium hover:bg-primary/90 transition-colors whitespace-nowrap">
+                Đã thanh toán
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-between items-center mt-8">
+          <!-- Nút tiếp tục -->
+          <div class="flex justify-center gap-4 mt-6">
+            <button
+              id="confirm-payment-btn"
+              class="text-center bg-primary text-white px-6 py-3 rounded font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
+            >
+              Tiếp tục
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popup chỉ phủ lên phần nội dung, không phủ lên header -->
+    <div id="success-popup" class="absolute inset-0 bg-black/60 flex items-center justify-center hidden z-50">
+      <div class="popup-content bg-white rounded-xl shadow-lg p-8 text-center max-w-md w-full mx-4">
+        <div class="w-28 h-28 mx-auto mb-8 rounded-full bg-green-50 flex items-center justify-center">
+          <i class="ri-check-line text-6xl text-green-500"></i>
+        </div>
+        <h1 class="text-3xl font-bold mb-4 text-gray-900">Đặt hàng thành công!</h1>
+        <p class="text-gray-600 text-lg mb-3">Cảm ơn bạn đã đặt hàng.</p>
+        <p class="text-gray-600 text-lg mb-6">Đơn hàng sẽ nhanh chóng được giao tới cho bạn.</p>
+        <p class="text-gray-500 mb-8 font-medium">Mã đơn hàng: <span class="text-[#1e40af]">#ORD123456</span></p>
+        <button
+          onclick="window.location.href='/'"
+          class="bg-primary text-white py-3 px-6 rounded font-medium hover:bg-primary/90 transition-colors"
+        >
+          Quay về trang chủ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/js/payment.js"></script>
+</body>
+</html>
+
+
+
+
+

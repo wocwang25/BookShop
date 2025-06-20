@@ -7,6 +7,9 @@ const Custormer_Schema = mongoose.Schema(
             required: true,
             trim: true
         },
+        avatar: String,
+        sex: String,
+        birthday: Date,
         address: String,
         phone: String,
         email: String,

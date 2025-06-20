@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thông tin cá nhân</title>
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <link rel="stylesheet" href="./assets/css/settingA.css" />
+
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <!-- Trang thông tin cá nhân -->
+  <div class="profile-page">
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="profile">
+          <div class="avatar">
+            <img src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg" alt="Profile" />
+          </div>
+          <h2 id="sidebar-name">User</h2>
+        </div>
+        <nav class="nav-links">
+          <div class="nav-item active" data-target="account-section"><i class="ri-user-line"></i> Tài khoản</div>
+          <div class="nav-item" data-target="delivery-section"><i class="ri-map-pin-line"></i> Địa chỉ giao hàng</div>
+          <div class="nav-item" data-target="security-section"><i class="ri-shield-line"></i> Bảo mật</div>
+        </nav>
+      </aside>
+
+      <!-- Nội dung chính -->
+      <main class="main-content">
+        <!-- Thông tin tài khoản -->
+        <div id="account-section" class="content-section">
+          <div class="card">
+            <div class="card-content">
+              <section class="section">
+                <h1 class="section-title">Thông tin cá nhân</h1>
+                <div class="info-grid">
+                  <div class="photo-section">
+                    <label>Ảnh đại diện</label>
+                    <div class="photo-preview">
+                      <img id="avatar-preview" src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg" alt="Profile" />
+                    </div>
+                    <div class="photo-buttons">
+                      <button class="btn btn-primary" onclick="document.getElementById('avatar-input').click()">Đổi</button>
+                      <button class="btn btn-secondary" onclick="removeAvatar()">Xóa</button>
+                      <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="changeAvatar(event)">
+                    </div>
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Tên</label>
+                      <input type="text" id="input-name" placeholder="Nguyễn Văn A" />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Email</label>
+                      <input type="email" id="input-email" placeholder="abc@example.com" />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Giới tính</label>
+                      <select id="input-sex">
+                        <option value="">Chọn</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                        <option value="Khác">Khác</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Số điện thoại</label>
+                      <input type="tel" id="input-phone" placeholder="0123 xxx xxx" />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Ngày sinh</label>
+                      <input type="date" id="input-birthday" />
+                    </div>
+
+                    <div class="form-group">
+                      <label>Địa chỉ</label>
+                      <input type="text" id="input-address" placeholder="Nhập địa chỉ của bạn" />
+                    </div>
+                    
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <h1 class="section-title">Thông tin tài chính</h1>
+                <div class="financial-info">
+                  <div class="debt-info">
+                    <label>Nợ hiện tại</label>
+                    <div class="debt-amount" id="debt-amount">0 VNĐ</div>
+                  </div>
+                  <div class="invoice-summary">
+                    <div class="invoice-stats">
+                      <div class="stat-item">
+                        <span class="stat-label">Hóa đơn bán hàng</span>
+                        <span class="stat-value" id="sales-invoices-count">0</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-label">Hóa đơn thuê sách</span>
+                        <span class="stat-value" id="rental-invoices-count">0</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="section">
+                <h1 class="section-title">Thông báo email</h1>
+                <div class="notifications-grid">
+                  <div class="notification-item"><input type="checkbox" id="cb1" /><label for="cb1">Sách mới</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb2" /><label for="cb2">Thay đổi mật khẩu</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb3" /><label for="cb3">Ưu đãi mới</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb4" /><label for="cb4">Cung cấp đặc biệt</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb5" /><label for="cb5">Trạng thái đơn hàng</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb6" /><label for="cb6">Phản hồi mới</label></div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn btn-outline">Bỏ qua</button>
+                  <button onclick="saveUserInfo()" class="btn btn-primary">Lưu</button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <!-- Địa chỉ giao hàng -->
+        <div id="delivery-section" class="content-section hidden">
+          <div class="card">
+            <div class="card-content">
+              <h1 class="section-title">Địa chỉ giao hàng</h1>
+              
+              <!-- Chọn địa chỉ -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Quốc gia</label>
+                  <select id="country" class="form-select" onchange="updateAddress()">
+                    <option value="Việt Nam">Việt Nam</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Thành phố/ Tỉnh</label>
+                  <select id="province" class="form-select" onchange="updateAddress()">
+                    <option value="">Chọn tỉnh/thành</option>
+                    <option value="Hà Nội">Hà Nội</option>
+                    <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                    <option value="Đà Nẵng">Đà Nẵng</option>
+                    <option value="Hải Phòng">Hải Phòng</option>
+                    <option value="Cần Thơ">Cần Thơ</option>
+                    <option value="An Giang">An Giang</option>
+                    <option value="Bà Rịa - Vũng Tàu">Bà Rịa - Vũng Tàu</option>
+                    <option value="Bắc Giang">Bắc Giang</option>
+                    <option value="Bắc Kạn">Bắc Kạn</option>
+                    <option value="Bạc Liêu">Bạc Liêu</option>
+                    <option value="Bắc Ninh">Bắc Ninh</option>
+                    <option value="Bến Tre">Bến Tre</option>
+                    <option value="Bình Định">Bình Định</option>
+                    <option value="Bình Dương">Bình Dương</option>
+                    <option value="Bình Phước">Bình Phước</option>
+                    <option value="Bình Thuận">Bình Thuận</option>
+                    <option value="Cà Mau">Cà Mau</option>
+                    <option value="Cao Bằng">Cao Bằng</option>
+                    <option value="Đắk Lắk">Đắk Lắk</option>
+                    <option value="Đắk Nông">Đắk Nông</option>
+                    <option value="Điện Biên">Điện Biên</option>
+                    <option value="Đồng Nai">Đồng Nai</option>
+                    <option value="Đồng Tháp">Đồng Tháp</option>
+                    <option value="Gia Lai">Gia Lai</option>
+                    <option value="Hà Giang">Hà Giang</option>
+                    <option value="Hà Nam">Hà Nam</option>
+                    <option value="Hà Tĩnh">Hà Tĩnh</option>
+                    <option value="Hải Dương">Hải Dương</option>
+                    <option value="Hậu Giang">Hậu Giang</option>
+                    <option value="Hòa Bình">Hòa Bình</option>
+                    <option value="Hưng Yên">Hưng Yên</option>
+                    <option value="Khánh Hòa">Khánh Hòa</option>
+                    <option value="Kiên Giang">Kiên Giang</option>
+                    <option value="Kon Tum">Kon Tum</option>
+                    <option value="Lai Châu">Lai Châu</option>
+                    <option value="Lâm Đồng">Lâm Đồng</option>
+                    <option value="Lạng Sơn">Lạng Sơn</option>
+                    <option value="Lào Cai">Lào Cai</option>
+                    <option value="Long An">Long An</option>
+                    <option value="Nam Định">Nam Định</option>
+                    <option value="Nghệ An">Nghệ An</option>
+                    <option value="Ninh Bình">Ninh Bình</option>
+                    <option value="Ninh Thuận">Ninh Thuận</option>
+                    <option value="Phú Thọ">Phú Thọ</option>
+                    <option value="Phú Yên">Phú Yên</option>
+                    <option value="Quảng Bình">Quảng Bình</option>
+                    <option value="Quảng Nam">Quảng Nam</option>
+                    <option value="Quảng Ngãi">Quảng Ngãi</option>
+                    <option value="Quảng Ninh">Quảng Ninh</option>
+                    <option value="Quảng Trị">Quảng Trị</option>
+                    <option value="Sóc Trăng">Sóc Trăng</option>
+                    <option value="Sơn La">Sơn La</option>
+                    <option value="Tây Ninh">Tây Ninh</option>
+                    <option value="Thái Bình">Thái Bình</option>
+                    <option value="Thái Nguyên">Thái Nguyên</option>
+                    <option value="Thanh Hóa">Thanh Hóa</option>
+                    <option value="Thừa Thiên Huế">Thừa Thiên Huế</option>
+                    <option value="Tiền Giang">Tiền Giang</option>
+                    <option value="Trà Vinh">Trà Vinh</option>
+                    <option value="Tuyên Quang">Tuyên Quang</option>
+                    <option value="Vĩnh Long">Vĩnh Long</option>
+                    <option value="Vĩnh Phúc">Vĩnh Phúc</option>
+                    <option value="Yên Bái">Yên Bái</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Nhập thông tin địa chỉ chi tiết -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Quận/ Huyện</label>
+                  <input type="text" id="district" class="form-input" placeholder="VD: Quận 1, Huyện Gia Lâm..." oninput="updateAddress()" />
+                </div>
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Phường/ Xã</label>
+                  <input type="text" id="ward" class="form-input" placeholder="VD: Phường Bến Nghé, Xã Yên Viên..." oninput="updateAddress()" />
+                </div>
+              </div>
+              
+              <!-- Địa chỉ số nhà và chi tiết -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Số nhà, tên đường</label>
+                  <input type="text" id="street-detail" class="form-input" placeholder="VD: 123 Nguyễn Văn A" onchange="updateAddress()" />
+                </div>
+                <div>
+                  <label class="block text-sm text-[#292d32] mb-2">Ghi chú</label>
+                  <input type="text" id="address-note" class="form-input" placeholder="Ghi chú thêm (tùy chọn)" />
+                </div>
+              </div>
+              
+              <!-- Địa chỉ hoàn chỉnh -->
+              <div class="form-group mb-6">
+                <label class="block text-sm text-[#292d32] mb-2">Địa chỉ hoàn chỉnh</label>
+                <textarea id="full-address" rows="3" class="form-input" placeholder="Địa chỉ sẽ được tự động tạo khi bạn chọn các trường trên" readonly></textarea>
+              </div>
+              
+              <div class="actions">
+                <button class="btn btn-outline">Bỏ qua</button>
+                <button onclick="saveDeliveryAddress()" class="btn btn-primary">Lưu địa chỉ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảo mật -->
+        <div id="security-section" class="content-section hidden">
+          <div class="card">
+            <div class="card-content">
+              <h1 class="section-title">Đổi mật khẩu</h1>
+              <div class="space-y-4">
+                <!-- Hidden dummy inputs to prevent autofill -->
+                <input type="text" style="display:none;" />
+                <input type="password" style="display:none;" />
+                
+                <div class="form-group">
+                  <label for="current-password">Mật khẩu cũ</label>
+                  <input type="password" id="current-password" name="current-password" placeholder="Nhập mật khẩu hiện tại" autocomplete="off" data-lpignore="true" />
+                </div>
+                <div class="form-group">
+                  <label for="new-password">Mật khẩu mới</label>
+                  <input type="password" id="new-password" name="new-password" placeholder="Nhập mật khẩu mới" autocomplete="new-password" />
+                </div>
+                <div class="form-group">
+                  <label for="confirm-password">Xác nhận mật khẩu</label>
+                  <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" />
+                </div>
+              </div>
+              <div class="flex justify-end mt-8">
+                <button class="btn btn-primary" onclick="handleChangePassword()">Thay đổi mật khẩu</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <!-- Load scripts in correct order -->
+  <script src="./assets/js/api.js"></script>
+  <script src="./assets/js/auth.js"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
+  <script src="./assets/js/settingA.js"></script>
+</body>
+</html>
+

@@ -95,6 +95,23 @@ class ApiService {
     static async getProfile() {
         return this.request('/auth/me');
     }
+
+    static async updateProfile(profileData) {
+        return this.request('/customer/profile', {
+            method: 'PATCH',
+            body: JSON.stringify(profileData)
+        });
+    }
+
+    static async changePassword(currentPassword, newPassword) {
+        return this.request('/auth/change-password', {
+            method: 'PUT',
+            body: JSON.stringify({
+                currentPassword,
+                newPassword
+            })
+        });
+    }
 }
 
 // Export for use in other files

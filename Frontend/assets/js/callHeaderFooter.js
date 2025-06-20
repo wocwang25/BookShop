@@ -66,8 +66,6 @@ document.addEventListener('click', function(e) {
 
   // Auth state management for header
   function updateHeaderAuthState() {
-    console.log('🔄 [callHeaderFooter] Updating header auth state...');
-    
     const userBtn = document.getElementById('userBtn');
     const userInfo = document.getElementById('userInfo');
     const guestActions = document.getElementById('guestActions');
@@ -78,7 +76,6 @@ document.addEventListener('click', function(e) {
     
     if (typeof window.AuthManager !== 'undefined' && window.AuthManager.isAuthenticated()) {
       const user = window.AuthManager.getUser();
-      console.log('👤 [callHeaderFooter] User authenticated:', user);
       
       if (user) {
         // Hide guest button, show user info in header
@@ -98,7 +95,6 @@ document.addEventListener('click', function(e) {
         if (userInfo && !userInfo._clickHandlerAdded) {
           userInfo.addEventListener('click', function(e) {
             e.stopPropagation(); // Prevent event bubbling
-            console.log('🖱️ [callHeaderFooter] User info clicked');
             openUserPanel();
           });
           userInfo._clickHandlerAdded = true;
@@ -106,17 +102,12 @@ document.addEventListener('click', function(e) {
         if (userInfoBtn && !userInfoBtn._clickHandlerAdded) {
           userInfoBtn.addEventListener('click', function(e) {
             e.stopPropagation(); // Prevent event bubbling  
-            console.log('🖱️ [callHeaderFooter] User info button clicked');
             openUserPanel();
           });
           userInfoBtn._clickHandlerAdded = true;
         }
-        
-        console.log('✅ [callHeaderFooter] Header updated for authenticated user:', displayName);
       }
-    } else {
-      console.log('🚫 [callHeaderFooter] User not authenticated, showing guest state');
-      
+          } else {
       // Show guest button, hide user info
       if (userBtn) userBtn.classList.remove('hidden');
       if (userInfo) userInfo.classList.add('hidden');
@@ -129,8 +120,6 @@ document.addEventListener('click', function(e) {
 
   // Handle logout button
   function handleLogout() {
-    console.log('🚪 [callHeaderFooter] Logout button clicked');
-    
     if (typeof window.AuthManager !== 'undefined') {
       // Close user panel first
       closeUserPanel();
@@ -163,8 +152,23 @@ document.addEventListener('click', function(e) {
     }
   }
 
+  // Debug function for header state
+  function debugHeaderState() {
+    console.log('🔍 [DEBUG] Header State:');
+    console.log('- Header element:', !!document.getElementById('header'));
+    console.log('- Header placeholder:', !!document.getElementById('header-placeholder'));
+    console.log('- UserBtn:', !!document.getElementById('userBtn'));
+    console.log('- UserInfo:', !!document.getElementById('userInfo'));
+    console.log('- AuthManager available:', typeof window.AuthManager !== 'undefined');
+    console.log('- User authenticated:', typeof window.AuthManager !== 'undefined' ? window.AuthManager.isAuthenticated() : 'N/A');
+    if (typeof window.AuthManager !== 'undefined' && window.AuthManager.isAuthenticated()) {
+      console.log('- User data:', window.AuthManager.getUser());
+    }
+  }
+
   // Make functions globally available
   window.updateHeaderAuthState = updateHeaderAuthState;
+  window.debugHeaderState = debugHeaderState;
 
   function openCartPanel() {
     const cartPanel = document.getElementById('cartPanel');
@@ -431,20 +435,26 @@ function showHeaderSearchBar() {
   }, 10);
 
   // Đóng search bar khi bấm nút đóng
-  document.getElementById('closeHeaderSearchBar').onclick = function() {
-    closeHeaderSearchBarWithTransition();
-  };
+  const closeBtn = document.getElementById('closeHeaderSearchBar');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      closeHeaderSearchBarWithTransition();
+    };
+  }
 
   // Đóng search bar khi submit
-  document.getElementById('headerSearchForm').onsubmit = function(e) {
-    e.preventDefault();
-    const query = document.getElementById('headerSearchInput').value.trim();
-    if (query) {
-      // window.location.href = `/search?query=${encodeURIComponent(query)}`;
-      alert('Tìm kiếm: ' + query);
-      closeHeaderSearchBarWithTransition();
-    }
-  };
+  const searchForm = document.getElementById('headerSearchForm');
+  if (searchForm) {
+    searchForm.onsubmit = function(e) {
+      e.preventDefault();
+      const query = document.getElementById('headerSearchInput').value.trim();
+      if (query) {
+        // window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        alert('Tìm kiếm: ' + query);
+        closeHeaderSearchBarWithTransition();
+      }
+    };
+  }
 
   // Đóng search bar khi click ra ngoài form search
   setTimeout(() => {
@@ -514,58 +524,98 @@ function initSearchBarButton() {
   };
 }
 
+// Wait for dependencies to be available before loading header
+function initHeaderFooter() {
+  // Check if required dependencies are available
+  if (typeof window.ApiService === 'undefined') {
+    setTimeout(initHeaderFooter, 100);
+    return;
+  }
+  
+  if (typeof window.AuthManager === 'undefined') {
+    setTimeout(initHeaderFooter, 100);
+    return;
+  }
+
 // Tải header và footer từ components
 fetch('./components/header.html')
   .then(res => res.text())
   .then(data => {
-    document.getElementById('header-placeholder').innerHTML = data;
-    
-    // Initialize header components
-    if (typeof initHeaderPanel === 'function') initHeaderPanel();
-    if (typeof initCartPanel === 'function') initCartPanel();
-    if (typeof initSearchBarButton === 'function') initSearchBarButton();
-    
-    // Add logout button handler and auth state management after header is loaded
-    setTimeout(() => {
-      // Use event delegation for logout button since it's in the panel
-      document.addEventListener('click', function(e) {
-        if (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn')) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('🚪 [callHeaderFooter] Logout button clicked via delegation');
-          handleLogout();
-        }
-      });
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    if (headerPlaceholder) {
+      headerPlaceholder.innerHTML = data;
       
-      // Update auth state after everything is loaded
-      console.log('🔄 [callHeaderFooter] Force updating auth state after header load...');
-      updateHeaderAuthState();
+      // Initialize header components
+      if (typeof initHeaderPanel === 'function') initHeaderPanel();
+      if (typeof initCartPanel === 'function') initCartPanel();
+      if (typeof initSearchBarButton === 'function') initSearchBarButton();
+      
+      // Add logout button handler and auth state management after header is loaded
+      setTimeout(() => {
+        // Use event delegation for logout button since it's in the panel
+        document.addEventListener('click', function(e) {
+          if (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleLogout();
+          }
+        });
+        
+              // Update auth state after everything is loaded
+      try {
+        updateHeaderAuthState();
+      } catch (error) {
+        console.error('❌ Error in initial auth state update:', error);
+      }
       
       // Also try again after a short delay to ensure all scripts are loaded
       setTimeout(() => {
-        console.log('🔄 [callHeaderFooter] Secondary auth state update...');
-        updateHeaderAuthState();
-      }, 500);
-      
-      // Listen for auth state changes
-      window.addEventListener('authStateChanged', function() {
-        console.log('🔄 [callHeaderFooter] Auth state changed event received');
-        updateHeaderAuthState();
-      });
-      
-      // Listen for storage changes (cross-tab)
-      window.addEventListener('storage', function(e) {
-        if (e.key === 'authToken' || e.key === 'userData') {
-          console.log('🔄 [callHeaderFooter] Storage changed, updating header...', e.key);
+        try {
           updateHeaderAuthState();
+        } catch (error) {
+          console.error('❌ Error in secondary auth state update:', error);
         }
-      });
-      
-    }, 200);
+      }, 500);
+        
+        // Listen for auth state changes
+        window.addEventListener('authStateChanged', function() {
+          updateHeaderAuthState();
+        });
+        
+        // Listen for storage changes (cross-tab)
+        window.addEventListener('storage', function(e) {
+          if (e.key === 'authToken' || e.key === 'userData') {
+            updateHeaderAuthState();
+          }
+        });
+        
+      }, 200);
+    } else {
+      console.warn('⚠️ [callHeaderFooter] header-placeholder not found');
+    }
+  })
+  .catch(error => {
+    console.error('❌ [callHeaderFooter] Error loading header:', error);
   });
 
 fetch('./components/footer.html')
   .then(res => res.text())
   .then(data => {
-    document.getElementById('footer-placeholder').innerHTML = data;
-  });
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    if (footerPlaceholder) {
+      footerPlaceholder.innerHTML = data;
+    } else {
+      console.warn('⚠️ [callHeaderFooter] footer-placeholder not found');
+    }
+  })
+     .catch(error => {
+     console.error('❌ [callHeaderFooter] Error loading footer:', error);
+   });
+}
+
+// Initialize when DOM is ready or immediately if already loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHeaderFooter);
+} else {
+  initHeaderFooter();
+}

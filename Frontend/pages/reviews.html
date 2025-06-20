@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đánh giá khách hàng | Readify</title>
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <link rel="stylesheet" href="./assets/css/review.css">
+  <script src="./assets/js/callHeaderFooter.js"></script>
+</head>
+<body class="bg-light">
+
+  <!-- Zero Section -->
+  <section class="relative py-16 md:py-24 overflow-hidden" style="background: url('https://i.pinimg.com/736x/12/15/19/121519de4a486c801a3069e66944aebf.jpg') center/cover no-repeat; margin-top:64px;">
+    
+    <div class="container mx-auto px-4 relative z-10 flex flex-col items-center text-center">
+      <div class="flex flex-col items-center">
+        <div class="mb-4 flex gap-2 justify-center">
+          <i class="ri-star-smile-line text-5xl text-yellow-400 animate-pulse"></i>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold font-['Lora'] gradient-text drop-shadow-lg mb-4 text-white" style="text-shadow: 0 2px 8px #f7e9e9, 0 1px 0 #ffffff;">Readify trao gửi yêu thương</h1>
+        <p class="text-lg md:text-xl text-white mb-6 max-w-2xl" style="margin-bottom:2.5rem; text-shadow: 0 1px 6px #1d3557;">Nơi bạn có thể khám phá, đánh giá và chia sẻ trải nghiệm về hàng ngàn cuốn sách cùng cộng đồng yêu sách Việt Nam.</p>
+        <a href="#hero-section" class="btn-discover inline-flex items-center gap-2 px-6 py-3 bg-primarynavy text-white rounded-button font-medium shadow-lg hover:bg-primary transition duration-200 animate-bounce-slow">
+          Khám phá ngay
+          <i class="ri-arrow-down-line text-xl"></i>
+        </a>
+      </div>
+    </div>
+    <style>
+      .gradient-text {
+        background: linear-gradient(90deg, #f5f5dc 0%, #fff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .animate-bounce-slow {
+        animation: bounce-slow 2.2s infinite;
+      }
+      @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0);}
+        50% { transform: translateY(-12px);}
+      }
+    </style>
+  </section>
+
+  <!-- Header -->
+  <div id="header-placeholder"></div>
+  <div id="hero-section"></div>
+
+  <!-- Why Readify? Let our users tell you -->
+  <section class="bg-white py-6 border-t">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
+  Tại sao chọn Readify?<br>Để khách hàng nói cho bạn biết
+</h2>
+      <div class="review-slider overflow-x-auto max-w-5xl mx-auto" id="review-slider">
+        <!-- Review 1 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Nguyễn Thị Minh Tâm" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Nguyễn Thị Minh Tâm</div>
+              <div class="text-gray-500 text-xs">Giáo viên</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Readify giúp tôi tìm được những cuốn sách phù hợp cho lớp học. Đánh giá của cộng đồng rất hữu ích!"</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+        <!-- Review 2 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Trần Văn Quang" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Trần Văn Quang</div>
+              <div class="text-gray-500 text-xs">Kỹ sư phần mềm</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Tôi luôn đọc review trước khi mua sách mới. Nhờ Readify, tôi không còn lo mua nhầm sách nữa."</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+        <!-- Review 3 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Phạm Thu Hương" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Phạm Thu Hương</div>
+              <div class="text-gray-500 text-xs">Nhà văn</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Cộng đồng Readify rất thân thiện, tôi thích chia sẻ cảm nhận về sách mình đã đọc."</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+        <!-- Review 4 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Ngô Văn Hùng" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Ngô Văn Hùng</div>
+              <div class="text-gray-500 text-xs">Nhà nghiên cứu</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Tôi tìm thấy nhiều sách chuyên ngành quý giá nhờ các đánh giá chi tiết trên Readify."</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+        <!-- Review 5 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/women/22.jpg" alt="Lê Thị Mai" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Lê Thị Mai</div>
+              <div class="text-gray-500 text-xs">Sinh viên</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Giao diện dễ dùng, tôi dễ dàng tìm kiếm và đọc cảm nhận từ cộng đồng."</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+        <!-- Review 6 -->
+        <div class="review-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/men/28.jpg" alt="Phạm Quốc Toàn" class="w-12 h-12 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-4">
+              <div class="font-semibold text-gray-800">Phạm Quốc Toàn</div>
+              <div class="text-gray-500 text-xs">Nhà báo</div>
+            </div>
+          </div>
+          <div class="text-gray-700 mb-2">"Tôi thường xuyên chia sẻ cảm nhận sách trên Readify, cộng đồng rất tích cực!"</div>
+          <div class="flex items-center gap-1 text-yellow-400 text-lg">★★★★★</div>
+        </div>
+      </div>
+      <div class="slider-dots mt-4" id="slider-dots">
+        <span class="slider-dot active" data-index="0"></span>
+        <span class="slider-dot" data-index="1"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Insights Section -->
+    <section class="bg-light py-12">
+    <div class="container mx-auto px-4">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">Những con số biết nói về thói quen đọc sách</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="insight-card flex flex-col items-center justify-center">
+            <div class="text-5xl font-extrabold insight-number percent-85 mb-2">85%</div>
+            <div class="font-semibold text-gray-800 mb-2 text-center">Độc giả chọn sách dựa trên đánh giá cộng đồng</div>
+            <div class="text-gray-600 text-sm text-center">Bạn có thể tìm sách phù hợp hơn nhờ ý kiến từ những người đã đọc.</div>
+        </div>
+        <div class="insight-card flex flex-col items-center justify-center">
+            <div class="text-5xl font-extrabold insight-number percent-90 mb-2">90%</div>
+            <div class="font-semibold text-gray-800 mb-2 text-center">Người mua tin rằng review giúp tiết kiệm thời gian chọn sách</div>
+            <div class="text-gray-600 text-sm text-center">Đọc đánh giá giúp bạn tránh mua phải sách không phù hợp.</div>
+        </div>
+        <div class="insight-card flex flex-col items-center justify-center">
+            <div class="text-5xl font-extrabold insight-number percent-80 mb-2">80%</div>
+            <div class="font-semibold text-gray-800 mb-2 text-center">Độc giả thường xuyên chia sẻ cảm nhận sau khi đọc xong</div>
+            <div class="text-gray-600 text-sm text-center">Cộng đồng review giúp lan tỏa văn hóa đọc tích cực.</div>
+        </div>
+        </div>
+        <div class="text-center mt-8">
+        <a href="#" class="text-primarynavy font-medium hover:underline">Xem thêm thống kê &rarr;</a>
+        </div>
+    </div>
+    </section>
+
+  <!-- Featured Reviews Section -->
+  <section class="bg-white py-16">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">Đánh giá nổi bật về sách</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="testimonial-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Lê Minh Tuấn" class="w-10 h-10 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-3">
+              <div class="font-semibold text-gray-800">Lê Minh Tuấn</div>
+              <div class="text-gray-500 text-xs">Sinh viên</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-yellow-400 text-base mb-2">★★★★★</div>
+          <div class="text-gray-700">"Nhờ review trên Readify, tôi chọn được sách tham khảo phù hợp cho kỳ thi đại học."</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/women/77.jpg" alt="Vũ Thị Lan" class="w-10 h-10 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-3">
+              <div class="font-semibold text-gray-800">Vũ Thị Lan</div>
+              <div class="text-gray-500 text-xs">Nhân viên văn phòng</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-yellow-400 text-base mb-2">★★★★★</div>
+          <div class="text-gray-700">"Tôi rất thích tính năng so sánh sách và đọc cảm nhận thực tế từ cộng đồng."</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="flex items-center mb-4">
+            <img src="https://randomuser.me/api/portraits/men/53.jpg" alt="Phan Quốc Bảo" class="w-10 h-10 rounded-full object-cover border-2 border-primarynavy">
+            <div class="ml-3">
+              <div class="font-semibold text-gray-800">Phan Quốc Bảo</div>
+              <div class="text-gray-500 text-xs">Doanh nhân</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-yellow-400 text-base mb-2">★★★★★</div>
+          <div class="text-gray-700">"Readify giúp tôi cập nhật nhanh các đầu sách kinh doanh mới, tiết kiệm thời gian chọn lựa."</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thêm đánh giá/feedback -->
+  <section class="bg-white py-10 border-t">
+    <div class="container mx-auto px-4">
+      <div class="max-w-xl mx-auto text-center mb-8">
+        <h2 class="text-3xl font-['Playfair_Display'] font-semibold text-gray-800 mb-3">Thêm đánh giá của bạn</h2>
+        <p class="text-gray-600 text-lg">Chia sẻ cảm nhận hoặc góp ý về trải nghiệm mua sách tại Readify</p>
+      </div>
+      <div class="max-w-md mx-auto">
+        <form class="flex flex-col gap-4 bg-gray-50 p-6 rounded shadow" id="review-form">
+          <input type="text" placeholder="Họ và tên" class="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" required>
+          <input type="email" placeholder="Email" class="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" required>
+          <textarea placeholder="Nội dung đánh giá hoặc góp ý..." rows="4" class="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" required></textarea>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-700">Đánh giá:</span>
+            <div class="flex gap-1" id="star-rating">
+              <i class="ri-star-line text-yellow-400 text-xl cursor-pointer" data-value="1"></i>
+              <i class="ri-star-line text-yellow-400 text-xl cursor-pointer" data-value="2"></i>
+              <i class="ri-star-line text-yellow-400 text-xl cursor-pointer" data-value="3"></i>
+              <i class="ri-star-line text-yellow-400 text-xl cursor-pointer" data-value="4"></i>
+              <i class="ri-star-line text-yellow-400 text-xl cursor-pointer" data-value="5"></i>
+            </div>
+            <input type="hidden" name="rating" id="rating-value" value="0" required>
+          </div>
+          <button type="submit" class="bg-primarynavy text-white px-6 py-3 font-medium rounded-button mt-2">Gửi đánh giá</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <script src="./assets/js/review.js"></script>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
+</body>
+</html>
