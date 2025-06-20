@@ -4,7 +4,7 @@ const FavouriteController = {
     async addBookToFavourite(req, res) {
         try {
             const customerId = req.user.id;
-            const bookId = req.params.id;
+            const bookId = req.params.bookId;
 
             const result = await FavouriteService.addBookToFavourite(customerId, bookId);
             res.json(result)
@@ -15,7 +15,7 @@ const FavouriteController = {
     async removeBookFromFavourite(req, res) {
         try {
             const customerId = req.user.id;
-            const bookId = req.params.id;
+            const bookId = req.params.bookId;
 
             const result = await FavouriteService.removeBookFromFavourite(customerId, bookId);
             res.json(result)

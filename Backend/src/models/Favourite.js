@@ -16,7 +16,7 @@ const FavouriteBook = mongoose.Schema(
     {
         customer: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'CustomerAccount',
+            ref: 'User',
             required: true,
             unique: true
         },

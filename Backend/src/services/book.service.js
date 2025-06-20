@@ -124,6 +124,7 @@ const BookService = {
                 path: 'category',
                 select: 'name'
             })
+            .populate('availableStock')
             .skip(skip)
             .limit(limit);
 
@@ -138,6 +139,7 @@ const BookService = {
             quantity: book.availableStock,
             description: book.description,
             publishedYear: book.publicationYear,
+            imageUrl: book.imageUrl,
             createdAt: book.createdAt,
             updatedAt: book.updatedAt
         }));
@@ -157,7 +159,8 @@ const BookService = {
             .populate({
                 path: 'category',
                 select: 'name'
-            });
+            })
+            .populate('availableStock')
 
         if (!book) {
             return null;
@@ -173,6 +176,7 @@ const BookService = {
             quantity: book.availableStock,
             description: book.description,
             publishedYear: book.publicationYear,
+            imageUrl: book.imageUrl,
             createdAt: book.createdAt,
             updatedAt: book.updatedAt
         };
@@ -208,7 +212,8 @@ const BookService = {
 
         const updatedBook = await Book.findByIdAndUpdate(id, updateData, { new: true })
             .populate('author', 'name')
-            .populate('category', 'name');
+            .populate('category', 'name')
+            .populate('availableStock')
 
         if (!updatedBook) {
             return null;
@@ -223,6 +228,7 @@ const BookService = {
             price: updatedBook.price,
             description: updatedBook.description,
             publishedYear: updatedBook.publicationYear,
+            imageUrl: updatedBook.imageUrl,
             createdAt: updatedBook.createdAt,
             updatedAt: updatedBook.updatedAt
         };

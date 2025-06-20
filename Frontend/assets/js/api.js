@@ -4,10 +4,10 @@ const API_BASE_URL = window.location.origin + '/api';
 class ApiService {
     static async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
-        
+
         // Tự động thêm Authorization header nếu có token
         const authHeaders = window.AuthManager ? AuthManager.getAuthHeaders() : {};
-        
+
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -19,12 +19,20 @@ class ApiService {
 
         try {
             const response = await fetch(url, config);
-            const data = await response.json();
 
+            // Kiểm tra nếu response không thành công
             if (!response.ok) {
-                throw new Error(data.error || data.message || 'API request failed');
+                // Thử parse JSON để lấy error message
+                try {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+                } catch (e) {
+                    // Nếu không parse được JSON, dùng status text
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
             }
 
+            const data = await response.json();
             return data;
         } catch (error) {
             console.error('API request failed:', error);
@@ -34,83 +42,313 @@ class ApiService {
 
     // Books API
     static async getAllBooks(limit = 0, sort = '-createdAt') {
-        const queryParams = new URLSearchParams();
-        if (limit > 0) queryParams.append('limit', limit);
-        if (sort) queryParams.append('sort', sort);
+        try {
+            const queryParams = new URLSearchParams();
+            if (limit > 0) queryParams.append('limit', limit);
+            if (sort) queryParams.append('sort', sort);
 
-        const endpoint = `/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-        return this.request(endpoint);
+            const endpoint = `/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+            const response = await this.request(endpoint);
+
+            // Đảm bảo response có định dạng phù hợp
+            return {
+                success: true,
+                books: response.books || [],
+                total: response.books ? response.books.length : 0
+            };
+        } catch (error) {
+            console.error('Error in getAllBooks:', error);
+            return {
+                success: false,
+                books: [],
+                total: 0,
+                error: error.message
+            };
+        }
     }
 
     static async getBookById(id) {
-        return this.request(`/books/${id}`);
+        try {
+            if (!id) {
+                throw new Error('Book ID is required');
+            }
+
+            const response = await this.request(`/books/${id}`);
+
+            // Kiểm tra định dạng response từ backend
+            if (response.success && response.book) {
+                return response;
+            } else if (response.book) {
+                // Nếu backend không trả về success flag
+                return {
+                    success: true,
+                    book: response.book
+                };
+            } else {
+                throw new Error('Invalid response format from server');
+            }
+        } catch (error) {
+            console.error('Error in getBookById:', error);
+            return {
+                success: false,
+                book: null,
+                error: error.message
+            };
+        }
     }
 
     static async searchBooks(keyword) {
-        const queryParams = new URLSearchParams();
-        if (keyword) queryParams.append('keyword', keyword);
+        try {
+            const queryParams = new URLSearchParams();
+            if (keyword) queryParams.append('keyword', keyword);
 
-        return this.request(`/books/search?${queryParams.toString()}`);
+            const response = await this.request(`/books/search?${queryParams.toString()}`);
+
+            // Đảm bảo response có định dạng phù hợp
+            return {
+                success: true,
+                books: response.books || [],
+                total: response.total || 0
+            };
+        } catch (error) {
+            console.error('Error in searchBooks:', error);
+            return {
+                success: false,
+                books: [],
+                total: 0,
+                error: error.message
+            };
+        }
     }
 
-    // Reviews API (if needed)
-    static async getReviews() {
-        return this.request('/reviews');
+    // Cart API
+    static async addToCart(bookId, quantity = 1) {
+        try {
+            return await this.request('/cart', {
+                method: 'POST',
+                body: JSON.stringify({
+                    bookId,
+                    quantity
+                })
+            });
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            throw error;
+        }
+    }
+
+    static async getCart() {
+        try {
+            return await this.request('/cart');
+        } catch (error) {
+            console.error('Error getting cart:', error);
+            throw error;
+        }
+    }
+
+    // Favourite API
+    static async addToFavourites(bookId) {
+        try {
+            console.log('➕ [API] Adding to favourites, bookId:', bookId);
+            const result = await this.request(`/favourite/${bookId}`, {
+                method: 'POST'
+            });
+            console.log('✅ [API] Add to favourites successful:', result);
+            return result;
+        } catch (error) {
+            console.error('❌ [API] Error adding to favourite:', error);
+            throw error;
+        }
+    }
+
+    static async removeFromFavourites(bookId) {
+        try {
+            console.log('➖ [API] Removing from favourites, bookId:', bookId);
+            const result = await this.request(`/favourite/${bookId}`, {
+                method: 'PATCH'
+            });
+            console.log('✅ [API] Remove from favourites successful:', result);
+            return result;
+        } catch (error) {
+            console.error('❌ [API] Error removing from favourites:', error);
+            throw error;
+        }
+    }
+
+    static async getFavourites() {
+        try {
+            return await this.request('/favourite');
+        } catch (error) {
+            console.error('Error getting favourites:', error);
+            throw error;
+        }
+    }
+
+    // Reviews API
+    static async getReviews(bookId) {
+        try {
+            if (!bookId) {
+                throw new Error('Book ID is required for getting reviews');
+            }
+            return await this.request(`/reviews/${bookId}`);
+        } catch (error) {
+            console.error('Error getting reviews:', error);
+            throw error;
+        }
+    }
+
+    static async addReview(bookId, rating, comment) {
+        try {
+            return await this.request(`/reviews/${bookId}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    rating,
+                    comment,
+                    content: comment  // Send both field names for compatibility
+                })
+            });
+        } catch (error) {
+            console.error('Error adding review:', error);
+            throw error;
+        }
+    }
+
+    static async updateReview(reviewId, rating, comment) {
+        try {
+            return await this.request(`/reviews/${reviewId}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    rating,
+                    comment,
+                    content: comment  // Send both field names for compatibility
+                })
+            });
+        } catch (error) {
+            console.error('Error updating review:', error);
+            throw error;
+        }
+    }
+
+    static async deleteReview(reviewId) {
+        try {
+            return await this.request(`/reviews/${reviewId}`, {
+                method: 'DELETE'
+            });
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            throw error;
+        }
     }
 
     // Stats API (if available)
     static async getStats() {
-        return this.request('/reports/stats');
+        try {
+            return await this.request('/reports/stats');
+        } catch (error) {
+            console.error('Error getting stats:', error);
+            throw error;
+        }
     }
 
     // Auth API
     static async login(identifier, password) {
-        return this.request('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({
-                identifier,
-                password
-            })
-        });
+        try {
+            const response = await this.request('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    identifier,
+                    password
+                })
+            });
+
+            // Lưu token nếu có
+            if (response.token && window.AuthManager) {
+                if (response.user) {
+                    // Full auth save with user data
+                    AuthManager.saveAuth(response.token, response.user, false);
+                } else {
+                    // Fallback for token-only responses
+                    console.warn('⚠️ Login response missing user data, using setToken fallback');
+                    AuthManager.setToken(response.token);
+                }
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error in login:', error);
+            throw error;
+        }
     }
 
     static async register(name, username, email, password) {
-        return this.request('/auth/register', {
-            method: 'POST',
-            body: JSON.stringify({
-                name,
-                username,
-                email,
-                password
-            })
-        });
+        try {
+            return await this.request('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    username,
+                    email,
+                    password
+                })
+            });
+        } catch (error) {
+            console.error('Error in register:', error);
+            throw error;
+        }
     }
 
     static async logout() {
-        return this.request('/auth/logout', {
-            method: 'POST'
-        });
+        try {
+            const response = await this.request('/auth/logout', {
+                method: 'POST'
+            });
+
+            // Clear token
+            if (window.AuthManager) {
+                AuthManager.logout();
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Error in logout:', error);
+            throw error;
+        }
     }
 
     static async getProfile() {
-        return this.request('/auth/me');
+        try {
+            return await this.request('/auth/me');
+        } catch (error) {
+            console.error('Error getting profile:', error);
+            throw error;
+        }
     }
 
     static async updateProfile(profileData) {
-        return this.request('/customer/profile', {
-            method: 'PATCH',
-            body: JSON.stringify(profileData)
-        });
+        try {
+            return await this.request('/customer/profile', {
+                method: 'PATCH',
+                body: JSON.stringify(profileData)
+            });
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            throw error;
+        }
     }
 
     static async changePassword(currentPassword, newPassword) {
-        return this.request('/auth/change-password', {
-            method: 'PUT',
-            body: JSON.stringify({
-                currentPassword,
-                newPassword
-            })
-        });
+        try {
+            return await this.request('/auth/change-password', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            });
+        } catch (error) {
+            console.error('Error changing password:', error);
+            throw error;
+        }
     }
 }
 

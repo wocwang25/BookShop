@@ -44,35 +44,33 @@ const ReviewService = {
                     path: 'reviewer',
                     select: 'name email'
                 })
-                .select('content rating')
-
             return reviews;
         } catch (error) {
             throw error;
         }
     },
 
-    async updateReview(customerId, bookId, content, rating) {
+    async updateReview(customerId, reviewId, content, rating) {
         try {
             const customer = await User.findById(customerId);
             if (!customer) {
                 throw new Error("Không có dữ liệu khách hàng");
             }
-            const book = await Book.findById(bookId);
-            if (!book) {
-                throw new Error("Không có dữ liệu sách");
+
+            const review = await Review.findById(reviewId);
+            if (!review) {
+                throw new Error("Không tìm thấy review");
             }
 
-            const review = await Review.findOneAndUpdate(
-                { reviewer: customerId, book: bookId },
-                {
-                    $set: {
-                        content: content,
-                        rating: rating
-                    }
-                },
-                { new: true }
-            );
+            // Chỉ cho phép chủ review hoặc admin sửa (nếu cần)
+            if (review.reviewer.toString() !== customerId) {
+                throw new Error("Bạn không có quyền sửa review này");
+            }
+
+            review.content = content;
+            review.rating = rating;
+            await review.save();
+
             return review;
         } catch (error) {
             throw error;

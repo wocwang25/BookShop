@@ -525,25 +525,61 @@ function initSearchBarButton() {
 }
 
 // Wait for dependencies to be available before loading header
+let initAttempts = 0;
+const maxAttempts = 30; // Wait max 3 seconds
+
 function initHeaderFooter() {
-  // Check if required dependencies are available
-  if (typeof window.ApiService === 'undefined') {
-    setTimeout(initHeaderFooter, 100);
-    return;
+  console.log('🔄 [callHeaderFooter] Initializing header/footer... (attempt', initAttempts + 1, ')');
+  console.log('🔍 [callHeaderFooter] ApiService available:', typeof window.ApiService !== 'undefined');
+  console.log('🔍 [callHeaderFooter] AuthManager available:', typeof window.AuthManager !== 'undefined');
+  
+  // Check if dependencies are available, but don't wait forever
+  if (initAttempts < maxAttempts) {
+    if (typeof window.ApiService === 'undefined') {
+      console.log('⏳ [callHeaderFooter] Waiting for ApiService...');
+      initAttempts++;
+      setTimeout(initHeaderFooter, 100);
+      return;
+    }
+    
+    if (typeof window.AuthManager === 'undefined') {
+      console.log('⏳ [callHeaderFooter] Waiting for AuthManager...');
+      initAttempts++;
+      setTimeout(initHeaderFooter, 100);
+      return;
+    }
+  } else {
+    console.warn('⚠️ [callHeaderFooter] Max attempts reached, loading header/footer without all dependencies');
   }
   
-  if (typeof window.AuthManager === 'undefined') {
-    setTimeout(initHeaderFooter, 100);
-    return;
-  }
+  console.log('✅ [callHeaderFooter] Loading header/footer...');
 
 // Tải header và footer từ components
-fetch('./components/header.html')
+// Determine correct path based on current location
+const isInSubfolder = window.location.pathname.includes('/pages/') || 
+                     window.location.pathname.includes('/bookDetail') ||
+                     window.location.pathname.includes('/books') ||
+                     window.location.pathname.includes('/login') ||
+                     window.location.pathname.includes('/register');
+const headerPath = isInSubfolder ? '../components/header.html' : './components/header.html';
+
+fetch(headerPath)
   .then(res => res.text())
   .then(data => {
     const headerPlaceholder = document.getElementById('header-placeholder');
     if (headerPlaceholder) {
+      // Fix relative paths in header content for subfolders
+      if (isInSubfolder) {
+        data = data.replace(/href="([^"]*?)"/g, (match, url) => {
+          if (url.startsWith('/') || url.startsWith('http') || url.startsWith('#')) {
+            return match; // Absolute URLs and fragments, leave as is
+          }
+          return `href="/${url}"`;
+        }).replace(/src="\.\.\/assets\//g, 'src="/assets/');
+      }
+      
       headerPlaceholder.innerHTML = data;
+      console.log('✅ [callHeaderFooter] Header loaded successfully from:', headerPath);
       
       // Initialize header components
       if (typeof initHeaderPanel === 'function') initHeaderPanel();
@@ -596,20 +632,37 @@ fetch('./components/header.html')
   })
   .catch(error => {
     console.error('❌ [callHeaderFooter] Error loading header:', error);
+    console.error('❌ [callHeaderFooter] Attempted header path:', headerPath);
+    console.error('❌ [callHeaderFooter] Current pathname:', window.location.pathname);
+    console.error('❌ [callHeaderFooter] Is in subfolder:', isInSubfolder);
   });
 
-fetch('./components/footer.html')
+const footerPath = isInSubfolder ? '../components/footer.html' : './components/footer.html';
+
+fetch(footerPath)
   .then(res => res.text())
   .then(data => {
     const footerPlaceholder = document.getElementById('footer-placeholder');
     if (footerPlaceholder) {
+      // Fix relative paths in footer content for subfolders
+      if (isInSubfolder) {
+        data = data.replace(/href="([^"]*?)"/g, (match, url) => {
+          if (url.startsWith('/') || url.startsWith('http') || url.startsWith('#')) {
+            return match; // Absolute URLs and fragments, leave as is
+          }
+          return `href="/${url}"`;
+        }).replace(/src="\.\.\/assets\//g, 'src="/assets/');
+      }
+      
       footerPlaceholder.innerHTML = data;
+      console.log('✅ [callHeaderFooter] Footer loaded successfully from:', footerPath);
     } else {
       console.warn('⚠️ [callHeaderFooter] footer-placeholder not found');
     }
   })
      .catch(error => {
      console.error('❌ [callHeaderFooter] Error loading footer:', error);
+     console.error('❌ [callHeaderFooter] Attempted footer path:', footerPath);
    });
 }
 

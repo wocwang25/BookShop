@@ -110,6 +110,18 @@ class AuthManager {
         const token = this.getToken();
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
+
+    // Compatibility methods cho các API khác
+    static setToken(token) {
+        console.warn('⚠️ AuthManager.setToken() is deprecated. Use saveAuth() instead.');
+        // Basic token save without user data - not recommended
+        sessionStorage.setItem(this.TOKEN_KEY, token);
+    }
+
+    static clearToken() {
+        console.warn('⚠️ AuthManager.clearToken() is deprecated. Use logout() instead.');
+        this.logout();
+    }
     
     // Trigger auth state change event
     static triggerAuthStateChange(type, user = null) {

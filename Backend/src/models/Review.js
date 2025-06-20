@@ -4,7 +4,7 @@ const ReviewSchema = mongoose.Schema(
     {
         reviewer: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'CustomerAccount',
+            ref: 'User',
             required: true
         },
         book: {
