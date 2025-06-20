@@ -67,6 +67,15 @@ app.get('/bookDetail', (req, res) => {
 app.get('/settings', (req, res) => {
     res.sendFile(path.join(__dirname, 'Frontend/pages', 'settingA.html'));
 });
+app.get('/orders', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend/pages', 'myOrder.html'));
+});
+app.get('/checkout', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend/pages', 'payment.html'));
+});
+app.get('/reviews', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend/pages', 'reviews.html'));
+});
 
 // 404 fallback
 app.use((req, res) => {

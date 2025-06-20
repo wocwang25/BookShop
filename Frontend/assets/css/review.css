@@ -1,0 +1,83 @@
+.review-slider { 
+  display: flex; 
+  gap: 2rem; 
+  justify-content: center; 
+  align-items: stretch;
+  min-height: 420px;
+  max-width: 80vw;
+  margin-left: auto;
+  margin-right: auto;
+}
+.review-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px 0 rgba(45,90,160,0.08);
+  padding: 2rem 1.5rem;
+  min-width: 260px;
+  max-width: 320px;
+  border: 1px solid #e6e6e6;
+  transition: box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
+  box-sizing: border-box;
+}
+.review-card:hover { box-shadow: 0 8px 32px 0 rgba(45,90,160,0.13); transform: translateY(-4px) scale(1.02);}
+.insight-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+  padding: 1.5rem;
+  min-width: 260px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.insight-card:hover { box-shadow: 0 4px 16px 0 rgba(45,90,160,0.10); transform: translateY(-2px) scale(1.01);}
+.testimonial-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.testimonial-card:hover { box-shadow: 0 4px 16px 0 rgba(45,90,160,0.10); transform: translateY(-2px) scale(1.01);}
+.slider-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;}
+.slider-dot { width: 10px; height: 10px; border-radius: 50%; background: #e6e6e6; cursor: pointer;}
+.slider-dot.active { background: #2d5aa0;}
+
+.gradient-text {
+  background: linear-gradient(90deg, #f5f5dc 0%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.animate-bounce-slow {
+  animation: bounce-slow 2.2s infinite;
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0);}
+  50% { transform: translateY(-12px);}
+}
+
+.bg-primarynavy {
+  background-color: #2d5aa0 !important;
+  color: #fff !important;
+}
+.hover\:bg-primary:hover {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Chỉ áp dụng nền trong suốt cho nút Khám phá ngay */
+.btn-discover.bg-primarynavy {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+.btn-discover.hover\:bg-primary:hover {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+.insight-card .insight-number {
+  color: #3c48f8; 
+}
+

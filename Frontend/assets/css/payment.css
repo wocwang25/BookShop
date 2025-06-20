@@ -1,0 +1,83 @@
+/* payment.css */
+
+/* Font và nền chung */
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #F5F1EC;
+}
+
+/* Nút thanh toán */
+.confirm-btn {
+  background-color: #1e40af;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+.confirm-btn:hover {
+  background-color: #1a3694;
+}
+
+/* Popup thành công */
+#success-popup {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.success-box {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  text-align: center;
+}
+
+.success-box .icon {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background-color: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+}
+
+.success-box h1 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.success-box p {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.success-box .order-id {
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.success-box button {
+  background-color: #1e40af;
+  color: white;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+.success-box button:hover {
+  background-color: #1a3694;
+}

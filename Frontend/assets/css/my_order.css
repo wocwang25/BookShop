@@ -1,0 +1,388 @@
+/* Base styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.bg-light {
+  background-color: #f9fafb;
+}
+
+.my-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Main */
+.main-content h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #111827;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Table */
+.table-wrapper {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th,
+.order-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f1f2f4;
+  vertical-align: middle;
+}
+
+.order-table th {
+  background-color: #f9fafb;
+  color: #687588;
+  font-weight: 500;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.book-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.book-info img {
+  width: 45px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.book-title {
+  font-weight: 500;
+  color: #344054;
+}
+
+.book-meta {
+  font-size: 14px;
+  color: #687588;
+}
+
+.container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* === HEADER STYLE TỪ FILE GỐC === */
+
+/* Biến màu và font cơ bản cho header */
+:root {
+  --primary-navy: #1a365d;
+  --primary-blue: #2d5aa0;
+  --accent-gold: #d4af37;
+  --accent-warm: #f7931e;
+  --text-dark: #2d3748;
+  --text-medium: #4a5568;
+  --text-light: #718096;
+  --bg-light: #f8fafc;
+  --border-light: #e2e8f0;
+
+  --font-primary: 'Montserrat', sans-serif;
+  --font-display: 'Playfair Display', serif;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* Tổng thể */
+body {
+  font-family: var(--font-primary);
+  color: var(--text-dark);
+  background-color: #ffffff;
+}
+
+/* Logo Readify */
+.logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary-navy);
+  text-decoration: none;
+}
+
+/* Nav menu */
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+}
+
+.nav-link {
+  color: var(--text-medium);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--primary-blue);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent-gold);
+  transition: var(--transition-normal);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Header actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-btn,
+.cart-btn,
+.user-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text-medium);
+  transition: var(--transition-fast);
+  border-radius: 8px;
+}
+
+.search-btn:hover,
+.cart-btn:hover,
+.user-btn:hover {
+  background: var(--bg-light);
+  color: var(--primary-blue);
+}
+
+/* Cart badge (số lượng) */
+.cart-badge {
+  position: relative;
+}
+
+.cart-badge::after {
+  content: '0';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent-warm);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.header.scrolled {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light); /* viền phân cách */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);     /* bóng nhẹ */
+  z-index: 1000;
+  transition: var(--transition-normal);
+}
+
+.main-content {
+  padding-top: 80px; /* hoặc 96px nếu header cao khoảng đó */
+}
+
+/* Modal chi tiết đơn hàng */
+.modal-header {
+  margin-bottom: 1rem;
+}
+.modal-header h1 {
+  font-size: 20px;
+  font-weight: bold;
+}
+.modal-meta {
+  margin-top: 0.5rem;
+  color: #444;
+  font-size: 15px;
+}
+.modal-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.status-text {
+  color: #2d5aa0;
+  font-weight: 500;
+}
+.products {
+  margin: 1.5rem 0;
+}
+.product {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.product .thumb img {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+.product .details h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+.product .price {
+  margin-left: auto;
+  text-align: right;
+}
+.product .price strong {
+  color: #2d5aa0;
+  font-size: 15px;
+}
+.product .qty {
+  font-size: 13px;
+  color: #687588;
+}
+.delivery h3,
+.summary h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.delivery p {
+  font-size: 14px;
+  color: #444;
+}
+.summary .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.summary .total {
+  font-weight: bold;
+  color: #2d5aa0;
+}
+.separator {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1rem 0;
+}
+
+/* === MODAL STYLE === */
+.modal-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.circle.success {
+  background-color: #12b76a;
+  border-radius: 9999px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-white {
+  color: white;
+  font-size: 16px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5); /* làm tối nền */
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-inner {
+  overflow-y: auto;
+  max-height: 90vh;
+  padding: 1.5rem;
+  padding-bottom: 4rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
