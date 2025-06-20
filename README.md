@@ -10,7 +10,6 @@ A Node.js backend project organized with **feature-based MVC architecture** for 
 
 ```bash
 git clone https://github.com/wocwang25/BookShop.git
-cd ./BookShop/Backend
 ```
 
 ### 2. Setup environment variables
@@ -27,88 +26,79 @@ JWT_REFRESH_SECRET=
 SALT_ROUNDS=10
 ```
 
-### 3. Run the project with Docker
+---
 
-#### 3.1. Build and start the containers
+## 🖥️ Run the User Interfaces
+
+### 1. Customer UI (HTML/CSS/JS - Static)
+
+- **Mặc định chạy cùng backend** (port 5000).
+- Sau khi chạy backend (xem hướng dẫn bên dưới), truy cập:
+  ```
+  http://localhost:5000/
+  ```
+- Giao diện này dành cho khách hàng, sử dụng các file HTML/CSS/JS tĩnh trong thư mục `Frontend`.
+
+---
+
+### 2. Admin/Staff UI (React)
+
+- **Chạy riêng bằng Vite (port 5173 mặc định)**
+
+```bash
+cd bookstore-fe
+npm install
+npm run dev
+```
+- Truy cập giao diện admin/staff tại:
+  ```
+  http://localhost:5173/
+  ```
+- Giao diện này dành cho quản trị viên và nhân viên, phát triển bằng React.
+
+---
+
+## 🛠️ Run the Backend
+
+### 1. Check the needed npm and node environment
+
+```bash
+node -v
+npm -v
+```
+
+### 2. Build and start backend
+
+```bash
+npm install
+npm run dev 
+```
+- The backend app will be available at: http://localhost:5000
+
+---
+
+## 🐳 Run the project with Docker (optional)
 
 ```bash
 docker-compose up --build
 ```
-
-- The first time, use `--build` to ensure dependencies are installed.
 - The app will be available at: http://localhost:5000
 
-#### 3.2. Stop the containers
-
+To stop:
 ```bash
 docker-compose down
 ```
 
-#### 3.3. (Optional) Remove all containers, networks, and volumes
-
+To remove all containers, networks, and volumes:
 ```bash
 docker-compose down -v
 ```
 
 ---
 
-## 📂 Project Structure
-
-```bash
-Backend/
-├── app.js
-├── server.js
-├── Dockerfile
-├── docker-compose.yml
-├── .dockerignore
-├── package.json
-├── .env
-├── uploads/
-├── src/
-│   ├── config/
-│   │   ├── db.js
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── test/
-```
-
----
-
-## 📦 Main Dependencies
-
-| Package      | Version |
-| ------------ | ------- |
-| express      | ^4.x    |
-| mongoose     | ^8.x    |
-| bcrypt       | ^5.x    |
-| jsonwebtoken | ^9.x    |
-| multer       | ^2.x    |
-| csv-parser   | ^3.x    |
-| redis        | ^5.x    |
-
----
-
-## 🛠 Features
-
-- 🛡️ User authentication (Login, Register, Change Password)
-- 🔑 JWT Authentication + Authorization
-- 🚀 Rate Limiter for Login
-- 🧹 Feature-based MVC structure
-- � Book management (CRUD, import from CSV)
-- 🛒 Cart (add, update, remove items)
-- 🧾 Sales invoice & rental invoice management
-- 💸 Payment receipt & debt management
-- ⭐ Favourite books
-- 📝 Book reviews
-- 📦 Inventory & debt reporting
-- 🔒 Password hashing with bcrypt
-
----
+## 🌐 Deploy in web for free (optional)
+Visit website render.com and follow the instruction to deploy easily.
 
 ## ✍️ Author
 
-- **Võ Quốc Quang** – [My GitHub](https://github.com/wocwang25)
-
----
+- **Võ Quốc Quang** –
