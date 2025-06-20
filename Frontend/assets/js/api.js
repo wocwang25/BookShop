@@ -4,9 +4,14 @@ const API_BASE_URL = window.location.origin + '/api';
 class ApiService {
     static async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
+        
+        // Tự động thêm Authorization header nếu có token
+        const authHeaders = window.AuthManager ? AuthManager.getAuthHeaders() : {};
+        
         const config = {
             headers: {
                 'Content-Type': 'application/json',
+                ...authHeaders,
                 ...options.headers
             },
             ...options
@@ -56,6 +61,39 @@ class ApiService {
     // Stats API (if available)
     static async getStats() {
         return this.request('/reports/stats');
+    }
+
+    // Auth API
+    static async login(identifier, password) {
+        return this.request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                identifier,
+                password
+            })
+        });
+    }
+
+    static async register(name, username, email, password) {
+        return this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                name,
+                username,
+                email,
+                password
+            })
+        });
+    }
+
+    static async logout() {
+        return this.request('/auth/logout', {
+            method: 'POST'
+        });
+    }
+
+    static async getProfile() {
+        return this.request('/auth/me');
     }
 }
 

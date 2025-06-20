@@ -28,11 +28,25 @@
           <i class="ri-shopping-cart-2-line text-xl"></i>
         </button>
 
-        <button id="userBtn"
+        <!-- User button khi chưa đăng nhập -->
+        <button id="userBtn" 
           class="user-btn ml-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
           aria-label="User">
           <i class="ri-user-line text-xl"></i>
         </button>
+
+        <!-- User info khi đã đăng nhập -->
+        <div id="userInfo" class="hidden ml-2 flex items-center space-x-3 cursor-pointer" title="Nhấn để xem menu tài khoản">
+          <div class="text-right">
+            <div id="headerUserName" class="font-medium text-gray-800 text-sm max-w-32 truncate">User</div>
+            <div class="text-xs text-green-600 font-medium">● Đã đăng nhập</div>
+          </div>
+          <button id="userInfoBtn"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-primarynavy text-white transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primarynavy"
+            aria-label="User Menu">
+            <i class="ri-user-3-fill text-xl"></i>
+          </button>
+        </div>
 
       </div>
     </div>
@@ -83,12 +97,44 @@
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-settings-3-line text-xl"></i> Cài đặt tài khoản
     </a>
-    <a href="login"
-      class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mt-auto">Đăng
-      nhập</a>
-    <a href="register"
-      class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold">Tạo
-      tài khoản</a>
+    
+    <!-- User not logged in -->
+    <div id="guestActions" class="space-y-2 mt-auto">
+      <div class="text-center text-gray-500 text-sm mb-3">
+        <i class="ri-information-line mr-1"></i>
+        Đăng nhập để trải nghiệm đầy đủ tính năng
+      </div>
+      <a href="login" id="loginLink"
+        class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold hover:bg-blue-700 transition-colors">
+        <i class="ri-login-circle-line mr-2"></i>Đăng nhập</a>
+      <a href="register" id="registerLink"
+        class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold hover:bg-gray-50 transition-colors">
+        <i class="ri-user-add-line mr-2"></i>Tạo tài khoản</a>
+    </div>
+    
+    <!-- User logged in -->
+    <div id="userActions" class="hidden">
+      <!-- User profile section -->
+      <div id="userWelcome" class="px-4 py-3 bg-gradient-to-r from-primarynavy to-blue-600 rounded-lg text-white mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <i class="ri-user-3-fill text-2xl"></i>
+          </div>
+          <div>
+            <div class="text-sm opacity-90">Xin chào,</div>
+            <div id="userName" class="font-semibold text-lg">User</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Logout button at bottom -->
+      <div class="mt-auto pt-4 border-t border-gray-200">
+        <button id="logoutBtn"
+          class="block w-full bg-red-500 text-white px-4 py-3 rounded-lg text-center font-semibold hover:bg-red-600 transition-colors">
+          <i class="ri-logout-circle-line mr-2"></i>Đăng xuất
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 <!-- Slide-in cart panel -->
@@ -366,5 +412,8 @@
       const regex = new RegExp(`(${term})`, 'gi');
       return escapeHtml(text).replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
     }
+
+    // Note: User panel functionality is handled by callHeaderFooter.js
+    // This script only handles search functionality
   });
 </script>

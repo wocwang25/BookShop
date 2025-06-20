@@ -16,7 +16,7 @@ let searchResults = [];
 let isSearching = false;
 
 // Wait for DOM to be loaded before initializing search
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   initializeSearchFunctionality();
 });
 
@@ -24,18 +24,18 @@ function initializeSearchFunctionality() {
   // Search functionality
   const searchInput = document.querySelector('.search-input');
   const searchBtnHero = document.querySelector('.search-btn-hero');
-  
+
   console.log('Search input found:', searchInput);
   console.log('Search button found:', searchBtnHero);
-  
+
   if (searchInput) {
     // Real-time search suggestions
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       const query = e.target.value.trim();
-      
+
       console.log('Search input changed:', query);
-      
+
       if (query.length >= 2) {
         searchTimeout = setTimeout(() => {
           performLiveSearch(query);
@@ -66,7 +66,7 @@ function initializeSearchFunctionality() {
         searchContainer.classList.add('search-focused');
       }
     });
-    
+
     searchInput.addEventListener('blur', () => {
       setTimeout(() => {
         const searchContainer = searchInput.parentElement;
@@ -99,7 +99,7 @@ async function performLiveSearch(query) {
   try {
     const response = await ApiService.searchBooks(query);
     console.log('Search response:', response);
-    
+
     if (response.success && response.books) {
       searchResults = response.books.slice(0, 5); // Limit to 5 suggestions
       showSearchResults(query);
@@ -147,7 +147,7 @@ function showSearchResults(query) {
   }
 
   const dropdown = createSearchDropdown(searchResults);
-  
+
   dropdown.innerHTML = `
     <div class="search-results-header">
       <span class="text-sm text-gray-600">Kết quả tìm kiếm cho "${query}"</span>
@@ -199,7 +199,7 @@ function hideSearchResults() {
 // Highlight search term in results
 function highlightSearchTerm(text, term) {
   if (!term) return escapeHtml(text);
-  
+
   const regex = new RegExp(`(${term})`, 'gi');
   return escapeHtml(text).replace(regex, '<mark class="search-highlight">$1</mark>');
 }
@@ -207,9 +207,9 @@ function highlightSearchTerm(text, term) {
 async function handleSearch() {
   const searchInput = document.querySelector('.search-input');
   const query = searchInput ? searchInput.value.trim() : '';
-  
+
   console.log('Handling search for:', query);
-  
+
   if (!query) {
     console.warn('No search query provided');
     return;
@@ -217,13 +217,13 @@ async function handleSearch() {
 
   try {
     const searchBtnHero = document.querySelector('.search-btn-hero');
-    
+
     // Show loading state
     if (searchBtnHero) {
       const originalContent = searchBtnHero.innerHTML;
       searchBtnHero.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Đang tìm...';
       searchBtnHero.disabled = true;
-      
+
       // Reset after delay
       setTimeout(() => {
         searchBtnHero.innerHTML = originalContent;
@@ -240,7 +240,7 @@ async function handleSearch() {
   } catch (error) {
     console.error('Search failed:', error);
     alert('Tìm kiếm thất bại. Vui lòng thử lại.');
-    
+
     // Reset button state on error
     const searchBtnHero = document.querySelector('.search-btn-hero');
     if (searchBtnHero) {
@@ -253,7 +253,7 @@ async function handleSearch() {
 // Load homepage data when page loads
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('DOM loaded, initializing homepage');
-  
+
   try {
     await Promise.all([
       loadFeaturedBooks(),
@@ -383,7 +383,7 @@ function renderPopularBooks(books) {
     console.warn('Popular books container not found');
     return;
   }
-  
+
   if (books.length === 0) {
     popularBooksContainer.innerHTML = `
       <div class="col-span-4 text-center text-gray-500 py-8">
@@ -424,7 +424,7 @@ function renderBookListing(books) {
     console.warn('Book listing container not found');
     return;
   }
-  
+
   if (books.length === 0) {
     bookListingContainer.innerHTML = `
       <div class="col-span-3 text-center text-gray-500 py-8">
@@ -473,7 +473,7 @@ function updateStatsDisplay(books) {
   if (statNumbers.length >= 3) {
     // Get unique authors and calculate stats
     const uniqueAuthors = new Set(books.map(book => book.author?._id).filter(Boolean));
-    
+
     statNumbers[0].textContent = `${books.length}+`; // Total books
     statNumbers[1].textContent = `${uniqueAuthors.size}+`; // Total authors
     statNumbers[2].textContent = '5k+'; // Keep readers as default since we don't have this data
@@ -484,39 +484,39 @@ function updateStatsDisplay(books) {
 function getBookImage(book) {
   console.log('Getting image for book:', book);
   console.log('Book imageUrl:', book.imageUrl);
-  
+
   // Check if imageUrl exists and is not empty
   if (!book.imageUrl || book.imageUrl.trim() === '') {
     console.log('No imageUrl found, using default');
     return getDefaultImage();
   }
-  
+
   // Convert Google Drive link to direct image link if needed
   const directImageUrl = convertGoogleDriveLink(book.imageUrl);
   console.log('Converted image URL:', directImageUrl);
-  
+
   return directImageUrl;
 }
 
 function convertGoogleDriveLink(url) {
   if (!url) return getDefaultImage();
-  
+
   // Check if it's already a direct link
   if (url.includes('drive.google.com/uc?')) {
     return url;
   }
-  
+
   // Convert Google Drive sharing link to direct link
   // From: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
   // To: https://drive.google.com/uc?id=FILE_ID&export=view
   const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
   const match = url.match(driveRegex);
-  
+
   if (match && match[1]) {
     const fileId = match[1];
     return `https://drive.google.com/uc?id=${fileId}&export=view`;
   }
-  
+
   // If it's not a Google Drive link, return as is
   return url;
 }
@@ -543,13 +543,13 @@ function escapeHtml(text) {
 function addToCart(bookId) {
   // TODO: Implement add to cart functionality with API
   console.log('Add to cart:', bookId);
-  
+
   // Show loading state
   const button = event.target;
   const originalText = button.textContent;
   button.classList.add('btn-loading');
   button.disabled = true;
-  
+
   // Simulate API call (replace with actual cart API)
   setTimeout(() => {
     button.classList.remove('btn-loading');
@@ -562,10 +562,10 @@ function addToCart(bookId) {
 function toggleFavorite(bookId) {
   // TODO: Implement favorite functionality with API
   console.log('Toggle favorite:', bookId);
-  
+
   const button = event.target.closest('button');
   const icon = button.querySelector('i');
-  
+
   // Toggle icon
   if (icon.classList.contains('ri-star-line')) {
     icon.classList.remove('ri-star-line');
