@@ -171,7 +171,7 @@ const BookService = {
             _id: book._id,
             title: book.title,
             author: book.author?.name || 'Unknown',
-            genre: book.category?.name || 'Unknown',
+            category: book.category?.name || 'Unknown',
             price: book.price,
             quantity: book.availableStock,
             description: book.description,

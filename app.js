@@ -33,6 +33,7 @@ app.use('/api/auth', require('./Backend/src/routes/auth.routes'));
 app.use('/api/customer', require('./Backend/src/routes/customer.routes'));
 app.use('/api/rules', require('./Backend/src/routes/rule.routes'))
 app.use('/api/books', require('./Backend/src/routes/book.routes'))
+app.use('/api/category', require('./Backend/src/routes/category.routes'))
 app.use('/api/import-slip', require('./Backend/src/routes/importslip.routes'))
 app.use('/api/invoice', require('./Backend/src/routes/salesinvoice.routes'))
 app.use('/api/invoice', require('./Backend/src/routes/rentalinvoice.routes'))

@@ -1,14 +1,14 @@
 // src/pages/staff/StaffDashboardPage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-    Container, 
-    Title, 
-    Text, 
-    SimpleGrid, 
-    Paper, 
-    Group, 
-    ThemeIcon, 
+import {
+    Container,
+    Title,
+    Text,
+    SimpleGrid,
+    Paper,
+    Group,
+    ThemeIcon,
     Button,
     Alert,
     Box,
@@ -16,10 +16,10 @@ import {
     ActionIcon,
     Tooltip
 } from '@mantine/core';
-import { 
-    IconReceipt, 
-    IconFileInvoice, 
-    IconCash, 
+import {
+    IconReceipt,
+    IconFileInvoice,
+    IconCash,
     IconReport,
     IconRefresh,
     IconAlertTriangle,
@@ -33,15 +33,15 @@ import StatCard from '../../components/dashboard/StatsOverview';
 import DebugPanel from '../../components/dashboard/DebugPanel';
 
 const ActionCard = ({ title, description, to, icon, badge, isDisabled = false }) => (
-    <Paper 
-        component={isDisabled ? 'div' : Link} 
+    <Paper
+        component={isDisabled ? 'div' : Link}
         to={!isDisabled ? to : undefined}
-        withBorder 
-        p="lg" 
-        radius="md" 
-        shadow="sm" 
-        sx={{ 
-            '&:hover': !isDisabled ? { 
+        withBorder
+        p="lg"
+        radius="md"
+        shadow="sm"
+        sx={{
+            '&:hover': !isDisabled ? {
                 boxShadow: 'var(--mantine-shadow-md)',
                 transform: 'translateY(-1px)',
                 transition: 'all 0.2s ease'
@@ -71,7 +71,7 @@ const ActionCard = ({ title, description, to, icon, badge, isDisabled = false })
                 {badge}
             </div>
         )}
-        
+
         <Group position="apart">
             <Group>
                 <ThemeIcon size="xl" variant="light" color={isDisabled ? 'gray' : undefined}>
@@ -91,28 +91,28 @@ const StaffDashboardPage = () => {
     const { stats, isLoading, error, lastUpdated, refresh } = useDashboardData();
 
     const actions = [
-        { 
-            title: 'Tạo Phiếu Nhập Sách', 
-            description: 'Nhập sách mới vào kho hàng.', 
-            to: '/staff/import', 
-            icon: <IconReceipt size="1.2rem" /> 
+        {
+            title: 'Tạo Phiếu Nhập Sách',
+            description: 'Nhập sách mới vào kho hàng.',
+            to: '/staff/import',
+            icon: <IconReceipt size="1.2rem" />
         },
-        { 
-            title: 'Lập Hóa Đơn Mới', 
-            description: 'Tạo hóa đơn bán hoặc thuê sách cho khách hàng.', 
-            to: '/staff/invoice', 
-            icon: <IconFileInvoice size="1.2rem" /> 
+        {
+            title: 'Lập Hóa Đơn Mới',
+            description: 'Tạo hóa đơn bán hoặc thuê sách cho khách hàng.',
+            to: '/staff/invoice',
+            icon: <IconFileInvoice size="1.2rem" />
         },
-        { 
-            title: 'Lập Phiếu Thu Tiền', 
-            description: 'Ghi nhận thanh toán công nợ từ khách hàng.', 
-            to: '/staff/payment', 
-            icon: <IconCash size="1.2rem" /> 
+        {
+            title: 'Lập Phiếu Thu Tiền',
+            description: 'Ghi nhận thanh toán công nợ từ khách hàng.',
+            to: '/staff/payment',
+            icon: <IconCash size="1.2rem" />
         },
-        { 
-            title: 'Xem Báo Cáo', 
-            description: 'Xem báo cáo tồn kho và công nợ hàng tháng.', 
-            to: '/staff/reports', 
+        {
+            title: 'Xem Báo Cáo',
+            description: 'Xem báo cáo tồn kho và công nợ hàng tháng.',
+            to: '/staff/reports',
             icon: <IconReport size="1.2rem" />,
             badge: stats.find(s => s.title === 'Sách tồn kho thấp')?.value !== '0' ? '!' : null
         },
@@ -144,7 +144,7 @@ const StaffDashboardPage = () => {
                     zIndex: -1
                 }}
             />
-            
+
             <Container size="xl">
                 {/* Debug Panel - chỉ hiện trong development */}
                 {process.env.NODE_ENV === 'development' && <DebugPanel />}
@@ -166,20 +166,20 @@ const StaffDashboardPage = () => {
                                     </ActionIcon>
                                 </Tooltip>
                             </Group>
-                            
+
                             <Group spacing="md">
                                 <Group spacing="xs">
                                     <IconCalendar size="1rem" color="var(--mantine-color-dimmed)" />
                                     <Text c="dimmed" fz="sm">
-                                        {new Date().toLocaleDateString('vi-VN', { 
-                                            weekday: 'long', 
-                                            year: 'numeric', 
-                                            month: 'long', 
-                                            day: 'numeric' 
+                                        {new Date().toLocaleDateString('vi-VN', {
+                                            weekday: 'long',
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
                                         })}
                                     </Text>
                                 </Group>
-                                
+
                                 {lastUpdated && (
                                     <>
                                         <Divider orientation="vertical" />
@@ -190,7 +190,7 @@ const StaffDashboardPage = () => {
                                 )}
                             </Group>
                         </div>
-                        
+
                         <Button
                             leftSection={<IconRefresh size="1rem" />}
                             variant="filled"
@@ -224,18 +224,18 @@ const StaffDashboardPage = () => {
 
                 {/* Stats Cards */}
                 <Title order={3} mb="lg">Thống kê tổng quan</Title>
-                <SimpleGrid 
-                    cols={4} 
+                <SimpleGrid
+                    cols={4}
                     breakpoints={[
-                        { maxWidth: 'lg', cols: 2 }, 
+                        { maxWidth: 'lg', cols: 2 },
                         { maxWidth: 'sm', cols: 1 }
                     ]}
                     mb="xl"
                 >
-                    {stats.map((stat, index) => 
-                        <StatCard 
-                            key={index} 
-                            {...stat} 
+                    {stats.map((stat, index) =>
+                        <StatCard
+                            key={index}
+                            {...stat}
                             isLoading={isLoading}
                         />
                     )}
@@ -243,19 +243,19 @@ const StaffDashboardPage = () => {
 
                 {/* Action Cards */}
                 <Title order={3} mb="lg">Chức năng chính</Title>
-                <SimpleGrid 
-                    cols={2} 
+                <SimpleGrid
+                    cols={2}
                     breakpoints={[{ maxWidth: 'sm', cols: 1 }]}
                     spacing="lg"
                     mb="xl"
                 >
-                    {actions.map((action, index) => 
+                    {actions.map((action, index) =>
                         <ActionCard key={index} {...action} />
                     )}
                 </SimpleGrid>
 
                 {/* Quick Links */}
-                <Paper withBorder p="lg" radius="md" shadow="sm">
+                {/* <Paper withBorder p="lg" radius="md" shadow="sm">
                     <Group position="apart" mb="md">
                         <Title order={4}>Liên kết nhanh</Title>
                         <Text fz="sm" c="dimmed">Truy cập nhanh các tính năng khác</Text>
@@ -290,7 +290,7 @@ const StaffDashboardPage = () => {
                             Cài đặt
                         </Button>
                     </SimpleGrid>
-                </Paper>
+                </Paper> */}
             </Container>
         </Container>
     );

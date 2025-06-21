@@ -1,3 +1,54 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  z-index: 1000;
+  transition: var(--transition-normal);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--primary-navy);
+  text-decoration: none;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+}
+
+.nav-link {
+  color: var(--text-medium);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--primary-blue);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 /* Settings page styling */
 .profile-page {
   min-height: 100vh;
@@ -116,6 +167,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -431,7 +483,7 @@ textarea.form-input {
 }
 
 /* Password form styling */
-.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+.space-y-4> :not([hidden])~ :not([hidden]) {
   margin-top: 1rem;
 }
 
@@ -560,29 +612,29 @@ textarea.form-input {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .sidebar {
     position: relative;
     top: auto;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .notifications-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .financial-info {
     grid-template-columns: 1fr;
   }
-  
+
   .invoice-stats {
     grid-template-columns: 1fr;
   }
@@ -592,21 +644,21 @@ textarea.form-input {
   .profile-page {
     padding: 1rem 0;
   }
-  
+
   .container {
     padding: 0 0.5rem;
   }
-  
+
   .card-content {
     padding: 1.5rem;
   }
-  
+
   .actions {
     flex-direction: column;
   }
-  
+
   .photo-buttons {
     flex-direction: column;
     gap: 0.75rem;
   }
-} 
+}

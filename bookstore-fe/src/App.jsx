@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
+import Books from './pages/Books';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import StaffDashboardPage from './pages/staff/StaffDashboardPage';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
@@ -29,9 +29,9 @@ function App() {
         {/* Routes sẽ quyết định component nào được render dựa trên URL */}
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/books" element={<Books />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
 
           <Route
             path="/admin/dashboard"
@@ -84,17 +84,6 @@ function App() {
               </RoleProtectedRoute>
             }
           />
-          {/* Một route ví dụ cho cả admin và staff */}
-          {/*
-      <Route 
-        path="/manage/products" 
-        element={
-          <RoleProtectedRoute allowedRoles={['admin', 'staff']}>
-            <ProductManagementPage />
-          </RoleProtectedRoute>
-        } 
-      />
-      */}
 
           {/* Thêm một route cho trang không tồn tại */}
           <Route path="*" element={<h1>404 - Trang không tìm thấy</h1>} />

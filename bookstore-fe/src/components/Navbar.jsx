@@ -36,14 +36,14 @@ const Navbar = () => {
 
     const userMenuItems = [
         { label: 'Bảng Điều Khiển', href: `/${role}/dashboard` },
-        { label: 'Sách Yêu Thích', href: '/favorites' },
-        { label: 'Đơn Hàng Của Tôi', href: '/orders' },
+        // { label: 'Sách Yêu Thích', href: '/favorites' },
+        // { label: 'Đơn Hàng Của Tôi', href: '/orders' },
     ];
 
     const navLinks = [
         { label: 'Trang Chủ', href: '/' },
         { label: 'Tất Cả Sách', href: '/books' },
-        { label: 'Về Chúng Tôi', href: '/about' },
+        // { label: 'Về Chúng Tôi', href: '/about' },
     ];
 
     // Thay thế <Header> cũ bằng <Box component="header">.

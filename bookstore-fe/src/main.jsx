@@ -5,6 +5,8 @@ import App from './App.jsx';
 import './index.css'; // File CSS chính, Tailwind directives nên ở đây
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css'; // << RẤT QUAN TRỌNG: Import file CSS này
+import '@mantine/notifications/styles.css';
+import { Notifications } from '@mantine/notifications';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -25,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* AuthProvider bọc App để cung cấp thông tin đăng nhập */}
         <AuthProvider>
           <App />
+          <Notifications />
         </AuthProvider>
       </MantineProvider>
     </BrowserRouter>

@@ -7,11 +7,11 @@ import { Container, Title, Text, Button, SimpleGrid, Card, Image, Group, Badge, 
 // --- Tạo một BookCard component riêng bằng Mantine ---
 const BookCard = ({ book }) => {
     // Logic nút thêm vào giỏ hàng
-    const handleAddToCart = () => {
-        API.cart.addToCart({ bookId: book._id, quantity: 1 })
-            .then(() => alert(`Đã thêm "${book.title}" vào giỏ hàng!`))
-            .catch(err => alert('Thêm vào giỏ hàng thất bại. Vui lòng đăng nhập.'));
-    };
+    // const handleAddToCart = () => {
+    //     API.cart.addToCart({ bookId: book._id, quantity: 1 })
+    //         .then(() => alert(`Đã thêm "${book.title}" vào giỏ hàng!`))
+    //         .catch(err => alert('Thêm vào giỏ hàng thất bại. Vui lòng đăng nhập.'));
+    // };
 
     return (
         <Card
@@ -56,14 +56,14 @@ const BookCard = ({ book }) => {
 
             <div style={{ flexGrow: 1 }} />
 
-            <Group position="apart" mt="md">
+            {/* <Group position="apart" mt="md">
                 <Text weight={700} size="xl" style={{ color: '#222' }}>
                     {new Intl.NumberFormat('vi-VN').format(book.price)} ₫
                 </Text>
                 <Button variant="light" color="blue" onClick={handleAddToCart}>
                     Thêm vào giỏ
                 </Button>
-            </Group>
+            </Group> */}
         </Card>);
 };
 
@@ -118,7 +118,7 @@ const HomePage = () => {
                 <Container size="xl" style={{ width: '100%' }}>
                     <Center>
                         <div style={{ textAlign: 'center', width: '100%' }}>
-                            <Title
+                            {/* <Title
                                 order={1}
                                 style={{
                                     fontSize: '3.5rem',
@@ -128,6 +128,17 @@ const HomePage = () => {
                                 }}
                             >
                                 Khám phá thế giới qua từng trang sách
+                            </Title> */}
+                            <Title
+                                order={1}
+                                style={{
+                                    fontSize: '3.5rem',
+                                    marginBottom: '20px',
+                                    color: '#1a237e',
+                                    textShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                                }}
+                            >
+                                TRANG QUẢN LÝ NHÀ SÁCH
                             </Title>
                             <Text
                                 size="xl"
@@ -140,7 +151,6 @@ const HomePage = () => {
                                 }}
                             >
                                 Readify - nơi những câu chuyện bắt đầu và trí tưởng tượng không có giới hạn.
-                                Tìm kiếm và sở hữu những cuốn sách yêu thích của bạn ngay hôm nay.
                             </Text>
                             <Button
                                 component={Link}

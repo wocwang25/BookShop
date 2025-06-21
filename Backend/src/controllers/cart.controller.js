@@ -46,7 +46,7 @@ const CartController = {
     async getItems(req, res) {
         try {
             const userId = req.user.id;
-            const { type } = req.body;
+            const type = req.params.type;
 
             const cartItems = await CartService.getItems(userId, type);
             res.json(cartItems);

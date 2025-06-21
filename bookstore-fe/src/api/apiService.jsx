@@ -230,6 +230,21 @@ export const reportsAPI = {
     getDebtReport: ({ month, year }) => apiClient.get('/reports/debt-report', { params: { month, year } }),
 };
 
+// ===== CATEGORIES APIs =====
+export const categoriesAPI = {
+    // Lấy tất cả thể loại
+    getAllCategories: () => apiClient.get('/category'),
+
+    // Lấy thể loại theo ID
+    getCategoryById: (id) => apiClient.get(`/category/${id}`),
+
+    // Tạo thể loại mới (Admin only)
+    createCategory: (categoryData) => apiClient.post('/category', categoryData),
+
+    // Xóa thể loại (Admin only)
+    deleteCategory: (id) => apiClient.delete(`/category/${id}`)
+};
+
 //           =================== END STAFF RELATED API ===================
 
 // Export instance chính
@@ -239,6 +254,7 @@ export default apiClient;
 export const API = {
     auth: authAPI,
     books: booksAPI,
+    categories: categoriesAPI,
     import: importAPI,
     customer: customerAPI,
     cart: cartAPI,
