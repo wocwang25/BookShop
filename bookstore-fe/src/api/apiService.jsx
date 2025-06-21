@@ -5,7 +5,7 @@ import axios from 'axios';
 const getBaseURL = () => {
     // Nếu đang ở production (deployed), sử dụng backend URL trên Render
     if (import.meta.env.PROD) {
-        return import.meta.env.VITE_API_URL || 'https://bookshop-backend-tfzk.onrender.com/api';
+        return import.meta.env.VITE_API_URL || 'https://bookshop-backend-tfzk.onrender.com/api' || 'https://bookshop-anfu.onrender.com/api';
     }
     // Nếu đang development, sử dụng localhost
     return 'http://localhost:5000/api';
