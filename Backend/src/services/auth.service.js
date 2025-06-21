@@ -66,6 +66,11 @@ const AuthService = {
             }
             next();
         };
+    },
+
+    // Alias for convenience
+    requireRole: function(role) {
+        return this.checkRole(role);
     }
 };
 

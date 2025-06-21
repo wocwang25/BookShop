@@ -71,6 +71,24 @@ export const authAPI = {
     changePassword: (data) => apiClient.put('/auth/change-password', data)
 };
 
+// ===== USER MANAGEMENT APIs (Admin only) =====
+export const userAPI = {
+    // Lấy tất cả users (Admin only)
+    getAllUsers: () => apiClient.get('/auth/users'),
+
+    // Tìm kiếm users (Admin only)
+    searchUsers: (keyword) => apiClient.get(`/auth/users/search?keyword=${encodeURIComponent(keyword)}`),
+
+    // Tạo user mới (Admin only)
+    createUser: (userData) => apiClient.post('/auth/users', userData),
+
+    // Cập nhật user (Admin only)
+    updateUser: (id, userData) => apiClient.put(`/auth/users/${id}`, userData),
+
+    // Xóa user (Admin only)
+    deleteUser: (id) => apiClient.delete(`/auth/users/${id}`)
+};
+
 // ===== BOOKS APIs =====
 export const booksAPI = {
     // Lấy tất cả sách
@@ -263,5 +281,6 @@ export const API = {
     invoice: invoiceAPI,
     payment: paymentAPI,
     reports: reportsAPI,
-    rules: rulesAPI
+    rules: rulesAPI,
+    user: userAPI
 };

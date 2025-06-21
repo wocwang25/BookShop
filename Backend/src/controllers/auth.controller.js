@@ -294,6 +294,227 @@ const AuthController = {
                 message: error.message
             });
         }
+    },
+
+    // Lấy tất cả users (Admin only)
+    getAllUsers: async (req, res) => {
+        try {
+            const users = await User.find()
+                .populate('customerProfile', 'name email phone address debt')
+                .select('-password')
+                .sort({ createdAt: -1 });
+
+            res.status(200).json({
+                success: true,
+                users: users,
+                count: users.length
+            });
+        } catch (error) {
+            console.error('Get all users error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi lấy danh sách người dùng',
+                error: error.message
+            });
+        }
+    },
+
+    // Cập nhật thông tin user (Admin only)
+    updateUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name, email, role } = req.body;
+
+            // Kiểm tra user tồn tại
+            const user = await User.findById(id);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Không tìm thấy người dùng'
+                });
+            }
+
+            // Cập nhật user
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                { name, email, role },
+                { new: true }
+            ).populate('customerProfile', 'name email phone address debt').select('-password');
+
+            // Nếu có customerProfile, cập nhật thông tin trong Customer
+            if (user.customerProfile) {
+                await Customer.findByIdAndUpdate(
+                    user.customerProfile,
+                    { name, email },
+                    { new: true }
+                );
+            }
+
+            res.status(200).json({
+                success: true,
+                message: 'Cập nhật thông tin người dùng thành công',
+                user: updatedUser
+            });
+        } catch (error) {
+            console.error('Update user error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi cập nhật thông tin người dùng',
+                error: error.message
+            });
+        }
+    },
+
+    // Xóa user (Admin only)
+    deleteUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Kiểm tra user tồn tại
+            const user = await User.findById(id);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Không tìm thấy người dùng'
+                });
+            }
+
+            // Không cho phép xóa admin (có thể bỏ qua nếu muốn)
+            if (user.role === 'admin') {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Không thể xóa tài khoản admin'
+                });
+            }
+
+            await User.findByIdAndDelete(id);
+
+            res.status(200).json({
+                success: true,
+                message: 'Xóa người dùng thành công'
+            });
+        } catch (error) {
+            console.error('Delete user error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi xóa người dùng',
+                error: error.message
+            });
+        }
+    },
+
+    // Tạo user mới (Admin only)
+    createUser: async (req, res) => {
+        try {
+            const { name, username, email, password, role } = req.body;
+
+            if (!name || !username || !email || !password) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Vui lòng điền đầy đủ thông tin"
+                });
+            }
+
+            const session = await mongoose.startSession();
+            session.startTransaction();
+
+            try {
+                const existingUser = await User.findOne({
+                    $or: [{ username }, { email }]
+                }).session(session);
+
+                if (existingUser) {
+                    throw new Error("Tên đăng nhập hoặc Email đã tồn tại");
+                }
+
+                let customerProfile = null;
+                // Chỉ tạo customer profile nếu role là customer
+                if (role === 'customer') {
+                    customerProfile = new Customer({
+                        name,
+                        email
+                    });
+                    await customerProfile.save({ session });
+                }
+
+                const user = new User({
+                    name,
+                    username,
+                    email,
+                    password,
+                    role: role || 'customer',
+                    customerProfile: customerProfile?._id
+                });
+                await user.save({ session });
+
+                await session.commitTransaction();
+
+                const userResponse = await User.findById(user._id)
+                    .populate('customerProfile', 'name email phone address debt')
+                    .select('-password');
+
+                res.status(201).json({
+                    success: true,
+                    message: "Tạo người dùng thành công",
+                    user: userResponse
+                });
+
+            } catch (error) {
+                await session.abortTransaction();
+                throw error;
+            } finally {
+                session.endSession();
+            }
+
+        } catch (error) {
+            console.error("Create user error:", error);
+            res.status(400).json({
+                success: false,
+                message: error.message || "Đã xảy ra lỗi khi tạo người dùng"
+            });
+        }
+    },
+
+    // Tìm kiếm users (Admin only)
+    searchUsers: async (req, res) => {
+        try {
+            const { keyword } = req.query;
+            
+            if (!keyword || keyword.trim().length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Từ khóa tìm kiếm không được để trống'
+                });
+            }
+
+            const searchRegex = new RegExp(keyword.trim(), 'i');
+            
+            const users = await User.find({
+                $or: [
+                    { name: searchRegex },
+                    { username: searchRegex },
+                    { email: searchRegex }
+                ]
+            })
+            .populate('customerProfile', 'name email phone address debt')
+            .select('-password')
+            .sort({ createdAt: -1 })
+            .limit(50); // Giới hạn 50 kết quả
+
+            res.status(200).json({
+                success: true,
+                users: users,
+                count: users.length,
+                keyword: keyword.trim()
+            });
+        } catch (error) {
+            console.error('Search users error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi khi tìm kiếm người dùng',
+                error: error.message
+            });
+        }
     }
 }
 

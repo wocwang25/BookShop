@@ -313,6 +313,140 @@ const RuleForm = ({ rule, onSave, onCancel }) => {
     );
 };
 
+// --- UserForm Component ---
+const UserForm = ({ user, onSave, onCancel }) => {
+    const form = useForm({
+        initialValues: {
+            name: user?.name || '',
+            username: user?.username || '',
+            email: user?.email || '',
+            role: user?.role || 'customer',
+            password: '',
+        },
+        validate: {
+            name: (value) => (value.trim().length < 2 ? 'Tên phải có ít nhất 2 ký tự' : null),
+            username: (value) => (value.trim().length < 3 ? 'Tên đăng nhập phải có ít nhất 3 ký tự' : null),
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email không hợp lệ'),
+            password: (value) => {
+                // Chỉ validate password khi tạo user mới
+                if (!user && value.length < 6) {
+                    return 'Mật khẩu phải có ít nhất 6 ký tự';
+                }
+                return null;
+            },
+        },
+    });
+
+    const handleSubmit = (values) => {
+        const formData = {
+            name: values.name.trim(),
+            username: values.username.trim(),
+            email: values.email.trim(),
+            role: values.role,
+        };
+
+        // Chỉ gửi password khi tạo user mới
+        if (!user && values.password) {
+            formData.password = values.password;
+        }
+
+        onSave(formData);
+    };
+
+    return (
+        <div style={{ padding: '1rem' }}>
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                <SimpleGrid cols={1} spacing="lg">
+                    <TextInput
+                        label="👤 Họ và tên"
+                        placeholder="Nhập họ và tên"
+                        {...form.getInputProps('name')}
+                        required
+                        size="md"
+                        radius="md"
+                    />
+
+                    <SimpleGrid cols={2} spacing="md">
+                        <TextInput
+                            label="🔑 Tên đăng nhập"
+                            placeholder="Nhập tên đăng nhập"
+                            {...form.getInputProps('username')}
+                            required
+                            size="md"
+                            radius="md"
+                            disabled={!!user} // Không cho sửa username khi edit
+                            description={user ? "Không thể thay đổi tên đăng nhập" : ""}
+                        />
+                        <TextInput
+                            label="📧 Email"
+                            placeholder="Nhập email"
+                            {...form.getInputProps('email')}
+                            required
+                            size="md"
+                            radius="md"
+                        />
+                    </SimpleGrid>
+
+                    <Select
+                        label="🏷️ Vai trò"
+                        placeholder="Chọn vai trò"
+                        data={[
+                            { value: 'customer', label: '👥 Khách hàng' },
+                            { value: 'staff', label: '👨‍💼 Nhân viên' },
+                            { value: 'admin', label: '👑 Quản trị viên' }
+                        ]}
+                        {...form.getInputProps('role')}
+                        required
+                        size="md"
+                        radius="md"
+                        withinPortal
+                        dropdownPosition="bottom"
+                        portalProps={{ zIndex: 10001 }}
+                        comboboxProps={{
+                            zIndex: 10001,
+                            withinPortal: true,
+                            dropdownPadding: 4,
+                            position: 'bottom-start'
+                        }}
+                    />
+
+                    {!user && (
+                        <TextInput
+                            label="🔒 Mật khẩu"
+                            placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
+                            type="password"
+                            {...form.getInputProps('password')}
+                            required
+                            size="md"
+                            radius="md"
+                            description="Mật khẩu chỉ được đặt khi tạo user mới"
+                        />
+                    )}
+                </SimpleGrid>
+                <Group justify="flex-end" mt="xl" gap="md">
+                    <Button
+                        variant="default"
+                        onClick={onCancel}
+                        size="md"
+                        radius="md"
+                    >
+                        Hủy
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="gradient"
+                        gradient={{ from: 'blue', to: 'purple' }}
+                        size="md"
+                        radius="md"
+                    >
+                        💾 {user ? 'Cập nhật' : 'Tạo'} Người dùng
+                    </Button>
+                </Group>
+            </form>
+        </div>
+    );
+};
+
 // --- Component Trang Dashboard Chính ---
 const AdminDashboardPage = () => {
     // States
@@ -346,6 +480,19 @@ const AdminDashboardPage = () => {
     const [isDeleteRuleModalOpen, { open: openDeleteRuleModal, close: closeDeleteRuleModal }] = useDisclosure(false);
     const [ruleToDelete, setRuleToDelete] = useState(null);
     const [showRules, setShowRules] = useState(false);
+
+    // State cho User Management
+    const [users, setUsers] = useState([]);
+    const [isUserModalOpen, { open: openUserModal, close: closeUserModal }] = useDisclosure(false);
+    const [editingUser, setEditingUser] = useState(null);
+    const [isDeleteUserModalOpen, { open: openDeleteUserModal, close: closeDeleteUserModal }] = useDisclosure(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [showUsers, setShowUsers] = useState(false);
+
+    // State cho User Search
+    const [userSearchQuery, setUserSearchQuery] = useState('');
+    const [userSearchResult, setUserSearchResult] = useState([]);
+    const [userSearchTotal, setUserSearchTotal] = useState(0);
 
     // Theme
     const theme = useMantineTheme();
@@ -395,10 +542,21 @@ const AdminDashboardPage = () => {
         }
     }, [showNotification]);
 
+    // Hàm lấy danh sách users
+    const fetchUsers = useCallback(async () => {
+        try {
+            const response = await API.user.getAllUsers();
+            setUsers(response.data.users || []);
+        } catch (error) {
+            showNotification('Không thể tải danh sách người dùng', 'red');
+        }
+    }, [showNotification]);
+
     useEffect(() => {
         fetchDashboardData();
         fetchRules();
-    }, [fetchDashboardData, fetchRules]);
+        fetchUsers();
+    }, [fetchDashboardData, fetchRules, fetchUsers]);
 
     // Hàm mở form thêm rule
     const handleAddNewRule = () => {
@@ -618,6 +776,88 @@ const AdminDashboardPage = () => {
         }
     };
 
+    // --- User Management Handlers ---
+    // Hàm mở form thêm user
+    const handleAddNewUser = () => {
+        setEditingUser(null);
+        openUserModal();
+    };
+
+    // Hàm mở form sửa user
+    const handleEditUser = (user) => {
+        setEditingUser(user);
+        openUserModal();
+    };
+
+    // Hàm xử lý lưu user
+    const handleSaveUser = async (formData) => {
+        try {
+            if (editingUser) {
+                await API.user.updateUser(editingUser._id, formData);
+                showNotification('Cập nhật người dùng thành công!', 'teal');
+            } else {
+                await API.user.createUser(formData);
+                showNotification('Thêm người dùng mới thành công!', 'teal');
+            }
+            closeUserModal();
+            fetchUsers();
+            // Refresh search results if there's an active search
+            if (userSearchQuery) {
+                handleUserSearch(new Event('submit'));
+            }
+        } catch (error) {
+            showNotification(
+                error.response?.data?.message || 'Có lỗi xảy ra',
+                'red'
+            );
+        }
+    };
+
+    // Hàm xử lý xóa user
+    const confirmDeleteUser = (user) => {
+        setUserToDelete(user);
+        openDeleteUserModal();
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+
+        try {
+            await API.user.deleteUser(userToDelete._id);
+            showNotification('Xóa người dùng thành công!', 'teal');
+            closeDeleteUserModal();
+            await fetchUsers();
+            // Refresh search results if there's an active search
+            if (userSearchQuery) {
+                handleUserSearch(new Event('submit'));
+            }
+        } catch (error) {
+            showNotification(
+                error.response?.data?.message || 'Lỗi khi xóa người dùng',
+                'red'
+            );
+        }
+    };
+
+    // Hàm tìm kiếm user
+    const handleUserSearch = async (event) => {
+        event.preventDefault();
+        if (!userSearchQuery.trim()) {
+            setUserSearchResult([]);
+            setUserSearchTotal(0);
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const response = await API.user.searchUsers(userSearchQuery);
+            setUserSearchResult(response.data.users || []);
+            setUserSearchTotal(response.data.count || 0);
+        } catch (error) {
+            showNotification('Lỗi khi tìm kiếm người dùng', 'red');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Component cho các thẻ thống kê
     const StatCard = ({ title, value, icon, color }) => (
@@ -835,6 +1075,157 @@ const AdminDashboardPage = () => {
         );
     };
 
+    // Component để render bảng users
+    const UsersTable = ({ data, title }) => {
+        const getRoleBadge = (role) => {
+            const roleConfig = {
+                admin: { color: 'red', label: '👑 Admin' },
+                staff: { color: 'blue', label: '👨‍💼 Staff' },
+                customer: { color: 'green', label: '👥 Customer' }
+            };
+            const config = roleConfig[role] || { color: 'gray', label: role };
+            return (
+                <Badge color={config.color} variant="gradient" size="lg">
+                    {config.label}
+                </Badge>
+            );
+        };
+
+        const formatDate = (dateString) => {
+            return new Date(dateString).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        return (
+            <Paper
+                withBorder
+                p="xl"
+                radius="lg"
+                shadow="sm"
+                style={{
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                    width: '100%',
+                    height: 'fit-content'
+                }}
+            >
+                <Title order={3} mb="xl" ta="center" c="dark">
+                    {title}
+                </Title>
+                <div style={{
+                    maxHeight: '500px',
+                    overflowY: 'auto',
+                    borderRadius: '12px',
+                    border: '1px solid #e9ecef'
+                }}>
+                    <Table
+                        striped
+                        highlightOnHover
+                        withTableBorder
+                        style={{
+                            borderRadius: '12px',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <Table.Thead style={{ backgroundColor: '#f1f3f4' }}>
+                            <Table.Tr>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>👤 Tên</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>🔑 Username</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>📧 Email</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>🏷️ Vai trò</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap' }}>📅 Tạo lúc</Table.Th>
+                                <Table.Th style={{ fontWeight: 600, color: '#495057', whiteSpace: 'nowrap', textAlign: 'center' }}>⚙️ Hành động</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                            {data.length > 0 ? (
+                                data.map((user, index) => (
+                                    <Table.Tr key={user._id || index} style={{ transition: 'background-color 0.2s ease' }}>
+                                        <Table.Td>
+                                            <Text fw={500} size="sm">
+                                                {user.name}
+                                            </Text>
+                                            {user.customerProfile?.debt > 0 && (
+                                                <Text size="xs" c="red">
+                                                    Nợ: {user.customerProfile.debt?.toLocaleString()}₫
+                                                </Text>
+                                            )}
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Text size="sm" c="dark">
+                                                {user.username}
+                                            </Text>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Text size="sm" c="dark">
+                                                {user.email}
+                                            </Text>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            {getRoleBadge(user.role)}
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Text size="xs" c="dimmed">
+                                                {formatDate(user.createdAt)}
+                                            </Text>
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <Group gap="xs" justify="center" wrap="nowrap">
+                                                <ActionIcon
+                                                    color="blue"
+                                                    variant="gradient"
+                                                    gradient={{ from: 'blue', to: 'cyan' }}
+                                                    onClick={() => handleEditUser(user)}
+                                                    radius="md"
+                                                    size="lg"
+                                                >
+                                                    <IconPencil size="1rem" />
+                                                </ActionIcon>
+                                                {user.role !== 'admin' && (
+                                                    <ActionIcon
+                                                        color="red"
+                                                        variant="gradient"
+                                                        gradient={{ from: 'red', to: 'pink' }}
+                                                        onClick={() => confirmDeleteUser(user)}
+                                                        radius="md"
+                                                        size="lg"
+                                                    >
+                                                        <IconTrash size="1rem" />
+                                                    </ActionIcon>
+                                                )}
+                                            </Group>
+                                        </Table.Td>
+                                    </Table.Tr>
+                                ))
+                            ) : (
+                                <Table.Tr>
+                                    <Table.Td colSpan={6}>
+                                        <div style={{
+                                            textAlign: 'center',
+                                            padding: '2rem',
+                                            color: '#868e96'
+                                        }}>
+                                            <Text size="lg" c="dimmed" mb="sm">
+                                                👥 Chưa có người dùng nào
+                                            </Text>
+                                            <Text size="sm" c="dimmed">
+                                                Thêm người dùng đầu tiên cho hệ thống
+                                            </Text>
+                                        </div>
+                                    </Table.Td>
+                                </Table.Tr>
+                            )}
+                        </Table.Tbody>
+                    </Table>
+                </div>
+            </Paper>
+        );
+    };
+
     // Component để render bảng sách
     const BooksTable = ({ data, title }) => (
         <Paper
@@ -1030,6 +1421,14 @@ const AdminDashboardPage = () => {
                         >
                             {showRules ? 'Ẩn' : 'Hiện'} Qui Định
                         </Button>
+                        <Button
+                            leftSection={<IconUser size="1rem" />}
+                            onClick={() => setShowUsers(!showUsers)}
+                            gradient={{ from: 'orange', to: 'red' }}
+                            variant="gradient"
+                        >
+                            {showUsers ? 'Ẩn' : 'Hiện'} Người Dùng
+                        </Button>
                     </Group>
                 </div>
 
@@ -1089,6 +1488,99 @@ const AdminDashboardPage = () => {
                         </div>
                         <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto' }}>
                             <RulesTable data={rules} title="📋 Danh Sách Qui Định" />
+                        </div>
+                    </div>
+                )}
+
+                {/* User Management Section */}
+                {showUsers && (
+                    <div style={{ marginBottom: '2rem' }}>
+                        <Title order={3} ta="center" mb="lg" c="dark">
+                            👥 Quản Lý Người Dùng
+                        </Title>
+                        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                            <Button
+                                leftSection={<IconPlus size="1rem" />}
+                                onClick={handleAddNewUser}
+                                gradient={{ from: 'orange', to: 'red' }}
+                                variant="gradient"
+                                radius="md"
+                            >
+                                Thêm Người Dùng Mới
+                            </Button>
+                        </div>
+
+                        {/* Thanh tìm kiếm user */}
+                        <div style={{ width: '100%', maxWidth: 600, margin: '0 auto', marginBottom: '2rem' }}>
+                            <Paper
+                                withBorder
+                                p="lg"
+                                radius="lg"
+                                shadow="sm"
+                                style={{
+                                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                                }}
+                            >
+                                <form onSubmit={handleUserSearch}>
+                                    <TextInput
+                                        label="🔍 Tìm kiếm người dùng"
+                                        placeholder="Nhập tên, username hoặc email..."
+                                        value={userSearchQuery}
+                                        onChange={(event) => setUserSearchQuery(event.currentTarget.value)}
+                                        size="md"
+                                        radius="md"
+                                        rightSection={
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', height: '100%' }}>
+                                                {userSearchQuery && (
+                                                    <ActionIcon
+                                                        variant="subtle"
+                                                        color="gray"
+                                                        onClick={() => {
+                                                            setUserSearchQuery('');
+                                                            setUserSearchResult([]);
+                                                            setUserSearchTotal(0);
+                                                        }}
+                                                        size="sm"
+                                                    >
+                                                        <IconX size="0.9rem" />
+                                                    </ActionIcon>
+                                                )}
+                                                <ActionIcon
+                                                    type="submit"
+                                                    variant="gradient"
+                                                    gradient={{ from: 'orange', to: 'red' }}
+                                                    size="lg"
+                                                    loading={isLoading}
+                                                >
+                                                    <IconSearch size="1.1rem" />
+                                                </ActionIcon>
+                                            </div>
+                                        }
+                                        rightSectionWidth={userSearchQuery ? 80 : 50}
+                                        styles={{
+                                            input: {
+                                                borderRadius: '8px',
+                                                border: '2px solid #e9ecef',
+                                                transition: 'border-color 0.2s ease',
+                                                '&:focus': {
+                                                    borderColor: '#fd7e14'
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </form>
+                            </Paper>
+                        </div>
+
+                        <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto' }}>
+                            {userSearchQuery ? (
+                                <UsersTable
+                                    data={userSearchResult}
+                                    title={`🔎 Kết quả tìm kiếm cho "${userSearchQuery}" (${userSearchTotal} kết quả)`}
+                                />
+                            ) : (
+                                <UsersTable data={users} title="👤 Danh Sách Người Dùng" />
+                            )}
                         </div>
                     </div>
                 )}
@@ -1509,6 +2001,143 @@ const AdminDashboardPage = () => {
                         onSave={handleSaveRule}
                         onCancel={closeRuleModal}
                     />
+                </Modal>
+
+                {/* Modal để Thêm/Sửa User */}
+                <Modal
+                    opened={isUserModalOpen}
+                    onClose={closeUserModal}
+                    title={editingUser ? '✏️ Chỉnh Sửa Người Dùng' : '➕ Thêm Người Dùng Mới'}
+                    centered
+                    size="lg"
+                    radius="lg"
+                    shadow="xl"
+                    zIndex={9999}
+                    overlayProps={{
+                        backgroundOpacity: 0.75,
+                        blur: 1,
+                        zIndex: 9998
+                    }}
+                    styles={{
+                        root: {
+                            zIndex: 9999,
+                        },
+                        inner: {
+                            zIndex: 9999,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                        },
+                        modal: {
+                            backgroundColor: 'white',
+                            zIndex: 9999,
+                            position: 'relative',
+                            maxHeight: '90vh',
+                            overflow: 'auto'
+                        },
+                        header: {
+                            backgroundColor: '#f8f9fa',
+                            borderBottom: '1px solid #dee2e6',
+                            padding: '1rem 1.5rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600
+                        },
+                        overlay: {
+                            zIndex: 9998,
+                            backgroundColor: 'rgba(0, 0, 0, 0.75) !important'
+                        }
+                    }}
+                    portalProps={{
+                        target: document.body
+                    }}
+                >
+                    <UserForm
+                        key={editingUser?._id || 'new-user-form'}
+                        user={editingUser}
+                        onSave={handleSaveUser}
+                        onCancel={closeUserModal}
+                    />
+                </Modal>
+
+                {/* Modal Xác Nhận Xóa User */}
+                <Modal
+                    opened={isDeleteUserModalOpen}
+                    onClose={closeDeleteUserModal}
+                    title="⚠️ Xác Nhận Xóa Người Dùng"
+                    centered
+                    radius="lg"
+                    shadow="xl"
+                    zIndex={10000}
+                    overlayProps={{
+                        backgroundOpacity: 0.55,
+                        blur: 3,
+                        zIndex: 9999
+                    }}
+                    styles={{
+                        root: {
+                            zIndex: 10000,
+                        },
+                        inner: {
+                            zIndex: 10000,
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                        },
+                        modal: {
+                            backgroundColor: 'white',
+                            zIndex: 10000,
+                            position: 'relative',
+                            maxHeight: '90vh',
+                            overflow: 'auto',
+                            minWidth: '400px'
+                        },
+                        header: {
+                            backgroundColor: '#f8f9fa',
+                            borderBottom: '1px solid #dee2e6',
+                            padding: '1rem 1.5rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600
+                        },
+                        overlay: {
+                            zIndex: 9999,
+                            backgroundColor: 'rgba(0, 0, 0, 0.55) !important'
+                        }
+                    }}
+                    portalProps={{
+                        target: document.body
+                    }}
+                >
+                    <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '8px' }}>
+                        <Text size="md" mb="lg">
+                            Bạn có chắc chắn muốn xóa người dùng <strong>"{userToDelete?.name}"</strong> không?
+                            <br />
+                            <Text span c="dimmed" size="sm" mt="xs">
+                                Username: {userToDelete?.username} | Email: {userToDelete?.email}
+                            </Text>
+                            <br />
+                            <Text span c="red" size="sm" mt="xs">
+                                Hành động này không thể hoàn tác.
+                            </Text>
+                        </Text>
+                    </div>
+                    <Group justify="flex-end" gap="md">
+                        <Button variant="default" onClick={closeDeleteUserModal} radius="md">
+                            Hủy
+                        </Button>
+                        <Button
+                            color="red"
+                            onClick={handleDeleteUser}
+                            radius="md"
+                            variant="gradient"
+                            gradient={{ from: 'red', to: 'pink' }}
+                        >
+                            Xác nhận Xóa
+                        </Button>
+                    </Group>
                 </Modal>
 
                 {/* Modal Xác Nhận Xóa Rule */}
