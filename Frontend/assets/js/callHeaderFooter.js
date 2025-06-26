@@ -861,6 +861,533 @@ window.addToCartFromExternal = addToCartFromExternal;
 window.refreshCart = refreshCart;
 window.debugCart = debugCart;
 
+// ==================== WISHLIST LOGIC ====================
+
+function openWishlistPanel() {
+  const wishlistPanel = document.getElementById('wishlistPanel');
+  if (wishlistPanel) {
+    wishlistPanel.classList.remove('hidden');
+    setTimeout(() => {
+      wishlistPanel.classList.remove('translate-x-full');
+    }, 10);
+  }
+}
+
+function closeWishlistPanel() {
+  const wishlistPanel = document.getElementById('wishlistPanel');
+  if (wishlistPanel) {
+    wishlistPanel.classList.add('translate-x-full');
+    setTimeout(() => {
+      wishlistPanel.classList.add('hidden');
+    }, 300);
+  }
+}
+
+// Wishlist logic
+let wishlist = [];
+let isWishlistLoading = false;
+
+// Load wishlist from API
+async function loadWishlist() {
+  if (!window.ApiService) {
+    console.warn('⚠️ [Wishlist] ApiService not available');
+    isWishlistLoading = false;
+    wishlist = [];
+    renderWishlist();
+    return;
+  }
+
+  if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+    console.log('❤️ [Wishlist] User not authenticated, wishlist will be empty');
+    isWishlistLoading = false;
+    wishlist = [];
+    renderWishlist();
+    return;
+  }
+
+  try {
+    isWishlistLoading = true;
+    renderWishlist(); // Show loading state immediately
+    console.log('❤️ [Wishlist] Loading wishlist from API...');
+    
+    const response = await window.ApiService.getFavourites();
+    console.log('❤️ [Wishlist] Raw API response:', JSON.stringify(response, null, 2));
+
+    // Reset wishlist first
+    wishlist = [];
+
+    // Check for different response formats
+    if (response && Array.isArray(response)) {
+      // Format: [...] - Direct array response
+      console.log('❤️ [Wishlist] Direct array format detected, length:', response.length);
+      wishlist = response.map(item => {
+        try {
+          return transformWishlistItem(item);
+        } catch (error) {
+          console.error('❌ [Wishlist] Error transforming item:', item, error);
+          return null;
+        }
+      }).filter(item => item !== null);
+      console.log('✅ [Wishlist] Wishlist loaded (direct array):', wishlist.length, 'items');
+    } else if (response && response.success && response.favourites) {
+      console.log('❤️ [Wishlist] Using success format, favourites:', response.favourites);
+      
+      if (Array.isArray(response.favourites)) {
+        wishlist = response.favourites.map(item => {
+          try {
+            return transformWishlistItem(item);
+          } catch (error) {
+            console.error('❌ [Wishlist] Error transforming item:', item, error);
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log('✅ [Wishlist] Wishlist loaded (success.favourites):', wishlist.length, 'items');
+      }
+    } else if (response && response.favourites && Array.isArray(response.favourites)) {
+      console.log('❤️ [Wishlist] Using direct favourites format');
+      wishlist = response.favourites.map(item => {
+        try {
+          return transformWishlistItem(item);
+        } catch (error) {
+          console.error('❌ [Wishlist] Error transforming item:', item, error);
+          return null;
+        }
+      }).filter(item => item !== null);
+      console.log('✅ [Wishlist] Wishlist loaded (favourites array):', wishlist.length, 'items');
+    } else {
+      console.log('📦 [Wishlist] No items in wishlist or unrecognized format');
+      wishlist = [];
+    }
+
+  } catch (error) {
+    console.error('❌ [Wishlist] Error loading wishlist:', error);
+    wishlist = [];
+  } finally {
+    isWishlistLoading = false;
+    renderWishlist();
+  }
+}
+
+// Transform wishlist item to consistent format
+function transformWishlistItem(item) {
+  console.log('🔄 [Wishlist] Transforming item:', JSON.stringify(item, null, 2));
+  
+  // Handle different item structures - similar to cart but for books
+  let book, bookId, title, author, price;
+  
+  if (item.book && typeof item.book === 'object') {
+    // Item has book object: { book: {...} }
+    book = item.book;
+    bookId = book._id || book.id;
+    title = book.title || book.name;
+    author = book.author?.name || book.author;
+    price = book.price;
+  } else if (item.book && typeof item.book === 'string') {
+    // Item has book ID: { book: "id_string" }
+    bookId = item.book;
+    title = `Book ${bookId.slice(-6)}`; // Use last 6 chars of ID as temp title
+    author = 'Unknown Author';
+    price = 0;
+    book = { _id: bookId }; // Create minimal book object for image handling
+  } else {
+    // Item is the book itself: { _id, title, author, price }
+    book = item;
+    bookId = item._id || item.id || item.bookId;
+    title = item.title || item.name;
+    author = item.author?.name || item.author;
+    price = item.price;
+  }
+  
+  // Validate required fields
+  if (!bookId) {
+    console.warn('⚠️ [Wishlist] Item missing ID:', item);
+    bookId = 'unknown_' + Date.now();
+  }
+  
+  const transformed = {
+    id: bookId,
+    name: title || 'Untitled Book',
+    author: author || 'Unknown Author',
+    price: parseInt(price) || 0,
+    image: getBookImageForWishlist(book)
+  };
+  
+  console.log('✅ [Wishlist] Transformed:', transformed);
+  return transformed;
+}
+
+// Get book image for wishlist display
+function getBookImageForWishlist(book) {
+  if (!book) return getDefaultWishlistImage();
+  
+  if (!book.imageUrl || book.imageUrl.trim() === '') {
+    return getDefaultWishlistImage();
+  }
+  
+  return convertGoogleDriveLinkForWishlist(book.imageUrl);
+}
+
+function convertGoogleDriveLinkForWishlist(url) {
+  if (!url) return getDefaultWishlistImage();
+
+  if (url.includes('drive.google.com/uc?')) {
+    return url;
+  }
+
+  const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const match = url.match(driveRegex);
+
+  if (match && match[1]) {
+    const fileId = match[1];
+    return `https://drive.google.com/uc?id=${fileId}&export=view`;
+  }
+
+  return url;
+}
+
+function getDefaultWishlistImage() {
+  return '../assets/images/default_image.jpg';
+}
+
+// Render wishlist items
+function renderWishlist() {
+  const wishlistItems = document.getElementById('wishlistItems');
+  const wishlistBadge = document.querySelector('.wishlist-badge');
+  const wishlistCount = document.getElementById('wishlistCount');
+  
+  if (!wishlistItems) return;
+
+  // Show loading state
+  if (isWishlistLoading) {
+    wishlistItems.innerHTML = `
+      <div class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+        <span class="ml-3 text-gray-600">Đang tải sách yêu thích...</span>
+      </div>
+    `;
+    return;
+  }
+
+  wishlistItems.innerHTML = '';
+  let totalItems = 0;
+
+  if (wishlist.length === 0) {
+    wishlistItems.innerHTML = `
+      <div class="text-center py-8">
+        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+          <i class="ri-heart-line text-2xl text-gray-400"></i>
+        </div>
+        <div class="text-gray-500 mb-2">Chưa có sách yêu thích</div>
+        <div class="text-sm text-gray-400">Thêm sách vào danh sách yêu thích để xem tại đây</div>
+      </div>
+    `;
+    
+    // Update badge and count
+    if (wishlistBadge) wishlistBadge.removeAttribute('data-count');
+    if (wishlistCount) wishlistCount.textContent = '0 sách';
+    
+    // Hide view all button when wishlist is empty
+    const viewBtn = document.querySelector('.wishlist-view-btn');
+    if (viewBtn) viewBtn.style.display = 'none';
+    
+    return;
+  }
+
+  // Show view all button when wishlist has items
+  const viewBtn = document.querySelector('.wishlist-view-btn');
+  if (viewBtn) viewBtn.style.display = 'block';
+
+  wishlist.forEach((item, idx) => {
+    totalItems += 1;
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.className = "flex items-start gap-3 p-3 bg-gray-50 rounded-lg mb-3 wishlist-item";
+    itemDiv.setAttribute('data-book-id', item.id);
+    
+    itemDiv.innerHTML = `
+      <img src="${item.image}" alt="${escapeHtmlForWishlist(item.name)}" 
+           class="w-16 h-20 object-cover rounded border border-gray-200 flex-shrink-0"
+           onerror="this.src='${getDefaultWishlistImage()}'"/>
+      <div class="flex-1 min-w-0">
+        <h4 class="font-medium text-gray-800 text-sm line-clamp-2 mb-1">${escapeHtmlForWishlist(item.name)}</h4>
+        <p class="text-xs text-gray-500 mb-2">${escapeHtmlForWishlist(item.author)}</p>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-red-500 font-semibold text-sm">${formatVND(item.price)}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <button class="px-3 py-1.5 bg-primarynavy text-white rounded text-xs font-medium hover:bg-blue-700 transition" 
+                  data-action="add-to-cart" data-idx="${idx}" data-book-id="${item.id}">
+            <i class="ri-shopping-cart-line mr-1"></i>Thêm vào giỏ
+          </button>
+          <button class="text-red-500 hover:text-red-700 transition text-xs font-medium" 
+                  data-action="remove" data-idx="${idx}" data-book-id="${item.id}" title="Xóa khỏi yêu thích">
+            <i class="ri-heart-fill"></i>
+          </button>
+        </div>
+      </div>
+    `;
+    
+    wishlistItems.appendChild(itemDiv);
+  });
+
+  // Update count and badge
+  if (wishlistCount) wishlistCount.textContent = `${totalItems} sách`;
+  if (wishlistBadge) {
+    wishlistBadge.setAttribute('data-count', totalItems);
+    // Update wishlist badge style
+    if (totalItems > 0) {
+      wishlistBadge.classList.add('wishlist-has-items');
+    } else {
+      wishlistBadge.classList.remove('wishlist-has-items');
+    }
+  }
+
+  console.log('❤️ [Wishlist] Rendered', wishlist.length, 'items');
+}
+
+// Escape HTML for wishlist display
+function escapeHtmlForWishlist(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Handle wishlist events (remove, add to cart)
+async function wishlistEventHandler(e) {
+  const target = e.target.closest('[data-action]');
+  if (!target) return;
+
+  const action = target.getAttribute('data-action');
+  const idx = parseInt(target.getAttribute('data-idx'));
+  const bookId = target.getAttribute('data-book-id');
+
+  // Prevent multiple clicks
+  if (target.disabled || isWishlistLoading) return;
+  target.disabled = true;
+
+  try {
+    console.log('❤️ [Wishlist] Action:', action, 'for book:', bookId, 'index:', idx);
+
+    if (action === 'remove') {
+      console.log('🗑️ [Wishlist] Removing item:', bookId);
+      await removeFromWishlist(bookId);
+    } else if (action === 'add-to-cart') {
+      console.log('🛒 [Wishlist] Adding to cart:', bookId);
+      const success = await addToCartFromExternal(bookId, 1, 'buy');
+      if (success) {
+        showWishlistSuccess('Đã thêm sách vào giỏ hàng');
+      }
+    } else {
+      console.warn('⚠️ [Wishlist] Unknown action:', action);
+    }
+  } catch (error) {
+    console.error('❌ [Wishlist] Error handling wishlist action:', error);
+    showWishlistError('Có lỗi xảy ra: ' + (error.message || 'Unknown error'));
+  } finally {
+    target.disabled = false;
+  }
+}
+
+// Remove item from wishlist via API
+async function removeFromWishlist(bookId) {
+  if (!window.ApiService || !window.AuthManager?.isAuthenticated()) {
+    throw new Error('Cần đăng nhập để xóa sách yêu thích');
+  }
+
+  try {
+    console.log('❤️ [Wishlist] Removing book from wishlist:', bookId);
+    
+    // Find item in local wishlist
+    const itemIndex = wishlist.findIndex(item => item.id === bookId);
+    if (itemIndex === -1) {
+      throw new Error('Sách không tồn tại trong danh sách yêu thích');
+    }
+
+    console.log('🗑️ [Wishlist] Calling removeFromFavourites API for book:', bookId);
+    const response = await window.ApiService.removeFromFavourites(bookId);
+    
+    if (response.success || response.message || response.msg) {
+      // Remove from local wishlist immediately for better UX
+      wishlist.splice(itemIndex, 1);
+      renderWishlist();
+      
+      // Reload wishlist to ensure consistency
+      setTimeout(loadWishlist, 100);
+      
+      showWishlistSuccess('Đã xóa sách khỏi danh sách yêu thích');
+      console.log('✅ [Wishlist] Item removed successfully');
+    } else {
+      console.error('❌ [Wishlist] Unexpected response format:', response);
+      
+      // Last resort: reload wishlist to check if item was actually removed
+      console.log('🔄 [Wishlist] Reloading wishlist to verify removal...');
+      await loadWishlist();
+      
+      // Check if item is still in wishlist after reload
+      const stillExists = wishlist.find(item => item.id === bookId);
+      if (!stillExists) {
+        showWishlistSuccess('Đã xóa sách khỏi danh sách yêu thích');
+        console.log('✅ [Wishlist] Item was removed despite unclear response');
+      } else {
+        throw new Error('Không thể xóa sách khỏi danh sách yêu thích');
+      }
+    }
+  } catch (error) {
+    console.error('❌ [Wishlist] Error removing from wishlist:', error);
+    throw error;
+  }
+}
+
+// Show wishlist success message
+function showWishlistSuccess(message) {
+  showWishlistMessage(message, 'success');
+}
+
+// Show wishlist error message
+function showWishlistError(message) {
+  showWishlistMessage(message, 'error');
+}
+
+// Show wishlist message
+function showWishlistMessage(message, type = 'info') {
+  const messageDiv = document.createElement('div');
+  const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  
+  messageDiv.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-[10001] flex items-center space-x-2 transform translate-x-full transition-transform duration-300`;
+  messageDiv.innerHTML = `
+    <i class="ri-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-warning' : 'information'}-line"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(messageDiv);
+
+  // Slide in
+  setTimeout(() => {
+    messageDiv.classList.remove('translate-x-full');
+  }, 10);
+
+  // Slide out and remove
+  setTimeout(() => {
+    messageDiv.classList.add('translate-x-full');
+    setTimeout(() => {
+      if (messageDiv.parentNode) {
+        messageDiv.remove();
+      }
+    }, 300);
+  }, 3000);
+}
+
+function initWishlistPanel() {
+  const wishlistBtn = document.getElementById('wishlistBtn');
+  const wishlistPanel = document.getElementById('wishlistPanel');
+  const closeWishlistPanelBtn = document.getElementById('closeWishlistPanel');
+  const wishlistItems = document.getElementById('wishlistItems');
+
+  if (!wishlistBtn || !wishlistPanel || !closeWishlistPanelBtn || !wishlistItems) return;
+
+  // Wishlist button click handler - load wishlist when opening
+  wishlistBtn.onclick = function(e) {
+    e.preventDefault();
+    console.log('❤️ [Wishlist] Wishlist button clicked');
+    openWishlistPanel();
+    // Load wishlist data when panel opens
+    loadWishlist();
+  };
+
+  closeWishlistPanelBtn.onclick = function(e) {
+    e.preventDefault(); 
+    closeWishlistPanel();
+  };
+
+  // Close panel when click outside panel
+  document.addEventListener('mousedown', function (e) {
+    if (
+      wishlistPanel &&
+      !wishlistPanel.classList.contains('hidden') &&
+      !wishlistPanel.classList.contains('translate-x-full') &&
+      !wishlistPanel.contains(e.target) &&
+      (!wishlistBtn || !wishlistBtn.contains(e.target))
+    ) {
+      closeWishlistPanel();
+    }
+  });
+
+  // Event delegation for wishlist items
+  wishlistItems.addEventListener('click', wishlistEventHandler);
+
+  // Initial wishlist load
+  if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+    loadWishlist();
+  } else {
+    renderWishlist(); // Show empty wishlist
+  }
+
+  console.log('❤️ [Wishlist] Wishlist panel initialized');
+}
+
+// Add to wishlist function for external use
+async function addToWishlistFromExternal(bookId) {
+  if (!window.ApiService) {
+    console.error('❌ [Wishlist] ApiService not available');
+    showWishlistError('Dịch vụ không khả dụng');
+    return false;
+  }
+
+  if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+    console.log('🔐 [Wishlist] User not authenticated, redirecting to login');
+    showWishlistError('Vui lòng đăng nhập để thêm sách yêu thích');
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1500);
+    return false;
+  }
+
+  try {
+    console.log('❤️ [Wishlist] Adding to wishlist:', bookId);
+    
+    const response = await window.ApiService.addToFavourites(bookId);
+    
+    if (response.success || response.message) {
+      showWishlistSuccess('Đã thêm sách vào danh sách yêu thích');
+      // Reload wishlist to update display
+      await loadWishlist();
+      console.log('✅ [Wishlist] Added to wishlist successfully');
+      return true;
+    } else {
+      throw new Error(response.error || 'Failed to add to wishlist');
+    }
+  } catch (error) {
+    console.error('❌ [Wishlist] Error adding to wishlist:', error);
+    showWishlistError('Có lỗi xảy ra khi thêm vào danh sách yêu thích');
+    return false;
+  }
+}
+
+// Refresh wishlist data (for external use)
+async function refreshWishlist() {
+  console.log('🔄 [Wishlist] Refreshing wishlist data...');
+  await loadWishlist();
+}
+
+// Debug function for wishlist
+function debugWishlist() {
+  console.log('=== WISHLIST DEBUG ===');
+  console.log('isWishlistLoading:', isWishlistLoading);
+  console.log('wishlist array:', wishlist);
+  console.log('wishlist length:', wishlist.length);
+  console.log('AuthManager available:', !!window.AuthManager);
+  console.log('ApiService available:', !!window.ApiService);
+  console.log('User authenticated:', window.AuthManager?.isAuthenticated());
+  console.log('======================');
+  return { isWishlistLoading, wishlist, authAvailable: !!window.AuthManager, apiAvailable: !!window.ApiService };
+}
+
+// Make wishlist functions globally available
+window.addToWishlistFromExternal = addToWishlistFromExternal;
+window.refreshWishlist = refreshWishlist;
+window.debugWishlist = debugWishlist;
+
 // Search overlay logic
 function showSearchOverlay() {
   console.log('🔍 [Search] Showing search overlay');
@@ -1104,6 +1631,7 @@ function restoreHeaderCenter() {
     delete headerContent._originalHeight;
     if (typeof initHeaderPanel === 'function') initHeaderPanel();
     if (typeof initCartPanel === 'function') initCartPanel();
+    if (typeof initWishlistPanel === 'function') initWishlistPanel();
     if (typeof initSearchBarButton === 'function') initSearchBarButton();
   }
 }
@@ -1307,6 +1835,7 @@ function loadHeaderFooter() {
       if (typeof updateHeaderAuthState === 'function') updateHeaderAuthState();
       if (typeof initHeaderPanel === 'function') initHeaderPanel();
       if (typeof initCartPanel === 'function') initCartPanel();
+      if (typeof initWishlistPanel === 'function') initWishlistPanel();
       if (typeof initSearchBarButton === 'function') initSearchBarButton();
       if (typeof initSearchOverlay === 'function') initSearchOverlay();
       
@@ -1344,12 +1873,15 @@ function loadHeaderFooter() {
         window._headerAuthStateChanged = function () {
           console.log('🔄 [callHeaderFooter] Auth state changed event received');
           updateHeaderAuthState();
-          // Reload cart when auth state changes
+          // Reload cart and wishlist when auth state changes
           if (window.AuthManager && window.AuthManager.isAuthenticated()) {
             loadCart();
+            loadWishlist();
           } else {
             cart = [];
+            wishlist = [];
             renderCart();
+            renderWishlist();
           }
         };
         window.addEventListener('authStateChanged', window._headerAuthStateChanged, true);

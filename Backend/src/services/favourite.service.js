@@ -87,7 +87,7 @@ const FavouriteService = {
             const list = await FavouriteBook.findOne({ customer: customer._id })
                 .populate({
                     path: 'items.book',
-                    select: 'title currentStock',
+                    // select: 'title price currentStock imageUrl author category',
                     populate: [
                         { path: 'author', select: 'name' },
                         { path: 'category', select: 'name' }

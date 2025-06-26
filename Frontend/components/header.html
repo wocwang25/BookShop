@@ -46,6 +46,12 @@
           </svg>
         </button>
 
+        <button id="wishlistBtn"
+          class="wishlist-btn wishlist-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy mr-2"
+          aria-label="Wishlist">
+          <i class="ri-heart-line text-xl"></i>
+        </button>
+
         <button id="cartBtn"
           class="cart-btn cart-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
           aria-label="Shopping Cart">
@@ -90,10 +96,10 @@
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-file-list-3-line text-xl"></i> Đơn hàng của tôi
     </a>
-    <a href="wishlist"
+    <!-- <a href="wishlist"
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-heart-line text-xl"></i> Sách yêu thích
-    </a>
+    </a> -->
 
     <a href="settings"
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
@@ -189,6 +195,29 @@
   </div>
 </div>
 
+<!-- Slide-in wishlist panel -->
+<div id="wishlistPanel" class="fixed top-0 right-0 h-full w-96 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
+  translate-x-full hidden transition-transform duration-300 ease-in-out
+  flex flex-col">
+  <div class="flex items-center justify-between p-5 border-b">
+    <span class="font-bold text-lg text-gray-800">Sách yêu thích</span>
+    <button id="closeWishlistPanel" class="text-gray-500 hover:text-primarynavy text-2xl">&times;</button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-5 space-y-4" id="wishlistItems">
+    <!-- Hiển thị sách yêu thích -->
+  </div>
+  <div class="p-5 border-t">
+    <div class="flex justify-between items-center mb-4">
+      <span class="font-medium text-gray-700">Tổng cộng:</span>
+      <span class="font-bold text-lg text-red-500" id="wishlistCount">0 sách</span>
+    </div>
+    <!-- <a href="wishlist"
+      class="wishlist-view-btn block w-full bg-red-500 text-white px-4 py-3 rounded-lg text-center font-semibold hover:bg-red-600 transition-colors">
+      <i class="ri-heart-line mr-2"></i>Xem tất cả yêu thích
+    </a> -->
+  </div>
+</div>
+
 <style>
   /* Ẩn mũi tên tăng giảm mặc định trên input[type=number] cho Chrome, Safari, Edge */
   input[type=number].no-spinner::-webkit-inner-spin-button,
@@ -227,6 +256,35 @@
     animation: cartButtonPulse 0.3s ease-out;
   }
 
+  /* Wishlist badge styles */
+  .wishlist-badge {
+    position: relative;
+  }
+
+  .wishlist-badge[data-count]::after {
+    content: attr(data-count);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: wishlistBadgePulse 0.3s ease-out;
+  }
+
+  .wishlist-badge.wishlist-has-items {
+    animation: wishlistButtonPulse 0.3s ease-out;
+  }
+
   /* Line clamp utility */
   .line-clamp-2 {
     display: -webkit-box;
@@ -253,6 +311,37 @@
   }
 
   @keyframes cartButtonPulse {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Wishlist animations */
+  @keyframes wishlistBadgePulse {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+
+    50% {
+      transform: scale(1.2);
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes wishlistButtonPulse {
     0% {
       transform: scale(1);
     }
