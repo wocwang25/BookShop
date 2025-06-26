@@ -252,12 +252,22 @@ class ApiService {
     }
 
     // Category API
-    static async getAllCategorỵ̣() {
+    static async getAllCategory() {
         try {
-            return await this.request('/category/')
+            const response = await this.request('/category');
+            
+            // Đảm bảo response có định dạng phù hợp
+            return {
+                success: true,
+                categories: Array.isArray(response) ? response : (response.categories || [])
+            };
         } catch (error) {
-            console.log('Error getting Category', error);
-            throw error;
+            console.error('Error getting Category:', error);
+            return {
+                success: false,
+                categories: [],
+                error: error.message
+            };
         }
     }
 

@@ -87,20 +87,56 @@
     <div class="flex flex-col md:flex-row gap-8">
       <!-- Sidebar Filter -->
       <aside class="search-filters hidden md:block" id="searchFilters" style="position:sticky;top:90px;z-index:2;">
-        <div class="filter-title">BỘ LỌC</div>
-        <div class="filter-accordion open" id="filter-category">
-          <div class="filter-accordion-title" onclick="toggleAccordion('filter-category')">Thể loại <span>⌄</span></div>
-          <div class="filter-accordion-content" id="categoryFilters"></div>
+        <div class="filter-header">
+          <div class="filter-title">
+            <i class="ri-filter-3-line text-xl"></i>
+            Bộ lọc tìm kiếm
+          </div>
+          <button class="filter-reset-btn" id="filterResetBtn" title="Xóa tất cả bộ lọc">
+            <i class="ri-refresh-line"></i>
+            <span>Đặt lại</span>
+          </button>
         </div>
-        <div class="filter-accordion open" id="filter-author">
-          <div class="filter-accordion-title" onclick="toggleAccordion('filter-author')">Tác giả <span>⌄</span></div>
-          <div class="filter-accordion-content" id="authorFilters"></div>
+        
+        <div class="filter-section">
+          <div class="filter-accordion open" id="filter-category">
+            <div class="filter-accordion-title" onclick="toggleAccordion('filter-category')">
+              <div class="filter-accordion-label">
+                <i class="ri-book-open-line text-lg"></i>
+                <span>Thể loại</span>
+              </div>
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+            </div>
+            <div class="filter-accordion-content" id="categoryFilters"></div>
+          </div>
+          
+          <div class="filter-accordion open" id="filter-author">
+            <div class="filter-accordion-title" onclick="toggleAccordion('filter-author')">
+              <div class="filter-accordion-label">
+                <i class="ri-user-line text-lg"></i>
+                <span>Tác giả</span>
+              </div>
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+            </div>
+            <div class="filter-accordion-content" id="authorFilters"></div>
+          </div>
+          
+          <div class="filter-accordion open" id="filter-price">
+            <div class="filter-accordion-title" onclick="toggleAccordion('filter-price')">
+              <div class="filter-accordion-label">
+                <i class="ri-money-dollar-circle-line text-lg"></i>
+                <span>Khoảng giá</span>
+              </div>
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+            </div>
+            <div class="filter-accordion-content" id="priceFilters"></div>
+          </div>
         </div>
-        <div class="filter-accordion open" id="filter-price">
-          <div class="filter-accordion-title" onclick="toggleAccordion('filter-price')">Khoảng giá <span>⌄</span></div>
-          <div class="filter-accordion-content" id="priceFilters"></div>
-        </div>
-        <button class="filter-reset-btn text-[#e53e3e]" id="filterResetBtn">RESET ✕</button>
+
+        <!-- Mobile filter toggle button -->
+        <button class="mobile-filter-toggle md:hidden fixed bottom-4 right-4 z-50 bg-primarynavy text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center" id="mobileFilterToggle">
+          <i class="ri-filter-3-line text-xl"></i>
+        </button>
       </aside>
       <!-- Book Listings -->
       <main class="w-full">
@@ -137,8 +173,91 @@
   <script>
     // Accordion logic
     function toggleAccordion(id) {
-      document.getElementById(id).classList.toggle('open');
+      const accordion = document.getElementById(id);
+      accordion.classList.toggle('open');
+      
+      // Add smooth animation for arrow rotation
+      const arrow = accordion.querySelector('.accordion-arrow');
+      if (arrow) {
+        arrow.style.transform = accordion.classList.contains('open') 
+          ? 'rotate(180deg)' 
+          : 'rotate(0deg)';
+      }
     }
+
+    // Mobile filter functionality
+    function initMobileFilters() {
+      const mobileToggle = document.getElementById('mobileFilterToggle');
+      const filtersPanel = document.getElementById('searchFilters');
+      let overlay = document.querySelector('.filter-overlay');
+      
+      // Create overlay if it doesn't exist
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'filter-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      function openFilters() {
+        filtersPanel.classList.add('open');
+        filtersPanel.classList.remove('hidden');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeFilters() {
+        filtersPanel.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Hide filters on mobile after animation
+        setTimeout(() => {
+          if (window.innerWidth <= 768) {
+            filtersPanel.classList.add('hidden');
+          }
+        }, 300);
+      }
+
+      // Toggle button click
+      if (mobileToggle) {
+        mobileToggle.addEventListener('click', openFilters);
+      }
+
+      // Close button in filter header
+      const filterResetBtn = document.getElementById('filterResetBtn');
+      if (filterResetBtn && window.innerWidth <= 768) {
+        // Add close functionality on mobile
+        filterResetBtn.addEventListener('click', (e) => {
+          if (window.innerWidth <= 768) {
+            e.preventDefault();
+            closeFilters();
+          }
+        });
+      }
+
+      // Overlay click to close
+      overlay.addEventListener('click', closeFilters);
+
+      // Escape key to close
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && filtersPanel.classList.contains('open')) {
+          closeFilters();
+        }
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+          closeFilters();
+          filtersPanel.classList.remove('hidden');
+        } else {
+          filtersPanel.classList.add('hidden');
+        }
+      });
+    }
+
+    // Initialize mobile filters when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initMobileFilters);
 
     // Global filter variables
     let selectedAuthor = 'all';

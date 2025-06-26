@@ -156,32 +156,112 @@
     }
 
     .search-filters {
-      width: 360px;
-      min-width: 320px;
-      max-width: 400px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
-      padding: 1.2rem 0.7rem 1.2rem 1rem;
-      margin-bottom: 1.2rem;
-      border-right: 2px solid #f3f6fa;
+      width: 380px;
+      min-width: 340px;
+      max-width: 420px;
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px 0 rgba(45, 90, 160, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(45, 90, 160, 0.1);
+      padding: 0;
+      margin-bottom: 1.5rem;
       position: sticky;
       top: 90px;
       height: fit-content;
-      max-height: 80vh;
-      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+      overflow: hidden;
       z-index: 2;
+      transition: all 0.3s ease;
     }
 
-    .search-filters .filter-title {
-      font-size: 1.13rem;
-      font-weight: 700;
-      color: #1a3760;
-      margin-bottom: 0.8rem;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      border-bottom: 1.5px solid #eaeaea;
-      padding-bottom: 0.5rem;
+    .search-filters:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px 0 rgba(45, 90, 160, 0.12), 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    .filter-header {
+      background: linear-gradient(135deg, #2d5aa0 0%, #1e4080 100%);
+      border-radius: 16px 16px 0 0;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+      opacity: 0.1;
+    }
+
+    .filter-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      letter-spacing: 0.3px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .filter-reset-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-reset-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .filter-section {
+      padding: 1.25rem 1.5rem 1.5rem;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(45, 90, 160, 0.2) transparent;
+    }
+
+    .filter-section::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .filter-section::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .filter-section::-webkit-scrollbar-thumb {
+      background: rgba(45, 90, 160, 0.2);
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .filter-section::-webkit-scrollbar-thumb:hover {
+      background: rgba(45, 90, 160, 0.4);
     }
 
     .search-filters .filter-group {
@@ -347,78 +427,138 @@
     }
 
     .filter-accordion {
-      border-bottom: 1px solid #ececec;
-      margin-bottom: 0.5rem;
+      background: #ffffff;
+      border: 1px solid rgba(45, 90, 160, 0.08);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .filter-accordion:hover {
+      border-color: rgba(45, 90, 160, 0.15);
+      box-shadow: 0 2px 8px rgba(45, 90, 160, 0.05);
     }
 
     .filter-accordion-title {
       font-weight: 600;
-      font-size: 1.05rem;
-      color: #222;
-      padding: 0.5rem 0;
+      font-size: 1rem;
+      color: #374151;
+      padding: 1rem 1.25rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
       user-select: none;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-bottom: 1px solid rgba(45, 90, 160, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    .filter-accordion-title:hover {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: #2d5aa0;
+    }
+
+    .filter-accordion-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: inherit;
+    }
+
+    .accordion-arrow {
+      color: #6b7280;
+      transition: transform 0.2s ease, color 0.2s ease;
+      font-size: 1.2rem;
+    }
+
+    .filter-accordion.open .accordion-arrow {
+      transform: rotate(180deg);
+      color: #2d5aa0;
     }
 
     .filter-accordion-content {
-      display: none;
-      padding-bottom: 0.5rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 1.25rem;
     }
 
     .filter-accordion.open .filter-accordion-content {
-      display: block;
+      max-height: 500px;
+      padding: 1rem 1.25rem 1.25rem;
+      overflow-y: auto;
     }
 
     .filter-radio-label {
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
-      gap: 0.5em;
-      font-size: 1rem;
-      margin-bottom: 0.2rem;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
       cursor: pointer;
       justify-content: flex-start;
-      padding: 0.18em 0.2em 0.18em 0.1em;
-      border-radius: 6px;
-      transition: background 0.15s;
-      min-height: 32px;
+      padding: 0.7rem 0.8rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      min-height: 40px;
       width: 100%;
       position: relative;
       box-sizing: border-box;
+      border: 1px solid transparent;
+      background: rgba(248, 250, 252, 0.5);
     }
 
-    /* Chỉ mục tác giả: tên 1 dòng, ellipsis */
-    #authorFilters .filter-radio-label span:not(.filter-count) {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
-      max-width: 100%;
-      display: block;
-      padding-right: 0.2em;
-      line-height: 1.4;
+    .filter-radio-label:hover {
+      background: linear-gradient(135deg, rgba(45, 90, 160, 0.08) 0%, rgba(45, 90, 160, 0.04) 100%);
+      border-color: rgba(45, 90, 160, 0.2);
+      transform: translateX(4px);
     }
 
-    #authorFilters .filter-radio-label {
-      align-items: flex-start;
-      min-height: 32px;
-      padding-top: 0.25em;
-      padding-bottom: 0.25em;
+    .filter-radio-label:has(input:checked) {
+      background: linear-gradient(135deg, rgba(45, 90, 160, 0.15) 0%, rgba(45, 90, 160, 0.08) 100%);
+      border-color: #2d5aa0;
+      color: #2d5aa0;
+      font-weight: 600;
     }
 
+    /* Custom Radio Button Styling */
     .filter-radio-label input[type="radio"] {
-      accent-color: #2d5aa0;
-      margin-right: 0.5em;
-      width: 18px;
-      height: 18px;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #d1d5db;
+      border-radius: 50%;
+      margin: 0;
       flex-shrink: 0;
       cursor: pointer;
-      display: block;
       position: relative;
-      left: 0;
-      top: 0;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .filter-radio-label input[type="radio"]:checked {
+      border-color: #2d5aa0;
+      background: #2d5aa0;
+    }
+
+    .filter-radio-label input[type="radio"]:checked::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: #ffffff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .filter-radio-label input[type="radio"]:hover {
+      border-color: #2d5aa0;
+      box-shadow: 0 0 0 3px rgba(45, 90, 160, 0.1);
     }
 
     .filter-radio-label span {
@@ -426,49 +566,140 @@
       min-width: 0;
       text-align: left;
       font-weight: 500;
-      color: #222;
+      color: #374151;
       cursor: pointer;
       display: block;
       word-break: break-word;
-      padding-right: 0.5em;
+      line-height: 1.4;
+    }
+
+    .filter-radio-label:has(input:checked) span {
+      color: #2d5aa0;
+      font-weight: 600;
     }
 
     .filter-radio-label .filter-count {
-      color: #aaa;
-      font-size: 0.97em;
-      margin-left: 0.5em;
-      font-weight: 400;
-      min-width: 54px;
-      max-width: none;
+      color: #6b7280;
+      font-size: 0.85rem;
+      font-weight: 500;
+      min-width: 50px;
       text-align: right;
       flex-shrink: 0;
-      display: block;
-      padding-left: 0.2em;
-      overflow: hidden;
-      white-space: nowrap;
+      background: rgba(107, 114, 128, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      transition: all 0.2s ease;
     }
 
-    .filter-radio-label:hover,
-    .filter-radio-label:has(input:focus) {
-      background: #f3f6fa;
+    .filter-radio-label:has(input:checked) .filter-count {
+      background: rgba(45, 90, 160, 0.2);
+      color: #2d5aa0;
     }
 
-    .filter-radio-label input[type="radio"]:focus-visible+span {
-      outline: 2px solid #2d5aa0;
-      outline-offset: 2px;
+    /* Author filters specific styling */
+    #authorFilters .filter-radio-label span:not(.filter-count) {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      max-width: 100%;
+      line-height: 1.4;
     }
 
-    .filter-accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      padding-bottom: 0;
+    #authorFilters .filter-radio-label {
+      align-items: flex-start;
+      min-height: 44px;
+      padding: 0.8rem;
     }
 
-    .filter-accordion.open .filter-accordion-content {
-      max-height: 500px;
-      padding-bottom: 16px;
+    /* Mobile filter styles */
+    .mobile-filter-toggle {
+      transition: all 0.3s ease;
+    }
+
+    .mobile-filter-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(45, 90, 160, 0.3);
+    }
+
+    .mobile-filter-toggle:active {
+      transform: scale(0.95);
+    }
+
+    /* Enhanced scrollable content */
+    .filter-scroll-content {
+      max-height: 280px;
       overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 1px solid rgba(45, 90, 160, 0.1);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      transition: all 0.2s ease;
+    }
+
+    .filter-scroll-content:hover {
+      border-color: rgba(45, 90, 160, 0.2);
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    }
+
+    .filter-scroll-indicator {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .filter-scroll-indicator::before,
+    .filter-scroll-indicator::after {
+      content: '';
+      height: 1px;
+      background: linear-gradient(to right, transparent, #d1d5db, transparent);
+      flex: 1;
+    }
+
+    /* Search input improvements */
+    .search-input {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0.875rem 1.125rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+
+    .search-input:focus {
+      border-color: #2d5aa0;
+      box-shadow: 0 0 0 3px rgba(45, 90, 160, 0.1);
+      outline: none;
+    }
+
+    .search-button {
+      background: linear-gradient(135deg, #2d5aa0 0%, #1e4080 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(45, 90, 160, 0.2);
+    }
+
+    .search-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45, 90, 160, 0.3);
+      background: linear-gradient(135deg, #1e4080 0%, #2d5aa0 100%);
+    }
+
+    .search-button:active {
+      transform: translateY(0);
     }
 
     /* Scrollable filter content */
@@ -565,5 +796,122 @@
       .grid {
         grid-template-columns: 1fr;
         gap: 0.7rem;
+      }
+    }
+
+    /* Mobile responsive for filters */
+    @media (max-width: 768px) {
+      .search-filters {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 90%;
+        max-width: 400px;
+        height: 100vh;
+        margin: 0;
+        z-index: 1000;
+        transition: right 0.3s ease;
+        overflow-y: auto;
+        border-radius: 0;
+      }
+
+      .search-filters.open {
+        right: 0;
+      }
+
+      .filter-header {
+        border-radius: 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .filter-section {
+        max-height: calc(100vh - 120px);
+      }
+
+      .search-container {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Mobile filter overlay */
+      .filter-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .filter-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Search inputs on mobile */
+      .search-input,
+      .search-button {
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+      }
+
+      .filter-radio-label {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+      }
+
+      .filter-radio-label input[type="radio"] {
+        width: 18px;
+        height: 18px;
+      }
+
+      .filter-accordion-title {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 480px) {
+      .search-filters {
+        width: 95%;
+      }
+
+      .filter-header {
+        padding: 1rem;
+      }
+
+      .filter-title {
+        font-size: 1rem;
+      }
+
+      .filter-reset-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+      }
+
+      .filter-section {
+        padding: 1rem;
+      }
+
+      .filter-radio-label {
+        padding: 0.7rem;
+        gap: 0.6rem;
+        min-height: 36px;
+      }
+
+      .filter-radio-label span {
+        font-size: 0.85rem;
+      }
+
+      .filter-count {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem;
       }
     }
