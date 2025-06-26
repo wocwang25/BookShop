@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,12 +8,16 @@
   <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="../assets/js/auth.js"></script>
   <link rel="stylesheet" href="../assets/css/settingA.css" />
 
 </head>
+
 <body>
   <div id="header-placeholder"></div>
 
@@ -23,7 +28,9 @@
       <aside class="sidebar">
         <div class="profile">
           <div class="avatar">
-            <img src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg" alt="Profile" />
+            <img
+              src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg"
+              alt="Profile" />
           </div>
           <h2 id="sidebar-name">User</h2>
         </div>
@@ -46,12 +53,16 @@
                   <div class="photo-section">
                     <label>Ảnh đại diện</label>
                     <div class="photo-preview">
-                      <img id="avatar-preview" src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg" alt="Profile" />
+                      <img id="avatar-preview"
+                        src="https://img.freepik.com/freie-psd/3d-darstellung-eines-menschlichen-avatars-oder-profils_23-2150671142.jpg"
+                        alt="Profile" />
                     </div>
                     <div class="photo-buttons">
-                      <button class="btn btn-primary" onclick="document.getElementById('avatar-input').click()">Đổi</button>
+                      <button class="btn btn-primary"
+                        onclick="document.getElementById('avatar-input').click()">Đổi</button>
                       <button class="btn btn-secondary" onclick="removeAvatar()">Xóa</button>
-                      <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="changeAvatar(event)">
+                      <input type="file" id="avatar-input" accept="image/*" class="hidden"
+                        onchange="changeAvatar(event)">
                     </div>
                   </div>
                   <div class="form-grid">
@@ -89,7 +100,7 @@
                       <label>Địa chỉ</label>
                       <input type="text" id="input-address" placeholder="Nhập địa chỉ của bạn" />
                     </div>
-                    
+
                   </div>
                 </div>
               </section>
@@ -119,12 +130,18 @@
               <section class="section">
                 <h1 class="section-title">Thông báo email</h1>
                 <div class="notifications-grid">
-                  <div class="notification-item"><input type="checkbox" id="cb1" /><label for="cb1">Sách mới</label></div>
-                  <div class="notification-item"><input type="checkbox" id="cb2" /><label for="cb2">Thay đổi mật khẩu</label></div>
-                  <div class="notification-item"><input type="checkbox" id="cb3" /><label for="cb3">Ưu đãi mới</label></div>
-                  <div class="notification-item"><input type="checkbox" id="cb4" /><label for="cb4">Cung cấp đặc biệt</label></div>
-                  <div class="notification-item"><input type="checkbox" id="cb5" /><label for="cb5">Trạng thái đơn hàng</label></div>
-                  <div class="notification-item"><input type="checkbox" id="cb6" /><label for="cb6">Phản hồi mới</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb1" /><label for="cb1">Sách mới</label>
+                  </div>
+                  <div class="notification-item"><input type="checkbox" id="cb2" /><label for="cb2">Thay đổi mật
+                      khẩu</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb3" /><label for="cb3">Ưu đãi mới</label>
+                  </div>
+                  <div class="notification-item"><input type="checkbox" id="cb4" /><label for="cb4">Cung cấp đặc
+                      biệt</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb5" /><label for="cb5">Trạng thái đơn
+                      hàng</label></div>
+                  <div class="notification-item"><input type="checkbox" id="cb6" /><label for="cb6">Phản hồi mới</label>
+                  </div>
                 </div>
 
                 <div class="actions">
@@ -141,7 +158,7 @@
           <div class="card">
             <div class="card-content">
               <h1 class="section-title">Địa chỉ giao hàng</h1>
-              
+
               <!-- Chọn địa chỉ -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
@@ -220,37 +237,41 @@
                   </select>
                 </div>
               </div>
-              
+
               <!-- Nhập thông tin địa chỉ chi tiết -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label class="block text-sm text-[#292d32] mb-2">Quận/ Huyện</label>
-                  <input type="text" id="district" class="form-input" placeholder="VD: Quận 1, Huyện Gia Lâm..." oninput="updateAddress()" />
+                  <input type="text" id="district" class="form-input" placeholder="VD: Quận 1, Huyện Gia Lâm..."
+                    oninput="updateAddress()" />
                 </div>
                 <div>
                   <label class="block text-sm text-[#292d32] mb-2">Phường/ Xã</label>
-                  <input type="text" id="ward" class="form-input" placeholder="VD: Phường Bến Nghé, Xã Yên Viên..." oninput="updateAddress()" />
+                  <input type="text" id="ward" class="form-input" placeholder="VD: Phường Bến Nghé, Xã Yên Viên..."
+                    oninput="updateAddress()" />
                 </div>
               </div>
-              
+
               <!-- Địa chỉ số nhà và chi tiết -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label class="block text-sm text-[#292d32] mb-2">Số nhà, tên đường</label>
-                  <input type="text" id="street-detail" class="form-input" placeholder="VD: 123 Nguyễn Văn A" onchange="updateAddress()" />
+                  <input type="text" id="street-detail" class="form-input" placeholder="VD: 123 Nguyễn Văn A"
+                    onchange="updateAddress()" />
                 </div>
                 <div>
                   <label class="block text-sm text-[#292d32] mb-2">Ghi chú</label>
                   <input type="text" id="address-note" class="form-input" placeholder="Ghi chú thêm (tùy chọn)" />
                 </div>
               </div>
-              
+
               <!-- Địa chỉ hoàn chỉnh -->
               <div class="form-group mb-6">
                 <label class="block text-sm text-[#292d32] mb-2">Địa chỉ hoàn chỉnh</label>
-                <textarea id="full-address" rows="3" class="form-input" placeholder="Địa chỉ sẽ được tự động tạo khi bạn chọn các trường trên" readonly></textarea>
+                <textarea id="full-address" rows="3" class="form-input"
+                  placeholder="Địa chỉ sẽ được tự động tạo khi bạn chọn các trường trên" readonly></textarea>
               </div>
-              
+
               <div class="actions">
                 <button class="btn btn-outline">Bỏ qua</button>
                 <button onclick="saveDeliveryAddress()" class="btn btn-primary">Lưu địa chỉ</button>
@@ -268,18 +289,21 @@
                 <!-- Hidden dummy inputs to prevent autofill -->
                 <input type="text" style="display:none;" />
                 <input type="password" style="display:none;" />
-                
+
                 <div class="form-group">
                   <label for="current-password">Mật khẩu cũ</label>
-                  <input type="password" id="current-password" name="current-password" placeholder="Nhập mật khẩu hiện tại" autocomplete="off" data-lpignore="true" />
+                  <input type="password" id="current-password" name="current-password"
+                    placeholder="Nhập mật khẩu hiện tại" autocomplete="off" data-lpignore="true" />
                 </div>
                 <div class="form-group">
                   <label for="new-password">Mật khẩu mới</label>
-                  <input type="password" id="new-password" name="new-password" placeholder="Nhập mật khẩu mới" autocomplete="new-password" />
+                  <input type="password" id="new-password" name="new-password" placeholder="Nhập mật khẩu mới"
+                    autocomplete="new-password" />
                 </div>
                 <div class="form-group">
                   <label for="confirm-password">Xác nhận mật khẩu</label>
-                  <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" />
+                  <input type="password" id="confirm-password" name="confirm-password"
+                    placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" />
                 </div>
               </div>
               <div class="flex justify-end mt-8">
@@ -300,5 +324,5 @@
   <script src="./assets/js/callHeaderFooter.js"></script>
   <script src="./assets/js/settingA.js"></script>
 </body>
-</html>
 
+</html>

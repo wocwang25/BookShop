@@ -4,7 +4,9 @@ const CartController = {
     async addToCart(req, res) {
         try {
             const userId = req.user.id;
-            const { item } = req.body
+            const { bookId, quantity } = req.body
+            console.log(req.body)
+            const item = { bookId, quantity }
 
             const result = await CartService.createOrUpdate(userId, item);
             res.json({

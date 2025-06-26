@@ -5,7 +5,7 @@ const CartService = {
     // Tạo mới hoặc thêm/cập nhật item trong giỏ hàng
     async createOrUpdate(userId, item) {
         try {
-            const book = await Book.findById(item.book);
+            const book = await Book.findById(item.bookId);
             if (!book) {
                 throw new Error("Sách không tồn tại");
             }
@@ -28,7 +28,8 @@ const CartService = {
                     cartItem => cartItem.book && cartItem.book.toString() === item.book
                 );
                 if (index > -1) {
-                    cart.items[index].quantity += typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
+                    // cart.items[index].quantity += typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
+                    cart.items[index].quantity += item.quantity > 0 ? item.quantity : 1;
                 } else {
                     cart.items.push(cartItem);
                 }

@@ -124,6 +124,7 @@ class ApiService {
     // Cart API
     static async addToCart(bookId, quantity = 1) {
         try {
+            console.log(bookId, quantity);
             return await this.request('/cart', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -246,6 +247,25 @@ class ApiService {
             return await this.request('/reports/stats');
         } catch (error) {
             console.error('Error getting stats:', error);
+            throw error;
+        }
+    }
+
+    // Category API
+    static async getAllCategorỵ̣() {
+        try {
+            return await this.request('/category/')
+        } catch (error) {
+            console.log('Error getting Category', error);
+            throw error;
+        }
+    }
+
+    static async getCategoryById(id) {
+        try {
+            return await this.request(`/category/${id}`)
+        } catch (error) {
+            console.log('Error getting Category', error);
             throw error;
         }
     }

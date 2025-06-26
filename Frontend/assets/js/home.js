@@ -236,7 +236,7 @@ async function handleSearch() {
 
     // Redirect to books page with search query
     console.log('Redirecting to search results page');
-    window.location.href = `/books?search=${encodeURIComponent(query)}`;
+    window.location.href = `/searchBooks?search=${encodeURIComponent(query)}`;
   } catch (error) {
     console.error('Search failed:', error);
     alert('Tìm kiếm thất bại. Vui lòng thử lại.');

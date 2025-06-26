@@ -30,7 +30,7 @@ function updateURL(params) {
 }
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     const params = getURLParams();
     currentSearchQuery = params.search;
     currentCategory = params.category;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Load and display books
     await loadBooks();
-    
+
     // Setup event listeners
     setupEventListeners();
 });
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function loadBooks() {
     try {
         showLoading();
-        
+
         let response;
         if (currentSearchQuery) {
             // Use search API
@@ -89,7 +89,7 @@ function filterAndDisplayBooks() {
 
     // Filter by category
     if (currentCategory && currentCategory !== 'all') {
-        filteredBooks = filteredBooks.filter(book => 
+        filteredBooks = filteredBooks.filter(book =>
             book.category?.name === currentCategory || book.category === currentCategory
         );
     }
@@ -178,7 +178,7 @@ function displayPagination() {
     if (!pagination) return;
 
     const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
-    
+
     if (totalPages <= 1) {
         pagination.innerHTML = '';
         return;
@@ -239,7 +239,7 @@ function changePage(page) {
     updateURL({ search: currentSearchQuery, category: currentCategory, page: currentPage });
     displayBooks();
     displayPagination();
-    
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -251,7 +251,7 @@ function updateResultsCount() {
         const total = filteredBooks.length;
         const start = (currentPage - 1) * booksPerPage + 1;
         const end = Math.min(currentPage * booksPerPage, total);
-        
+
         if (total > 0) {
             resultCount.textContent = `Hiển thị ${start}-${end} trong ${total} kết quả`;
         } else {
@@ -265,7 +265,7 @@ function setupEventListeners() {
     // Search functionality
     const searchInput = document.querySelector('#searchInput');
     const searchButton = document.querySelector('#searchButton');
-    
+
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -273,7 +273,7 @@ function setupEventListeners() {
             }
         });
     }
-    
+
     if (searchButton) {
         searchButton.addEventListener('click', performSearch);
     }
@@ -297,7 +297,7 @@ function performSearch() {
 
     currentSearchQuery = searchInput.value.trim();
     currentPage = 1;
-    
+
     updateURL({ search: currentSearchQuery, category: currentCategory, page: 1 });
     loadBooks();
 }
@@ -308,17 +308,17 @@ function clearSearch() {
     if (searchInput) {
         searchInput.value = '';
     }
-    
+
     currentSearchQuery = '';
     currentCategory = 'all';
     currentPage = 1;
-    
+
     // Reset category radio
     const allCategoryRadio = document.querySelector('input[name="category"][value="all"]');
     if (allCategoryRadio) {
         allCategoryRadio.checked = true;
     }
-    
+
     updateURL({ search: '', category: 'all', page: 1 });
     loadBooks();
 }
@@ -327,12 +327,12 @@ function clearSearch() {
 function addBookCardEventListeners() {
     // Add to cart buttons
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.stopPropagation();
             const originalText = this.textContent;
             this.textContent = '✓ Đã thêm';
             this.classList.add('bg-green-500', 'text-white');
-            
+
             setTimeout(() => {
                 this.textContent = originalText;
                 this.classList.remove('bg-green-500', 'text-white');
@@ -342,7 +342,7 @@ function addBookCardEventListeners() {
 
     // Favorite buttons
     document.querySelectorAll('.fav-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.stopPropagation();
             this.classList.toggle('faved');
             const icon = this.querySelector('i');
@@ -362,26 +362,26 @@ function getBookImage(book) {
     if (!book.imageUrl || book.imageUrl.trim() === '') {
         return getDefaultImage();
     }
-    
+
     // Convert Google Drive link if needed
     return convertGoogleDriveLink(book.imageUrl);
 }
 
 function convertGoogleDriveLink(url) {
     if (!url) return getDefaultImage();
-    
+
     if (url.includes('drive.google.com/uc?')) {
         return url;
     }
-    
+
     const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
     const match = url.match(driveRegex);
-    
+
     if (match && match[1]) {
         const fileId = match[1];
         return `https://drive.google.com/uc?id=${fileId}&export=view`;
     }
-    
+
     return url;
 }
 
@@ -430,16 +430,21 @@ function showError(message) {
     }
 }
 
-function addToCart(event, bookId) {
+async function addToCart(event, bookId) {
     event.stopPropagation();
     console.log('Add to cart:', bookId);
     // TODO: Implement actual cart functionality
+    console.log("dữ liệu từ books.js", bookId)
+    const response = await ApiService.addToCart(bookId);
 }
 
-function toggleFavorite(event, bookId) {
+async function toggleFavorite(event, bookId) {
     event.stopPropagation();
     console.log('Toggle favorite:', bookId);
     // TODO: Implement actual favorite functionality
+    const response = await ApiService.addToFavourites({
+        bookId: bookId
+    });
 }
 
 function viewBookDetail(bookId) {

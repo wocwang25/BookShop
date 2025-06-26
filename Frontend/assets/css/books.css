@@ -1,0 +1,569 @@
+    .book-card:nth-child(2) {
+      transform: translateY(0px);
+    }
+
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .main-content {
+      padding-top: 80px;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding-top: 90px;
+      }
+    }
+
+    /* Book card style */
+    .book-img-rect {
+      width: 100%;
+      height: 256px;
+      object-fit: cover;
+      border-radius: 16px 16px 0 0;
+      background: #f3f4f6;
+      transition: transform 0.2s;
+      display: block;
+    }
+
+    .book-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
+      transition: box-shadow 0.2s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .book-card:hover {
+      box-shadow: 0 6px 24px 0 rgba(45, 90, 160, 0.12);
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .fav-btn {
+      background: #f5f5dc;
+      color: #f59e0b;
+      border: 1.5px solid #f5f5dc;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+
+    .fav-btn.faved {
+      background: #fffbe6 !important;
+      color: #f59e0b !important;
+      border: 1.5px solid #f59e0b;
+    }
+
+    .fav-btn.faved i {
+      color: #f59e0b !important;
+    }
+
+    .add-to-cart-btn {
+      background: #e6e6e6;
+      color: #2d5aa0;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .add-to-cart-btn:hover {
+      background: #2d5aa0;
+      color: #fff;
+    }
+
+    /* Pagination style */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 8px 0;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.03);
+      transition: background 0.2s;
+    }
+
+    .pagination-btn {
+      min-width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid #e2e8f0;
+      background: #fff;
+      color: #2d5aa0;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .pagination-btn.active,
+    .pagination-btn:focus,
+    .pagination-btn:hover:not(:disabled) {
+      background: #2d5aa0;
+      color: #fff;
+      border-color: #2d5aa0;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Hiệu ứng chuyển trang */
+    .fadeout {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .fadein {
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+
+    #booksGrid {
+      align-items: end !important;
+    }
+
+    /* Ẩn mũi tên tăng giảm trên input[type=number] */
+    #gotoPageInput::-webkit-outer-spin-button,
+    #gotoPageInput::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    #gotoPageInput[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    /* Bỏ border đen, chỉ giữ border màu xám và focus màu xanh */
+    #gotoPageInput {
+      border: 1.5px solid #d1d5db !important;
+      box-shadow: none !important;
+    }
+
+    #gotoPageInput:focus {
+      border-color: #2d5aa0 !important;
+      outline: none !important;
+    }
+
+    .search-filters {
+      width: 360px;
+      min-width: 320px;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
+      padding: 1.2rem 0.7rem 1.2rem 1rem;
+      margin-bottom: 1.2rem;
+      border-right: 2px solid #f3f6fa;
+      position: sticky;
+      top: 90px;
+      height: fit-content;
+      max-height: 80vh;
+      overflow-y: auto;
+      z-index: 2;
+    }
+
+    .search-filters .filter-title {
+      font-size: 1.13rem;
+      font-weight: 700;
+      color: #1a3760;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #eaeaea;
+      padding-bottom: 0.5rem;
+    }
+
+    .search-filters .filter-group {
+      margin-bottom: 0.8rem;
+    }
+
+    .search-filters label {
+      font-size: 0.97rem;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .search-filters input[type="radio"] {
+      accent-color: #2d5aa0;
+    }
+
+
+    .search-title {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #2d5aa0;
+      margin-bottom: 0.5rem;
+    }
+
+    .search-keyword {
+      color: #f7931e;
+      font-weight: 600;
+    }
+
+    .search-count {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Breadcrumb sửa lại cho rõ ràng */
+    .breadcrumb {
+      font-size: 1.08rem;
+      color: #6b7280;
+      padding: 1.2rem 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb a {
+      color: #2d5aa0;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.2em;
+    }
+
+    .breadcrumb .sep {
+      color: #2d5aa0;
+      font-weight: 700;
+      margin: 0 0.2em;
+    }
+
+    .breadcrumb .current {
+      color: #f7931e;
+      font-weight: 700;
+    }
+
+    /* Book grid: 4 cột desktop, 3 cột tablet, 2 cột mobile */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem 1.2rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .book-card-item {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px 0 rgba(45, 90, 160, 0.06);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.18s, transform 0.18s;
+      cursor: pointer;
+      position: relative;
+      min-height: 380px;
+      max-width: 320px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .book-card-item:focus {
+      outline: none;
+      box-shadow: none;
+      border: none;
+    }
+
+    .book-card-item .h-96 {
+      height: 260px;
+      min-height: 260px;
+      max-height: 260px;
+    }
+
+    .book-card-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #f3f6fa;
+      border-bottom: 1px solid #f3f6fa;
+    }
+
+    .book-card-item .p-4 {
+      padding: 1rem 1rem 0.7rem 1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .book-card-item h3 {
+      font-size: 1.13rem;
+      font-weight: 700;
+      color: #1a3760;
+      margin-bottom: 0.2rem;
+      line-height: 1.3;
+      min-height: 2.2em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .book-card-item p {
+      font-size: 1.05rem;
+      color: #444;
+      margin-bottom: 0.5rem;
+      min-height: 1.2em;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .filter-accordion {
+      border-bottom: 1px solid #ececec;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-accordion-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #222;
+      padding: 0.5rem 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .filter-accordion-content {
+      display: none;
+      padding-bottom: 0.5rem;
+    }
+
+    .filter-accordion.open .filter-accordion-content {
+      display: block;
+    }
+
+    .filter-radio-label {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.5em;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+      cursor: pointer;
+      justify-content: flex-start;
+      padding: 0.18em 0.2em 0.18em 0.1em;
+      border-radius: 6px;
+      transition: background 0.15s;
+      min-height: 32px;
+      width: 100%;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    /* Chỉ mục tác giả: tên 1 dòng, ellipsis */
+    #authorFilters .filter-radio-label span:not(.filter-count) {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      max-width: 100%;
+      display: block;
+      padding-right: 0.2em;
+      line-height: 1.4;
+    }
+
+    #authorFilters .filter-radio-label {
+      align-items: flex-start;
+      min-height: 32px;
+      padding-top: 0.25em;
+      padding-bottom: 0.25em;
+    }
+
+    .filter-radio-label input[type="radio"] {
+      accent-color: #2d5aa0;
+      margin-right: 0.5em;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: block;
+      position: relative;
+      left: 0;
+      top: 0;
+    }
+
+    .filter-radio-label span {
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: left;
+      font-weight: 500;
+      color: #222;
+      cursor: pointer;
+      display: block;
+      word-break: break-word;
+      padding-right: 0.5em;
+    }
+
+    .filter-radio-label .filter-count {
+      color: #aaa;
+      font-size: 0.97em;
+      margin-left: 0.5em;
+      font-weight: 400;
+      min-width: 54px;
+      max-width: none;
+      text-align: right;
+      flex-shrink: 0;
+      display: block;
+      padding-left: 0.2em;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .filter-radio-label:hover,
+    .filter-radio-label:has(input:focus) {
+      background: #f3f6fa;
+    }
+
+    .filter-radio-label input[type="radio"]:focus-visible+span {
+      outline: 2px solid #2d5aa0;
+      outline-offset: 2px;
+    }
+
+    .filter-accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding-bottom: 0;
+    }
+
+    .filter-accordion.open .filter-accordion-content {
+      max-height: 500px;
+      padding-bottom: 16px;
+      overflow-y: auto;
+    }
+
+    /* Scrollable filter content */
+    .filter-scroll-content {
+      max-height: 500px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+      margin-right: -8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #fafafa;
+      padding: 8px;
+    }
+
+    /* Custom scrollbar for filter content */
+    .filter-scroll-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .filter-scroll-content::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    .filter-scroll-content::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .filter-scroll-content::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Firefox scrollbar */
+    .filter-scroll-content {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f1f5f9;
+    }
+
+    /* Scroll indicator */
+    .filter-scroll-indicator {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* Hover effect for scrollable content */
+    .filter-scroll-content:hover {
+      border-color: #2d5aa0;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.2rem 0.7rem;
+      }
+
+      .book-card-item {
+        min-height: 300px;
+        max-width: 220px;
+      }
+
+      .book-card-item .h-96 {
+        height: 160px;
+        min-height: 160px;
+        max-height: 160px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem 0.5rem;
+      }
+
+      .book-card-item {
+        min-height: 220px;
+        max-width: 180px;
+      }
+
+      .book-card-item .h-96 {
+        height: 120px;
+        min-height: 120px;
+        max-height: 120px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+      }
+    }

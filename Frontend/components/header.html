@@ -8,19 +8,249 @@
       <nav class="nav">
         <ul class="nav-menu">
           <li><a href="/" class="nav-link">Trang chủ</a></li>
-          <li><a href="books" class="nav-link">Cửa Hàng</a></li>
-          <li><a href="categories" class="nav-link">Thể loại</a></li>
+          <li class="relative group">
+            <a href="books" class="nav-link">Cửa Hàng</a>
+
+          </li>
+          <li class="relative group" id="categoryMenu" style="z-index:51;">
+            <a href="searchBooks" class="nav-link flex items-center gap-2">
+              <i class="ri-list-unordered text-lg"></i>
+              Thể loại
+              <svg class="ml-1 w-4 h-4 text-gray-500 group-hover:text-primarynavy transition" fill="none"
+                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </a>
+            <!-- Hover bridge: invisible div để giữ hover khi di chuyển chuột giữa menu và mega menu -->
+            <div id="categoryHoverBridge"
+              style="position:absolute;left:50%;transform:translateX(-50%);top:100%;width:120px;height:32px;z-index:51;pointer-events:auto;">
+            </div>
+            <div id="categoryMegaMenu"
+              class="fixed left-0 right-0 mx-auto top-18 w-[1450px] bg-white shadow-2xl border border-gray-100 mt-3 py-6 px-12 rounded-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto z-50 flex flex-row flex-nowrap justify-between gap-8 text-left transition-opacity duration-300"
+              style="min-width:400px; transition: opacity 0.5s, visibility 0.5s;">
+              <div class="flex flex-row w-full gap-4 overflow-x-auto">
+                <div class="w-[340px] min-w-[320px] max-w-[400px]">
+                  <div class="font-bold mb-4 text-primarynavy text-base flex items-center gap-2">
+                    Danh mục thể loại
+                  </div>
+                  <ul class="space-y-2">
+                    <li><a href="/searchBooks?category=Tiểu%20Thuyết" data-category="Tiểu Thuyết"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-open-line"></i>Tiểu Thuyết</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tư%20duy%20-%20Kỹ%20năng%20sống"
+                        data-category="Sách tư duy - Kỹ năng sống"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-lightbulb-line"></i>Sách tư duy - Kỹ năng sống</a></li>
+                    <li><a href="/searchBooks?category=Lĩnh%20vực%20khác" data-category="Lĩnh vực khác"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-earth-line"></i>Lĩnh vực khác</a></li>
+                    <li><a href="/searchBooks?category=Tác%20phẩm%20kinh%20điển" data-category="Tác phẩm kinh điển"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-star-line"></i>Tác phẩm kinh điển</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20ngắn%20-%20Tản%20văn%20-%20Tạp%20Văn"
+                        data-category="Truyện ngắn - Tản văn - Tạp Văn"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-quill-pen-line"></i>Truyện ngắn - Tản văn - Tạp Văn</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20Giả%20tưởng%20-%20Huyền%20Bí%20-%20Phiêu%20Lưu"
+                        data-category="Truyện Giả tưởng - Huyền Bí - Phiêu Lưu"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-magic-line"></i>Truyện Giả tưởng - Huyền Bí - Phiêu Lưu</a></li>
+                    <li><a href="/searchBooks?category=Sách%20kinh%20tế%20học" data-category="Sách kinh tế học"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-bar-chart-2-line"></i>Sách kinh tế học</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Chiêm%20Tinh%20-%20Horoscope"
+                        data-category="Sách Chiêm Tinh - Horoscope"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-planet-line"></i>Sách Chiêm Tinh - Horoscope</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20kể%20cho%20bé" data-category="Truyện kể cho bé"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-bear-smile-line"></i>Truyện kể cho bé</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20dài" data-category="Truyện dài"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-bookmark-3-line"></i>Truyện dài</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tài%20chính,%20tiền%20tệ"
+                        data-category="Sách tài chính, tiền tệ"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-money-dollar-circle-line"></i>Sách tài chính, tiền tệ</a></li>
+                    <li><a href="/searchBooks?category=Du%20ký" data-category="Du ký"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-road-map-line"></i>Du ký</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20trinh%20thám" data-category="Truyện trinh thám"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-search-eye-line"></i>Truyện trinh thám</a></li>
+                  </ul>
+                </div>
+                <div class="w-[340px] min-w-[320px] max-w-[400px]">
+                  <div class="font-bold mb-4 text-white text-base opacity-0 select-none">Ẩn</div>
+                  <ul class="space-y-2 mt-2">
+                    <li><a href="/searchBooks?category=Sách%20kỹ%20năng%20làm%20việc"
+                        data-category="Sách kỹ năng làm việc"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-tools-line"></i>Sách kỹ năng làm việc</a></li>
+                    <li><a href="/searchBooks?category=Bài%20học%20kinh%20doanh" data-category="Bài học kinh doanh"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-briefcase-4-line"></i>Bài học kinh doanh</a></li>
+                    <li><a href="/searchBooks?category=Kiến%20Thức%20Bách%20Khoa" data-category="Kiến Thức Bách Khoa"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-graduation-cap-line"></i>Kiến Thức Bách Khoa</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Học%20Tiếng%20Anh" data-category="Sách Học Tiếng Anh"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-english-input"></i>Sách Học Tiếng Anh</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Marketing%20-%20Bán%20hàng"
+                        data-category="Sách Marketing - Bán hàng"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-bar-chart-grouped-line"></i>Sách Marketing - Bán hàng</a></li>
+                    <li><a href="/searchBooks?category=Sách%20giáo%20dục" data-category="Sách giáo dục"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-3-line"></i>Sách giáo dục</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Làm%20Cha%20Mẹ" data-category="Sách Làm Cha Mẹ"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-parent-line"></i>Sách Làm Cha Mẹ</a></li>
+                    <li><a href="/searchBooks?category=Văn%20học%20thiếu%20nhi" data-category="Văn học thiếu nhi"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-user-smile-line"></i>Văn học thiếu nhi</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20đam%20mỹ" data-category="Truyện đam mỹ"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-heart-line"></i>Truyện đam mỹ</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20ngôn%20tình" data-category="Truyện ngôn tình"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-emotion-happy-line"></i>Truyện ngôn tình</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Tâm%20Lý%20Tuổi%20Teen"
+                        data-category="Sách Tâm Lý Tuổi Teen"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-mental-health-line"></i>Sách Tâm Lý Tuổi Teen</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Nấu%20ăn" data-category="Sách Nấu ăn"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-restaurant-line"></i>Sách Nấu ăn</a></li>
+                    <li><a href="/searchBooks?category=Sách%20khởi%20nghiệp" data-category="Sách khởi nghiệp"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-seedling-line"></i>Sách khởi nghiệp</a></li>
+                    <li><a href="/searchBooks?category=Sách%20nghệ%20thuật%20sống%20đẹp"
+                        data-category="Sách nghệ thuật sống đẹp"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-heart-2-line"></i>Sách nghệ thuật sống đẹp</a></li>
+                  </ul>
+                </div>
+                <div class="w-[340px] min-w-[320px] max-w-[400px]">
+                  <div class="font-bold mb-4 text-white text-base opacity-0 select-none">Ẩn</div>
+                  <ul class="space-y-2 mt-2">
+                    <li><a href="/searchBooks?category=Sách%20hướng%20nghiệp%20-%20Kỹ%20năng%20mềm"
+                        data-category="Sách hướng nghiệp - Kỹ năng mềm"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-compasses-2-line"></i>Sách hướng nghiệp - Kỹ năng mềm</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Luyện%20Thi%20Đại%20Học%20-%20Cao%20Đẳng"
+                        data-category="Sách Luyện Thi Đại Học - Cao Đẳng"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-booklet-line"></i>Sách Luyện Thi Đại Học - Cao Đẳng</a></li>
+                    <li><a href="/searchBooks?category=Sách%20doanh%20nhân" data-category="Sách doanh nhân"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-user-star-line"></i>Sách doanh nhân</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Phong%20Thủy%20-%20Kinh%20Dịch"
+                        data-category="Sách Phong Thủy - Kinh Dịch"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-yin-yang-line"></i>Sách Phong Thủy - Kinh Dịch</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Học%20Tiếng%20Hoa" data-category="Sách Học Tiếng Hoa"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-translate-2"></i>Sách Học Tiếng Hoa</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Học%20Tiếng%20Nhật" data-category="Sách Học Tiếng Nhật"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-translate"></i>Sách Học Tiếng Nhật</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Học%20Tiếng%20Hàn" data-category="Sách Học Tiếng Hàn"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-translate"></i>Sách Học Tiếng Hàn</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Làm%20Đẹp" data-category="Sách Làm Đẹp"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-magic-fill"></i>Sách Làm Đẹp</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Danh%20Nhân" data-category="Sách Danh Nhân"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-user-3-line"></i>Sách Danh Nhân</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tham%20khảo%20cấp%20I"
+                        data-category="Sách tham khảo cấp I"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-read-line"></i>Sách tham khảo cấp I</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tham%20khảo%20cấp%20II"
+                        data-category="Sách tham khảo cấp II"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-read-line"></i>Sách tham khảo cấp II</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tham%20khảo%20cấp%20III"
+                        data-category="Sách tham khảo cấp III"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-read-line"></i>Sách tham khảo cấp III</a></li>
+                    <li><a href="/searchBooks?category=Sách%20tài%20chính,%20kế%20toán"
+                        data-category="Sách tài chính, kế toán"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-bank-card-line"></i>Sách tài chính, kế toán</a></li>
+                    <li><a href="/searchBooks?category=Thơ" data-category="Thơ"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-brush-line"></i>Thơ</a></li>
+                  </ul>
+                </div>
+                <div class="w-[340px] min-w-[320px] max-w-[400px]">
+                  <div class="font-bold mb-4 text-white text-base opacity-0 select-none">Ẩn</div>
+                  <ul class="space-y-2 mt-2">
+                    <li><a href="/searchBooks?category=Sách%20Phong%20Tục%20-%20Tập%20Quán"
+                        data-category="Sách Phong Tục - Tập Quán"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-group-line"></i>Sách Phong Tục - Tập Quán</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Kiến%20Thức%20-%20Kỹ%20Năng%20Cho%20Trẻ"
+                        data-category="Sách Kiến Thức - Kỹ Năng Cho Trẻ"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-plant-line"></i>Sách Kiến Thức - Kỹ Năng Cho Trẻ</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Thai%20Giáo" data-category="Sách Thai Giáo"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-baby-carriage-line"></i>Sách Thai Giáo</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Hôn%20Nhân%20-%20Giới%20Tính"
+                        data-category="Sách Hôn Nhân - Giới Tính"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-coupen-line"></i>Sách Hôn Nhân - Giới Tính</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Tô%20Màu%20Dành%20Cho%20Người%20Lớn"
+                        data-category="Sách Tô Màu Dành Cho Người Lớn"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-palette-line"></i>Sách Tô Màu Dành Cho Người Lớn</a></li>
+                    <li><a href="/searchBooks?category=Sách%20Đường%20Xưa%20Mây%20Trắng"
+                        data-category="Sách Đường Xưa Mây Trắng"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-roadster-line"></i>Sách Đường Xưa Mây Trắng</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20tranh%20Ehon" data-category="Truyện tranh Ehon"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-2-line"></i>Truyện tranh Ehon</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20kinh%20dị" data-category="Truyện kinh dị"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-ghost-line"></i>Truyện kinh dị</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20kiếm%20hiệp" data-category="Truyện kiếm hiệp"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-sword-line"></i>Truyện kiếm hiệp</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20cười" data-category="Truyện cười"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-emotion-laugh-line"></i>Truyện cười</a></li>
+                    <li><a href="/searchBooks?category=Truyện%20cổ%20tích" data-category="Truyện cổ tích"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-book-3-line"></i>Truyện cổ tích</a></li>
+                    <li><a href="/searchBooks?category=Tranh%20Truyện" data-category="Tranh Truyện"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-landscape-line"></i>Tranh Truyện</a></li>
+                    <li><a href="/searchBooks?category=Triết%20Học" data-category="Triết Học"
+                        class="flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium"><i
+                          class="ri-brain-line"></i>Triết Học</a></li>
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          </li>
           <li><a href="reviews" class="nav-link">Đánh giá</a></li>
           <li><a href="about" class="nav-link">Về chúng tôi</a></li>
         </ul>
       </nav>
       <div class="header-actions relative">
-        <!-- <button id="headerSearchBtn" class="search-btn w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy" aria-label="Search">
+        <button
+          class="search-btn w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
+          aria-label="Search">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
-        </button> -->
+        </button>
 
         <button id="cartBtn"
           class="cart-btn cart-badge w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
@@ -28,15 +258,15 @@
           <i class="ri-shopping-cart-2-line text-xl"></i>
         </button>
 
-        <!-- User button khi chưa đăng nhập -->
-        <button id="userBtn" 
+        <button id="userBtn"
           class="user-btn ml-2 w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-200 hover:bg-primarynavy hover:text-white focus:outline-none focus:ring-2 focus:ring-primarynavy"
           aria-label="User">
           <i class="ri-user-line text-xl"></i>
         </button>
 
         <!-- User info khi đã đăng nhập -->
-        <div id="userInfo" class="hidden ml-2 flex items-center space-x-3 cursor-pointer" title="Nhấn để xem menu tài khoản">
+        <div id="userInfo" class="hidden ml-2 flex items-center space-x-3 cursor-pointer"
+          title="Nhấn để xem menu tài khoản">
           <div class="text-right">
             <div id="headerUserName" class="font-medium text-gray-800 text-sm max-w-32 truncate">User</div>
             <div class="text-xs text-green-600 font-medium">● Đã đăng nhập</div>
@@ -52,25 +282,6 @@
     </div>
   </div>
 </header>
-
-<!-- Header Search Modal -->
-<div id="headerSearchModal" class="fixed inset-0 bg-black bg-opacity-50 z-[9998] hidden items-center justify-center">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-96 overflow-hidden">
-    <div class="p-4 border-b">
-      <div class="flex items-center space-x-4">
-        <input type="text" id="headerSearchInput" class="flex-1 text-lg border-none outline-none"
-          placeholder="Tìm kiếm sách, tác giả hoặc thể loại..." autocomplete="off">
-        <button id="closeHeaderSearch" class="text-gray-500 hover:text-gray-700">
-          <i class="ri-close-line text-xl"></i>
-        </button>
-      </div>
-    </div>
-    <div id="headerSearchResults" class="max-h-80 overflow-y-auto">
-      <!-- Search results will be populated here -->
-    </div>
-  </div>
-</div>
-
 <!-- Slide-in user panel -->
 <div id="userPanel" class="fixed top-0 right-0 h-full w-80 max-w-full bg-white shadow-2xl border-l border-gray-200 z-[9999] rounded-l-xl
   translate-x-full hidden transition-transform duration-300 ease-in-out
@@ -80,6 +291,7 @@
     <button id="closeUserPanel" class="text-gray-500 hover:text-primarynavy text-2xl">&times;</button>
   </div>
   <div class="p-5 space-y-4 flex-1 flex flex-col">
+
     <a href="orders"
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-file-list-3-line text-xl"></i> Đơn hàng của tôi
@@ -93,7 +305,7 @@
       class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/20 transition text-gray-800 font-medium">
       <i class="ri-settings-3-line text-xl"></i> Cài đặt tài khoản
     </a>
-    
+
     <!-- User not logged in -->
     <div id="guestActions" class="space-y-2 mt-auto">
       <div class="text-center text-gray-500 text-sm mb-3">
@@ -107,7 +319,8 @@
         class="block w-full bg-white text-primarynavy border border-primarynavy px-4 py-3 rounded-lg text-center font-semibold hover:bg-gray-50 transition-colors">
         <i class="ri-user-add-line mr-2"></i>Tạo tài khoản</a>
     </div>
-    
+
+
     <!-- User logged in -->
     <div id="userActions" class="hidden">
       <!-- User profile section -->
@@ -122,7 +335,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Logout button at bottom -->
       <div class="mt-auto pt-4 border-t border-gray-200">
         <button id="logoutBtn"
@@ -171,7 +384,7 @@
       <span class="font-medium text-gray-700">Tạm tính:</span>
       <span class="font-bold text-lg text-primarynavy" id="cartTotal">0đ</span>
     </div>
-    <a href="cart"
+    <a href="orders"
       class="block w-full bg-primarynavy text-white px-4 py-3 rounded-lg text-center font-semibold mb-2">Xem giỏ
       hàng</a>
     <a href="checkout"
@@ -188,228 +401,87 @@
     appearance: none;
     margin: 0;
   }
-
-  /* Header Search Modal Styles */
-  #headerSearchModal {
-    backdrop-filter: blur(4px);
-  }
-
-  #headerSearchModal.show {
-    display: flex !important;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
 </style>
-
 <script>
-  // Header search functionality
-  document.addEventListener('DOMContentLoaded', function () {
-    const headerSearchBtn = document.getElementById('headerSearchBtn');
-    const headerSearchModal = document.getElementById('headerSearchModal');
-    const headerSearchInput = document.getElementById('headerSearchInput');
-    const closeHeaderSearch = document.getElementById('closeHeaderSearch');
-    const headerSearchResults = document.getElementById('headerSearchResults');
-
-    let headerSearchTimeout;
-    let isHeaderSearching = false;
-
-    // Open search modal
-    if (headerSearchBtn) {
-      headerSearchBtn.addEventListener('click', () => {
-        headerSearchModal.classList.remove('hidden');
-        headerSearchModal.classList.add('show');
-        setTimeout(() => {
-          headerSearchInput.focus();
-        }, 100);
-      });
+  // Tối ưu hover mega menu: chỉ ẩn khi chuột rời hoàn toàn khỏi cả menu và mega menu
+  (function () {
+    const menu = document.getElementById('categoryMenu');
+    const mega = document.getElementById('categoryMegaMenu');
+    const bridge = document.getElementById('categoryHoverBridge');
+    let isOverMenu = false;
+    let isOverMega = false;
+    let isOverBridge = false;
+    function showMenu() {
+      mega.classList.add('opacity-100', 'pointer-events-auto');
+      mega.classList.remove('opacity-0', 'pointer-events-none');
     }
-
-    // Close search modal
-    function closeSearchModal() {
-      headerSearchModal.classList.add('hidden');
-      headerSearchModal.classList.remove('show');
-      headerSearchInput.value = '';
-      headerSearchResults.innerHTML = '';
-    }
-
-    if (closeHeaderSearch) {
-      closeHeaderSearch.addEventListener('click', closeSearchModal);
-    }
-
-    // Close on backdrop click
-    headerSearchModal.addEventListener('click', (e) => {
-      if (e.target === headerSearchModal) {
-        closeSearchModal();
+    function hideMenu() {
+      if (!isOverMenu && !isOverMega && !isOverBridge) {
+        mega.classList.remove('opacity-100', 'pointer-events-auto');
+        mega.classList.add('opacity-0', 'pointer-events-none');
       }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && headerSearchModal.classList.contains('show')) {
-        closeSearchModal();
-      }
-    });
-
-    // Search functionality
-    if (headerSearchInput) {
-      headerSearchInput.addEventListener('input', (e) => {
-        clearTimeout(headerSearchTimeout);
-        const query = e.target.value.trim();
-
-        if (query.length >= 2) {
-          headerSearchTimeout = setTimeout(() => {
-            performHeaderSearch(query);
-          }, 300);
-        } else {
-          headerSearchResults.innerHTML = '';
-        }
+    }
+    if (menu && mega && bridge) {
+      menu.addEventListener('mouseenter', () => {
+        isOverMenu = true;
+        showMenu();
       });
-
-      headerSearchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const query = headerSearchInput.value.trim();
-          if (query) {
-            closeSearchModal();
-            window.location.href = `/books?search=${encodeURIComponent(query)}`;
-          }
-        }
+      menu.addEventListener('mouseleave', () => {
+        isOverMenu = false;
+        setTimeout(hideMenu, 10);
+      });
+      mega.addEventListener('mouseenter', () => {
+        isOverMega = true;
+        showMenu();
+      });
+      mega.addEventListener('mouseleave', () => {
+        isOverMega = false;
+        setTimeout(hideMenu, 10);
+      });
+      bridge.addEventListener('mouseenter', () => {
+        isOverBridge = true;
+        showMenu();
+      });
+      bridge.addEventListener('mouseleave', () => {
+        isOverBridge = false;
+        setTimeout(hideMenu, 10);
       });
     }
+  })();
 
-    // Perform header search
-    async function performHeaderSearch(query) {
-      if (isHeaderSearching) return;
-      isHeaderSearching = true;
-
-      try {
-        headerSearchResults.innerHTML = '<div class="p-4 text-center"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primarynavy"></div></div>';
-
-        // Use the same API service as homepage
-        if (typeof ApiService !== 'undefined') {
-          const response = await ApiService.searchBooks(query);
-          if (response.success && response.books) {
-            renderHeaderSearchResults(response.books.slice(0, 5), query);
+  // Luồng chuyển trang category: event delegation, SPA-like nếu đang ở searchBooks (không cần .html)
+  (function () {
+    const megaMenu = document.getElementById('categoryMegaMenu');
+    if (!megaMenu) return;
+    megaMenu.addEventListener('click', function (e) {
+      let link = e.target.closest('a[data-category]');
+      if (!link && e.target.tagName === 'LI') {
+        link = e.target.querySelector('a[data-category]');
+      }
+      if (!link) return;
+      // Chỉ xử lý khi click chuột trái không có modifier (để Ctrl+click, chuột phải, middle mouse vẫn mở tab mới/copy link đúng)
+      if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      const category = link.getAttribute('data-category');
+      // Luôn chuyển hướng về đúng domain gốc + /searchBooks?category=...
+      const targetUrl = '/searchBooks?category=' + encodeURIComponent(category);
+      // Xác định pathname hiện tại (bỏ hết .html, thư mục con)
+      const currentPath = window.location.pathname.replace(/\/+/g, '/').replace(/\.html$/, '');
+      // Hỗ trợ cả file://
+      const isSearchBooks = /\/searchBooks$/i.test(currentPath);
+      if (isSearchBooks) {
+        // Nếu đã ở searchBooks, chỉ pushState và phát event SPA
+        window.history.pushState({}, '', targetUrl);
+        window.dispatchEvent(new CustomEvent('categoryFilterChange', { detail: { category } }));
           } else {
-            showHeaderNoResults(query);
-          }
+        // Nếu không, chuyển trang đúng domain (hỗ trợ file://)
+        if (window.location.origin === 'null' || window.location.origin === 'file://') {
+          window.location.href = targetUrl;
         } else {
-          // Fallback if ApiService is not available
-          showHeaderNoResults(query);
-        }
-      } catch (error) {
-        console.error('Header search failed:', error);
-        showHeaderNoResults(query);
-      } finally {
-        isHeaderSearching = false;
-      }
-    }
-
-    // Render header search results
-    function renderHeaderSearchResults(books, query) {
-      if (books.length === 0) {
-        showHeaderNoResults(query);
-        return;
-      }
-
-      const booksHtml = books.map(book => `
-      <div class="p-3 border-b hover:bg-gray-50 cursor-pointer" onclick="viewBookFromHeader('${book._id}')">
-        <div class="flex items-center space-x-3">
-          <img src="${getBookImageUrl(book)}" alt="${escapeHtml(book.title)}" 
-               class="w-12 h-16 object-cover rounded" onerror="this.src='/assets/images/default_image.jpg'">
-          <div class="flex-1 min-w-0">
-            <h4 class="font-medium text-gray-900 truncate">${highlightSearchTerm(book.title, query)}</h4>
-            <p class="text-sm text-gray-500 truncate">${escapeHtml(book.author?.name || book.author || 'Unknown Author')}</p>
-            <p class="text-sm font-medium text-primarynavy">${formatPrice(book.price)}</p>
-          </div>
-        </div>
-      </div>
-    `).join('');
-
-      headerSearchResults.innerHTML = `
-      ${booksHtml}
-      <div class="p-3 border-t bg-gray-50">
-        <button onclick="viewAllSearchResults('${query}')" class="w-full text-center text-primarynavy hover:underline font-medium">
-          Xem tất cả kết quả cho "${query}" →
-        </button>
-      </div>
-    `;
-    }
-
-    // Show no results
-    function showHeaderNoResults(query) {
-      headerSearchResults.innerHTML = `
-      <div class="p-6 text-center">
-        <i class="ri-search-line text-3xl text-gray-400 mb-2"></i>
-        <p class="text-gray-500 mb-3">Không tìm thấy sách nào với từ khóa "${query}"</p>
-        <button onclick="viewAllSearchResults('${query}')" class="text-primarynavy hover:underline">
-          Tìm kiếm tất cả →
-        </button>
-      </div>
-    `;
-    }
-
-    // Global functions for header search
-    window.viewBookFromHeader = function (bookId) {
-      closeSearchModal();
-      window.location.href = `/bookDetail?id=${bookId}`;
-    };
-
-    window.viewAllSearchResults = function (query) {
-      closeSearchModal();
-      window.location.href = `/books?search=${encodeURIComponent(query)}`;
-    };
-
-    // Helper functions
-    function getBookImageUrl(book) {
-      if (!book.imageUrl || book.imageUrl.trim() === '') {
-        return '/assets/images/default_image.jpg';
-      }
-
-      // Convert Google Drive link if needed
-      if (book.imageUrl.includes('drive.google.com/file/d/')) {
-        const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
-        const match = book.imageUrl.match(driveRegex);
-        if (match && match[1]) {
-          return `https://drive.google.com/uc?id=${match[1]}&export=view`;
+          window.location.href = window.location.origin + targetUrl;
         }
       }
+    });
+  })();
 
-      return book.imageUrl;
-    }
-
-    function formatPrice(price) {
-      if (!price) return 'Liên hệ';
-      return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-      }).format(price);
-    }
-
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function highlightSearchTerm(text, term) {
-      if (!term) return escapeHtml(text);
-
-      const regex = new RegExp(`(${term})`, 'gi');
-      return escapeHtml(text).replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
-    }
-
-    // Note: User panel functionality is handled by callHeaderFooter.js
-    // This script only handles search functionality
-  });
 </script>
