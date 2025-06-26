@@ -48,7 +48,7 @@
 
 </head>
 
-<body class="bg-[#fafaf3]">
+<body class="bg-light" style="padding-top: 80px;">
   <!-- Header -->
   <div id="header-placeholder"></div>
 
@@ -317,106 +317,139 @@
               window.location.href = `${window.location.origin}/bookDetail?id=${id}`;
             });
           });
+
+          // Add event listeners only for new buttons to avoid duplicates
+          document.querySelectorAll('.add-to-cart-btn:not([data-listener-added])').forEach(btn => {
+            btn.setAttribute('data-listener-added', 'true');
+            btn.addEventListener('click', async function (e) {
+              e.stopPropagation();
+              const bookId = btn.getAttribute('data-id');
+
+              // Check if already in cart
+              const isInCart = userCartBookIds.some(cartId =>
+                cartId === bookId || cartId === String(bookId)
+              );
+
+              if (isInCart) {
+                console.log('📚 [books.html AddToCart] Book already in cart:', bookId);
+                return;
+              }
+
+              // Prevent multiple clicks
+              if (btn.disabled) return;
+
+              btn.innerHTML = "Đang thêm...";
+              btn.disabled = true;
+              try {
+                console.log('📚 [books.html AddToCart] Adding book to cart:', bookId);
+
+                // Use global function if available
+                if (window.addToCartFromExternal) {
+                  const success = await window.addToCartFromExternal(bookId, 1, 'buy');
+                  if (success) {
+                    // Update local state
+                    if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                      userCartBookIds.push(bookId);
+                    }
+                    btn.innerHTML = "✔ Đã thêm";
+                    btn.classList.remove("bg-gray-200", "text-gray-800");
+                    btn.classList.add("bg-green-500", "text-white");
+                    btn.disabled = true;
+                    console.log('✅ [books.html AddToCart] Successfully added to cart');
+                  } else {
+                    throw new Error('Failed to add to cart');
+                  }
+                } else {
+                  // Fallback to direct API call
+                  await ApiService.addToCart(bookId, 1, 'buy');
+
+                  // Update local state
+                  if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                    userCartBookIds.push(bookId);
+                  }
+
+                  btn.innerHTML = "✔ Đã thêm";
+                  btn.classList.remove("bg-gray-200", "text-gray-800");
+                  btn.classList.add("bg-green-500", "text-white");
+                  btn.disabled = true;
+                }
+              } catch (error) {
+                console.error('❌ [books.html AddToCart] Error:', error);
+                btn.innerHTML = "Lỗi!";
+                btn.classList.add("bg-red-500", "text-white");
+                setTimeout(() => {
+                  btn.innerHTML = "Thêm vào giỏ";
+                  btn.classList.remove("bg-red-500", "text-white");
+                  btn.classList.add("bg-gray-200", "text-gray-800");
+                  btn.disabled = false;
+                }, 2000);
+              }
+            });
+          });
+
+          // Add event listeners only for new favourite buttons
+          document.querySelectorAll('.fav-btn:not([data-listener-added])').forEach(btn => {
+            btn.setAttribute('data-listener-added', 'true');
+            btn.addEventListener('click', async function (e) {
+              e.stopPropagation();
+              const bookId = btn.getAttribute('data-id');
+              const icon = btn.querySelector("i");
+              const isFaved = btn.classList.contains("faved");
+
+              // Prevent multiple clicks
+              if (btn.disabled) return;
+
+              try {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+
+                if (isFaved) {
+                  console.log('💖 [books.html Favourite] Removing from favourites:', bookId);
+                  await ApiService.removeFromFavourites(bookId);
+                  userFavouriteBookIds = userFavouriteBookIds.filter(id =>
+                    id !== bookId && id !== String(bookId)
+                  );
+                  btn.classList.remove("faved");
+                  icon.classList.remove("ri-star-fill", "text-yellow-400");
+                  icon.classList.add("ri-star-line", "text-gray-800");
+                  console.log('✅ [books.html Favourite] Removed from favourites');
+                } else {
+                  console.log('💖 [books.html Favourite] Adding to favourites:', bookId);
+                  await ApiService.addToFavourites(bookId);
+                  if (!userFavouriteBookIds.some(favId => favId === bookId || favId === String(bookId))) {
+                    userFavouriteBookIds.push(bookId);
+                  }
+                  btn.classList.add("faved");
+                  icon.classList.remove("ri-star-line", "text-gray-800");
+                  icon.classList.add("ri-star-fill", "text-yellow-400");
+                  console.log('✅ [books.html Favourite] Added to favourites');
+                }
+              } catch (error) {
+                console.error('❌ [books.html Favourite] Error toggling favourite:', error);
+
+                // Revert UI state on error
+                if (isFaved) {
+                  btn.classList.add("faved");
+                  icon.classList.add("ri-star-fill", "text-yellow-400");
+                  icon.classList.remove("ri-star-line", "text-gray-800");
+                } else {
+                  btn.classList.remove("faved");
+                  icon.classList.add("ri-star-line", "text-gray-800");
+                  icon.classList.remove("ri-star-fill", "text-yellow-400");
+                }
+              } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+              }
+            });
+          });
         }, 0);
 
-        // Hiệu ứng khi bấm "Thêm vào giỏ"
-        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-          btn.addEventListener('click', async function (e) {
-            e.stopPropagation();
-            const bookId = btn.getAttribute('data-id');
-            // Kiểm tra xem sách đã có trong giỏ chưa (với nhiều format ID)
-            const isInCart = userCartBookIds.some(cartId =>
-              cartId === bookId || cartId === String(bookId)
-            );
+        // Note: Add to cart functionality is now handled by books.js
+        // This comment is left for clarity - the actual implementation is in books.js
 
-            if (isInCart) {
-              console.log('📚 [AddToCart] Book already in cart:', bookId);
-              return; // Nếu đã có trong giỏ thì không làm gì
-            }
-
-            btn.innerHTML = "Đang thêm...";
-            btn.disabled = true;
-            try {
-              console.log('📚 [AddToCart] Adding book to cart:', bookId);
-              await ApiService.addToCart(bookId, 1);
-
-              // Cập nhật state local
-              if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
-                userCartBookIds.push(bookId);
-                console.log('📚 [AddToCart] Updated cart IDs:', userCartBookIds);
-              }
-
-              btn.innerHTML = "✔ Đã thêm";
-              btn.classList.remove("bg-gray-200", "text-gray-800");
-              btn.classList.add("bg-green-500", "text-white");
-              btn.disabled = true; // Giữ disabled để không thể thêm lại
-              console.log('✅ [AddToCart] Successfully added to cart');
-            } catch (error) {
-              btn.innerHTML = "Lỗi!";
-              btn.classList.add("bg-red-500", "text-white");
-              setTimeout(() => {
-                btn.innerHTML = "Thêm vào giỏ";
-                btn.classList.remove("bg-red-500", "text-white");
-                btn.classList.add("bg-gray-200", "text-gray-800");
-                btn.disabled = false;
-              }, 2000);
-            }
-          });
-        });
-
-        // Hiệu ứng khi bấm "Yêu thích"
-        document.querySelectorAll('.fav-btn').forEach(btn => {
-          btn.addEventListener('click', async function (e) {
-            e.stopPropagation();
-            const bookId = btn.getAttribute('data-id');
-            const icon = btn.querySelector("i");
-            const isFaved = btn.classList.contains("faved");
-            try {
-              // Disable button during request
-              btn.disabled = true;
-              btn.style.opacity = '0.5';
-
-              if (isFaved) {
-                console.log('💖 [Favourite] Removing from favourites:', bookId);
-                await ApiService.removeFromFavourites(bookId);
-                userFavouriteBookIds = userFavouriteBookIds.filter(id =>
-                  id !== bookId && id !== String(bookId)
-                );
-                btn.classList.remove("faved");
-                icon.classList.remove("ri-star-fill", "text-yellow-400");
-                icon.classList.add("ri-star-line", "text-gray-800");
-                console.log('✅ [Favourite] Removed from favourites');
-              } else {
-                console.log('💖 [Favourite] Adding to favourites:', bookId);
-                await ApiService.addToFavourites(bookId);
-                if (!userFavouriteBookIds.some(favId => favId === bookId || favId === String(bookId))) {
-                  userFavouriteBookIds.push(bookId);
-                }
-                btn.classList.add("faved");
-                icon.classList.remove("ri-star-line", "text-gray-800");
-                icon.classList.add("ri-star-fill", "text-yellow-400");
-                console.log('✅ [Favourite] Added to favourites');
-              }
-            } catch (error) {
-              console.error('❌ [Favourite] Error toggling favourite:', error);
-              alert('Có lỗi xảy ra: ' + (error.message || 'Không thể cập nhật trạng thái yêu thích'));
-
-              // Revert UI state on error (theo cách bookDetail)
-              if (isFaved) {
-                btn.classList.add("faved");
-                icon.classList.add("ri-star-fill", "text-yellow-400");
-                icon.classList.remove("ri-star-line", "text-gray-800");
-              } else {
-                btn.classList.remove("faved");
-                icon.classList.add("ri-star-line", "text-gray-800");
-                icon.classList.remove("ri-star-fill", "text-yellow-400");
-              }
-            } finally {
-              btn.disabled = false;
-              btn.style.opacity = '1';
-            }
-          });
-        });
+        // Note: Favourite functionality is now handled by books.js
+        // This comment is left for clarity - the actual implementation is in books.js
 
         // Render phân trang
         renderPagination(totalPages);
@@ -640,7 +673,7 @@
         recommendedGrid.innerHTML = recommended.map(book => renderSpecialBookCard(book)).join('');
       }
 
-      // Thêm event listeners cho special sections
+      // Note: Special sections now use books.js logic
       addEventListenersToSpecialSections();
     }
 
@@ -675,11 +708,13 @@
       addEventListenersToSpecialSections();
     }
 
-    // Hàm thêm event listeners cho các sections đặc biệt
+    // Event listeners for special sections
     function addEventListenersToSpecialSections() {
-      // Event listeners cho book cards
-      document.querySelectorAll('.book-card-item:not([data-events-added])').forEach(card => {
-        card.setAttribute('data-events-added', 'true');
+      console.log('📘 [books.html] Adding event listeners for special sections');
+
+      // Handle card navigation for special sections
+      document.querySelectorAll('.book-card-item:not([data-nav-added])').forEach(card => {
+        card.setAttribute('data-nav-added', 'true');
         card.addEventListener('click', function (e) {
           if (e.target.closest('.fav-btn') || e.target.closest('.add-to-cart-btn')) return;
           const id = this.getAttribute('data-id');
@@ -689,13 +724,14 @@
         });
       });
 
-      // Event listeners cho add to cart buttons
-      document.querySelectorAll('.add-to-cart-btn:not([data-events-added])').forEach(btn => {
-        btn.setAttribute('data-events-added', 'true');
+      // Handle add to cart for special sections - using event delegation to avoid duplicates
+      document.querySelectorAll('.add-to-cart-btn:not([data-listener-added])').forEach(btn => {
+        btn.setAttribute('data-listener-added', 'true');
         btn.addEventListener('click', async function (e) {
           e.stopPropagation();
           const bookId = btn.getAttribute('data-id');
-          // Kiểm tra xem sách đã có trong giỏ chưa (với nhiều format ID)
+
+          // Check if already in cart
           const isInCart = userCartBookIds.some(cartId =>
             cartId === bookId || cartId === String(bookId)
           );
@@ -705,24 +741,46 @@
             return;
           }
 
+          // Prevent multiple clicks
+          if (btn.disabled) return;
+
           btn.innerHTML = "Đang thêm...";
           btn.disabled = true;
           try {
             console.log('📚 [Special AddToCart] Adding book to cart:', bookId);
-            await ApiService.addToCart(bookId, 1);
 
-            // Cập nhật state local
-            if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
-              userCartBookIds.push(bookId);
-              console.log('📚 [Special AddToCart] Updated cart IDs:', userCartBookIds);
+            // Use global function if available
+            if (window.addToCartFromExternal) {
+              const success = await window.addToCartFromExternal(bookId, 1, 'buy');
+              if (success) {
+                // Update local state
+                if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                  userCartBookIds.push(bookId);
+                }
+                btn.innerHTML = "✔ Đã thêm";
+                btn.classList.remove("bg-gray-200", "text-gray-800");
+                btn.classList.add("bg-green-500", "text-white");
+                btn.disabled = true;
+                console.log('✅ [Special AddToCart] Successfully added to cart');
+              } else {
+                throw new Error('Failed to add to cart');
+              }
+            } else {
+              // Fallback to direct API call
+              await ApiService.addToCart(bookId, 1, 'buy');
+
+              // Update local state
+              if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                userCartBookIds.push(bookId);
+              }
+
+              btn.innerHTML = "✔ Đã thêm";
+              btn.classList.remove("bg-gray-200", "text-gray-800");
+              btn.classList.add("bg-green-500", "text-white");
+              btn.disabled = true;
             }
-
-            btn.innerHTML = "✔ Đã thêm";
-            btn.classList.remove("bg-gray-200", "text-gray-800");
-            btn.classList.add("bg-green-500", "text-white");
-            btn.disabled = true;
-            console.log('✅ [Special AddToCart] Successfully added to cart');
           } catch (error) {
+            console.error('❌ [Special AddToCart] Error:', error);
             btn.innerHTML = "Lỗi!";
             btn.classList.add("bg-red-500", "text-white");
             setTimeout(() => {
@@ -735,16 +793,19 @@
         });
       });
 
-      // Event listeners cho favourite buttons
-      document.querySelectorAll('.fav-btn:not([data-events-added])').forEach(btn => {
-        btn.setAttribute('data-events-added', 'true');
+      // Handle favourites for special sections - using event delegation to avoid duplicates
+      document.querySelectorAll('.fav-btn:not([data-listener-added])').forEach(btn => {
+        btn.setAttribute('data-listener-added', 'true');
         btn.addEventListener('click', async function (e) {
           e.stopPropagation();
           const bookId = btn.getAttribute('data-id');
           const icon = btn.querySelector("i");
           const isFaved = btn.classList.contains("faved");
+
+          // Prevent multiple clicks
+          if (btn.disabled) return;
+
           try {
-            // Disable button during request
             btn.disabled = true;
             btn.style.opacity = '0.5';
 
@@ -771,7 +832,6 @@
             }
           } catch (error) {
             console.error('❌ [Special Favourite] Error toggling favourite:', error);
-            alert('Có lỗi xảy ra: ' + (error.message || 'Không thể cập nhật trạng thái yêu thích'));
 
             // Revert UI state on error
             if (isFaved) {

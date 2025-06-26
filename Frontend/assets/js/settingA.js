@@ -38,6 +38,9 @@ function initializePage() {
         birthdayField.max = today;
     }
 
+    // Load provinces data for dynamic address dropdown
+    loadProvinces();
+
     // Load saved data from localStorage if available
     loadSavedFormData();
 }
@@ -55,6 +58,53 @@ function initializeFormHandlers() {
     formInputs.forEach(input => {
         input.addEventListener('change', saveFormData);
     });
+
+    // Address field handlers for delivery section
+    const streetDetailField = document.getElementById('street-detail');
+    if (streetDetailField) {
+        streetDetailField.addEventListener('input', updateCompleteAddress);
+        streetDetailField.addEventListener('change', updateCompleteAddress);
+    }
+
+    // Specific handlers for address dropdowns
+    const provinceSelect = document.getElementById('province');
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            const selectedCode = this.value;
+            if (selectedCode) {
+                loadDistricts(selectedCode);
+            } else {
+                // Clear districts and wards when no province selected
+                const districtSelect = document.getElementById('district');
+                const wardSelect = document.getElementById('ward');
+                if (districtSelect) districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+                if (wardSelect) wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            }
+            updateCompleteAddress();
+        });
+    }
+
+    const districtSelect = document.getElementById('district');
+    if (districtSelect) {
+        districtSelect.addEventListener('change', function() {
+            const selectedCode = this.value;
+            if (selectedCode) {
+                loadWards(selectedCode);
+            } else {
+                // Clear wards when no district selected
+                const wardSelect = document.getElementById('ward');
+                if (wardSelect) wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            }
+            updateCompleteAddress();
+        });
+    }
+
+    const wardSelect = document.getElementById('ward');
+    if (wardSelect) {
+        wardSelect.addEventListener('change', function() {
+            updateCompleteAddress();
+        });
+    }
 
     // Password change button handler
     const changePasswordBtn = document.querySelector('#security-section .btn-primary');
@@ -550,42 +600,145 @@ function hidePasswordLoading() {
     }
 }
 
-// Update address when dropdown or input changes
+// ================= DYNAMIC ADDRESS API INTEGRATION =================
+// API tỉnh - quận - phường
+function loadProvinces() {
+    fetch("https://provinces.open-api.vn/api/?depth=1")
+        .then(res => res.json())
+        .then(data => {
+            const provinceSelect = document.getElementById("province");
+            if (provinceSelect) {
+                provinceSelect.innerHTML = '<option value="">Chọn tỉnh/thành</option>';
+                data.forEach(p => {
+                    provinceSelect.innerHTML += `<option value="${p.code}">${p.name}</option>`;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading provinces:', error);
+        });
+}
+
+// Load districts when province changes
+function loadDistricts(provinceCode) {
+    if (!provinceCode) {
+        const districtSelect = document.getElementById("district");
+        const wardSelect = document.getElementById("ward");
+        if (districtSelect) districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+        if (wardSelect) wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+        updateCompleteAddress();
+        return;
+    }
+
+    console.log('📍 Loading districts for province:', provinceCode);
+    fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
+            const districtSelect = document.getElementById("district");
+            const wardSelect = document.getElementById("ward");
+            if (districtSelect) {
+                districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+                data.districts.forEach(d => {
+                    districtSelect.innerHTML += `<option value="${d.code}">${d.name}</option>`;
+                });
+                console.log('✅ Loaded', data.districts.length, 'districts');
+            }
+            if (wardSelect) {
+                wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+            }
+            updateCompleteAddress();
+        })
+        .catch(error => {
+            console.error('❌ Error loading districts:', error);
+        });
+}
+
+// Load wards when district changes
+function loadWards(districtCode) {
+    if (!districtCode) {
+        const wardSelect = document.getElementById("ward");
+        if (wardSelect) wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+        updateCompleteAddress();
+        return;
+    }
+
+    console.log('📍 Loading wards for district:', districtCode);
+    fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
+            const wardSelect = document.getElementById("ward");
+            if (wardSelect) {
+                wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+                data.wards.forEach(w => {
+                    wardSelect.innerHTML += `<option value="${w.code}">${w.name}</option>`;
+                });
+                console.log('✅ Loaded', data.wards.length, 'wards');
+            }
+            updateCompleteAddress();
+        })
+        .catch(error => {
+            console.error('❌ Error loading wards:', error);
+        });
+}
+
+// Handle dropdown changes and update address
 function updateAddress() {
-    const country = document.getElementById('country')?.value || '';
-    const province = document.getElementById('province')?.value || '';
-    const district = document.getElementById('district')?.value || '';
-    const ward = document.getElementById('ward')?.value || '';
+    // Just update the complete address - don't handle loading here
+    // Loading is handled by individual event listeners
+    updateCompleteAddress();
+}
+
+// Generate and update the complete address field
+function updateCompleteAddress() {
+    const country = document.getElementById('country')?.value || 'Việt Nam';
+    const provinceSelect = document.getElementById('province');
+    const districtSelect = document.getElementById('district');
+    const wardSelect = document.getElementById('ward');
     const streetDetail = document.getElementById('street-detail')?.value || '';
+    const fullAddressField = document.getElementById('full-address');
 
-    // Build full address
-    let addressParts = [];
+    if (!fullAddressField) return;
 
+    // Get text values from selected options (not codes)
+    let provinceName = '';
+    let districtName = '';
+    let wardName = '';
+
+    if (provinceSelect && provinceSelect.selectedIndex > 0) {
+        provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+    }
+
+    if (districtSelect && districtSelect.selectedIndex > 0) {
+        districtName = districtSelect.options[districtSelect.selectedIndex].text;
+    }
+
+    if (wardSelect && wardSelect.selectedIndex > 0) {
+        wardName = wardSelect.options[wardSelect.selectedIndex].text;
+    }
+
+    // Build address parts array (street first, then ward, district, province, country)
+    const addressParts = [];
+    
     if (streetDetail.trim()) {
         addressParts.push(streetDetail.trim());
     }
-    if (ward.trim()) {
-        addressParts.push(ward.trim());
+    if (wardName) {
+        addressParts.push(wardName);
     }
-    if (district.trim()) {
-        addressParts.push(district.trim());
+    if (districtName) {
+        addressParts.push(districtName);
     }
-    if (province.trim()) {
-        addressParts.push(province.trim());
+    if (provinceName) {
+        addressParts.push(provinceName);
     }
-    if (country.trim()) {
-        addressParts.push(country.trim());
-    }
-
-    const fullAddress = addressParts.join(', ');
-
-    // Update the full address textarea
-    const fullAddressTextarea = document.getElementById('full-address');
-    if (fullAddressTextarea) {
-        fullAddressTextarea.value = fullAddress;
+    if (country && country !== 'Việt Nam') {
+        addressParts.push(country);
     }
 
-    console.log('📍 Address updated:', fullAddress);
+    // Update the complete address field
+    fullAddressField.value = addressParts.join(', ');
+    
+    console.log('📍 Complete address updated:', fullAddressField.value);
 }
 
 // Save delivery address functionality
@@ -661,3 +814,7 @@ window.removeAvatar = removeAvatar;
 window.handleChangePassword = handleChangePassword;
 window.saveDeliveryAddress = saveDeliveryAddress;
 window.updateAddress = updateAddress;
+window.updateCompleteAddress = updateCompleteAddress;
+window.loadProvinces = loadProvinces;
+window.loadDistricts = loadDistricts;
+window.loadWards = loadWards;

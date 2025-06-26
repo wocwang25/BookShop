@@ -24,11 +24,11 @@ const CartService = {
                     items: [cartItem]
                 });
             } else {
+                // Sửa ở đây: so sánh với item.bookId
                 const index = cart.items.findIndex(
-                    cartItem => cartItem.book && cartItem.book.toString() === item.book
+                    cartItem => cartItem.book && cartItem.book.toString() === item.bookId
                 );
                 if (index > -1) {
-                    // cart.items[index].quantity += typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
                     cart.items[index].quantity += item.quantity > 0 ? item.quantity : 1;
                 } else {
                     cart.items.push(cartItem);
@@ -44,7 +44,7 @@ const CartService = {
     // Xóa một item cụ thể khỏi giỏ hàng
     async removeItem(userId, bookId) {
         try {
-            const cart = await Cart.findOne({ user: userId });
+            const cart = await Cart.findOne({ customer: userId });
             if (!cart) {
                 throw new Error('Không tìm thấy giỏ hàng');
             }

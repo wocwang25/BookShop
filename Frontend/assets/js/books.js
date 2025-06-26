@@ -6,6 +6,10 @@ const booksPerPage = 12;
 let currentSearchQuery = '';
 let currentCategory = 'all';
 
+// User cart and favorites state (similar to books.html)
+let userCartBookIds = [];
+let userFavouriteBookIds = [];
+
 // Get URL parameters
 function getURLParams() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -50,12 +54,91 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
+    // Load user cart and favorites first
+    await fetchUserCartAndWishlist();
+
     // Load and display books
     await loadBooks();
 
     // Setup event listeners
     setupEventListeners();
 });
+
+// Fetch user cart and wishlist data
+async function fetchUserCartAndWishlist() {
+    try {
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!isLoggedIn) {
+            console.log('💳 [books.js] User not logged in');
+            userCartBookIds = [];
+            userFavouriteBookIds = [];
+            return;
+        }
+
+        console.log('💳 [books.js] Fetching cart and favourites...');
+
+        // Fetch cart
+        try {
+            const cartRes = await ApiService.getCart();
+            console.log('💳 [books.js] Cart response:', cartRes);
+
+            let cartItems = [];
+            if (cartRes.items) {
+                cartItems = cartRes.items;
+            } else if (cartRes.cart && cartRes.cart.items) {
+                cartItems = cartRes.cart.items;
+            } else if (Array.isArray(cartRes)) {
+                cartItems = cartRes;
+            }
+
+            userCartBookIds = cartItems.map(item =>
+                item.bookId || item.book?._id || item.book || item._id || item.id
+            ).filter(id => id);
+
+            console.log('💳 [books.js] Cart book IDs:', userCartBookIds);
+        } catch (cartError) {
+            console.error('❌ [books.js] Error fetching cart:', cartError);
+            userCartBookIds = [];
+        }
+
+        // Fetch favourites
+        try {
+            const favRes = await ApiService.getFavourites();
+            console.log('💖 [books.js] Favourites response:', favRes);
+
+            let favourites = [];
+            if (favRes.favourites) {
+                favourites = favRes.favourites;
+            } else if (Array.isArray(favRes)) {
+                favourites = favRes;
+            } else if (favRes.success && favRes.data) {
+                favourites = favRes.data;
+            } else if (favRes.data) {
+                favourites = favRes.data;
+            }
+
+            userFavouriteBookIds = favourites.map(fav => {
+                if (fav.book && fav.book._id) return fav.book._id;
+                if (fav.book) return fav.book;
+                if (fav.bookId) return fav.bookId;
+                if (fav._id) return fav._id;
+                if (fav.id) return fav.id;
+                return null;
+            }).filter(id => id);
+
+            console.log('💖 [books.js] Favourite book IDs:', userFavouriteBookIds);
+        } catch (favError) {
+            console.error('❌ [books.js] Error fetching favourites:', favError);
+            userFavouriteBookIds = [];
+        }
+
+    } catch (error) {
+        console.error('❌ [books.js] General error fetching user data:', error);
+        userCartBookIds = [];
+        userFavouriteBookIds = [];
+    }
+}
 
 // Load books from API
 async function loadBooks() {
@@ -143,28 +226,42 @@ function displayBooks() {
 
 // Create book card HTML
 function createBookCard(book) {
+    const bookId = book._id || book.id;
+    
+    // Check if book is in cart or favourites
+    const isInCart = userCartBookIds.some(cartId =>
+        cartId === bookId || cartId === String(bookId)
+    );
+    const isFaved = userFavouriteBookIds.some(favId =>
+        favId === bookId || favId === String(favId)
+    );
+
     return `
         <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" 
-             data-id="${book._id || book.id}" onclick="viewBookDetail('${book._id || book.id}')">
+             data-id="${bookId}" onclick="viewBookDetail('${bookId}')">
             <div class="relative h-96 w-full flex-shrink-0">
                 <img src="${getBookImage(book)}" alt="${escapeHtml(book.title)}" 
                      class="w-full h-full object-cover object-top" 
                      onerror="this.src='${getDefaultImage()}'">
-                <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-primary rounded-full" 
-                        onclick="toggleFavorite(event, '${book._id || book.id}')" title="Yêu thích">
-                    <i class="ri-star-line text-gray-800"></i>
+                <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center bg-[#eaeaea]/90 rounded-full transition shadow-sm" 
+                        onclick="toggleFavorite(event, '${bookId}')" title="Yêu thích">
+                    <i class="${isFaved ? 'ri-star-fill text-yellow-400' : 'ri-star-line text-gray-800'}"></i>
                 </button>
-                ${book.isNew ? '<div class="absolute top-2 left-2 bg-primary text-gray-800 px-2 py-1 text-sm rounded-full">Mới</div>' : ''}
+                ${book.rating ? `
+                    <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
+                        <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
+                    </span>
+                ` : ''}
             </div>
             <div class="p-4 flex flex-col flex-1">
                 <div class="text-sm text-gray-500 mb-2">${escapeHtml(book.category?.name || book.category || 'Sách')}</div>
                 <h3 class="font-semibold text-gray-800 mb-2">${escapeHtml(book.title)}</h3>
                 <p class="text-gray-600 mb-3">${escapeHtml(book.author?.name || book.author || 'Unknown Author')}</p>
                 <div class="flex justify-between items-center mt-auto">
-                    <span class="font-semibold text-gray-800">${formatPrice(book.price)}</span>
-                    <button class="bg-gray-200 text-gray-800 px-4 py-2 !rounded-button whitespace-nowrap" 
-                            onclick="addToCart(event, '${book._id || book.id}')">
-                        Thêm vào giỏ
+                    <span class="font-semibold text-primarynavy">${formatPrice(book.price)}</span>
+                    <button class="${isInCart ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 !rounded-button whitespace-nowrap transition" 
+                            onclick="addToCart(event, '${bookId}')" ${isInCart ? 'disabled' : ''}>
+                        ${isInCart ? '✔ Đã thêm' : 'Thêm vào giỏ'}
                     </button>
                 </div>
             </div>
@@ -325,36 +422,9 @@ function clearSearch() {
 
 // Add event listeners to book cards
 function addBookCardEventListeners() {
-    // Add to cart buttons
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const originalText = this.textContent;
-            this.textContent = '✓ Đã thêm';
-            this.classList.add('bg-green-500', 'text-white');
-
-            setTimeout(() => {
-                this.textContent = originalText;
-                this.classList.remove('bg-green-500', 'text-white');
-            }, 1200);
-        });
-    });
-
-    // Favorite buttons
-    document.querySelectorAll('.fav-btn').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            this.classList.toggle('faved');
-            const icon = this.querySelector('i');
-            if (this.classList.contains('faved')) {
-                icon.classList.remove('ri-star-line');
-                icon.classList.add('ri-star-fill');
-            } else {
-                icon.classList.remove('ri-star-fill');
-                icon.classList.add('ri-star-line');
-            }
-        });
-    });
+    // Note: Event listeners are now handled inline in createBookCard
+    // This function is kept for compatibility but can be removed later
+    console.log('📘 [books.js] Book card event listeners handled inline');
 }
 
 // Utility functions
@@ -432,19 +502,120 @@ function showError(message) {
 
 async function addToCart(event, bookId) {
     event.stopPropagation();
-    console.log('Add to cart:', bookId);
-    // TODO: Implement actual cart functionality
-    console.log("dữ liệu từ books.js", bookId)
-    const response = await ApiService.addToCart(bookId);
+    
+    const button = event.target;
+    const originalText = button.textContent;
+    const originalClasses = button.className;
+    
+    // Check if already in cart or if button is processing
+    if (button.disabled) return;
+    
+    // Check if already in cart by ID
+    const isInCart = userCartBookIds.some(cartId =>
+        cartId === bookId || cartId === String(bookId)
+    );
+
+    if (isInCart) {
+        console.log('📚 [books.js] Book already in cart:', bookId);
+        return;
+    }
+    
+    try {
+        button.textContent = 'Đang thêm...';
+        button.disabled = true;
+        
+        // Use the global addToCartFromExternal function
+        if (window.addToCartFromExternal) {
+            const success = await window.addToCartFromExternal(bookId, 1, 'buy');
+            if (success) {
+                // Update local state
+                if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                    userCartBookIds.push(bookId);
+                }
+                
+                button.textContent = '✔ Đã thêm';
+                button.className = 'bg-green-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
+                console.log('✅ [books.js] Successfully added to cart:', bookId);
+            } else {
+                throw new Error('Failed to add to cart');
+            }
+        } else {
+            // Fallback to direct API call
+            await ApiService.addToCart(bookId, 1, 'buy');
+            
+            // Update local state
+            if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
+                userCartBookIds.push(bookId);
+            }
+            
+            button.textContent = '✔ Đã thêm';
+            button.className = 'bg-green-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
+        }
+    } catch (error) {
+        console.error('❌ [books.js] Error adding to cart:', error);
+        button.textContent = 'Lỗi!';
+        button.className = 'bg-red-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.className = originalClasses;
+            button.disabled = false;
+        }, 2000);
+    }
 }
 
 async function toggleFavorite(event, bookId) {
     event.stopPropagation();
-    console.log('Toggle favorite:', bookId);
-    // TODO: Implement actual favorite functionality
-    const response = await ApiService.addToFavourites({
-        bookId: bookId
-    });
+    
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+    const isFaved = icon.classList.contains('ri-star-fill');
+    
+    // Prevent multiple clicks
+    if (button.disabled) return;
+    
+    try {
+        button.disabled = true;
+        button.style.opacity = '0.5';
+        
+        if (isFaved) {
+            await ApiService.removeFromFavourites(bookId);
+            
+            // Update local state
+            userFavouriteBookIds = userFavouriteBookIds.filter(id =>
+                id !== bookId && id !== String(bookId)
+            );
+            
+            icon.classList.remove('ri-star-fill', 'text-yellow-400');
+            icon.classList.add('ri-star-line', 'text-gray-800');
+            console.log('✅ [books.js] Removed from favourites:', bookId);
+        } else {
+            await ApiService.addToFavourites(bookId);
+            
+            // Update local state
+            if (!userFavouriteBookIds.some(favId => favId === bookId || favId === String(bookId))) {
+                userFavouriteBookIds.push(bookId);
+            }
+            
+            icon.classList.remove('ri-star-line', 'text-gray-800');
+            icon.classList.add('ri-star-fill', 'text-yellow-400');
+            console.log('✅ [books.js] Added to favourites:', bookId);
+        }
+    } catch (error) {
+        console.error('❌ [books.js] Error toggling favourite:', error);
+        
+        // Revert on error
+        if (isFaved) {
+            icon.classList.add('ri-star-fill', 'text-yellow-400');
+            icon.classList.remove('ri-star-line', 'text-gray-800');
+        } else {
+            icon.classList.add('ri-star-line', 'text-gray-800');
+            icon.classList.remove('ri-star-fill', 'text-yellow-400');
+        }
+    } finally {
+        button.disabled = false;
+        button.style.opacity = '1';
+    }
 }
 
 function viewBookDetail(bookId) {
@@ -452,9 +623,14 @@ function viewBookDetail(bookId) {
     window.location.href = `/bookDetail?id=${bookId}`;
 }
 
-// Export functions for use in HTML
-window.changePage = changePage;
-window.clearSearch = clearSearch;
-window.addToCart = addToCart;
-window.toggleFavorite = toggleFavorite;
-window.viewBookDetail = viewBookDetail;
+// Export functions for use in HTML (only for /books page, not books.html)
+if (window.location.pathname === '/books' || window.location.pathname.endsWith('/books')) {
+    window.changePage = changePage;
+    window.clearSearch = clearSearch;
+    window.addToCart = addToCart;
+    window.toggleFavorite = toggleFavorite;
+    window.viewBookDetail = viewBookDetail;
+    console.log('📘 [books.js] Functions exported for /books page');
+} else {
+    console.log('📘 [books.js] Skipping function export - not on /books page');
+}

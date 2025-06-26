@@ -187,93 +187,567 @@ function closeCartPanel() {
 }
 
 // Cart logic
-let cart = [
-  {
-    id: 1,
-    name: "Tuổi trẻ đáng giá bao nhiêu",
-    author: "Rosie Nguyễn",
-    price: 120000,
-    oldPrice: 150000,
-    image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1495635816i/32521178.jpg",
-    quantity: 1
-  }
-  // Thêm sản phẩm mẫu khác nếu muốn
-];
+let cart = [];
+let isCartLoading = false;
 
 // Định dạng tiền Việt
 function formatVND(n) {
   return n.toLocaleString('vi-VN') + "đ";
 }
 
+// Load cart from API
+async function loadCart() {
+  if (!window.ApiService) {
+    console.warn('⚠️ [Cart] ApiService not available');
+    isCartLoading = false;
+    cart = [];
+    renderCart();
+    return;
+  }
+
+  if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+    console.log('🛒 [Cart] User not authenticated, cart will be empty');
+    isCartLoading = false;
+    cart = [];
+    renderCart();
+    return;
+  }
+
+  try {
+    isCartLoading = true;
+    renderCart(); // Show loading state immediately
+    console.log('🛒 [Cart] Loading cart from API...');
+    
+    const response = await window.ApiService.getCart();
+    console.log('🛒 [Cart] Raw API response:', JSON.stringify(response, null, 2));
+
+    // Reset cart first
+    cart = [];
+
+    // Check for different response formats - prioritize direct array first
+    if (response && Array.isArray(response)) {
+      // Format: [...] - Direct array response (most common)
+      console.log('🛒 [Cart] Direct array format detected, length:', response.length);
+      cart = response.map(item => {
+        try {
+          return transformCartItem(item);
+        } catch (error) {
+          console.error('❌ [Cart] Error transforming item:', item, error);
+          return null;
+        }
+      }).filter(item => item !== null);
+      console.log('✅ [Cart] Cart loaded (direct array):', cart.length, 'items');
+    } else if (response && response.success && response.cart) {
+      console.log('🛒 [Cart] Using success format, cart:', response.cart);
+      
+      if (response.cart.items && Array.isArray(response.cart.items)) {
+        // Format: { success: true, cart: { items: [...] } }
+        cart = response.cart.items.map(item => {
+          try {
+            return transformCartItem(item);
+          } catch (error) {
+            console.error('❌ [Cart] Error transforming item:', item, error);
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log('✅ [Cart] Cart loaded (success.cart.items):', cart.length, 'items');
+      } else if (Array.isArray(response.cart)) {
+        // Format: { success: true, cart: [...] }
+        cart = response.cart.map(item => {
+          try {
+            return transformCartItem(item);
+          } catch (error) {
+            console.error('❌ [Cart] Error transforming item:', item, error);
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log('✅ [Cart] Cart loaded (success.cart array):', cart.length, 'items');
+      }
+    } else if (response && response.cart) {
+      console.log('🛒 [Cart] Using direct cart format, cart:', response.cart);
+      
+      if (response.cart.items && Array.isArray(response.cart.items)) {
+        // Format: { cart: { items: [...] } }
+        cart = response.cart.items.map(item => {
+          try {
+            return transformCartItem(item);
+          } catch (error) {
+            console.error('❌ [Cart] Error transforming item:', item, error);
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log('✅ [Cart] Cart loaded (cart.items):', cart.length, 'items');
+      } else if (Array.isArray(response.cart)) {
+        // Format: { cart: [...] }
+        cart = response.cart.map(item => {
+          try {
+            return transformCartItem(item);
+          } catch (error) {
+            console.error('❌ [Cart] Error transforming item:', item, error);
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log('✅ [Cart] Cart loaded (cart array):', cart.length, 'items');
+      }
+    } else {
+      console.log('📦 [Cart] No items in cart or unrecognized format');
+      console.log('🔍 [Cart] Response type:', typeof response, 'Is array:', Array.isArray(response));
+      cart = [];
+    }
+
+    // After loading cart, fetch book details for items that need them
+    if (cart.length > 0) {
+      await fetchMissingBookDetails();
+    }
+
+  } catch (error) {
+    console.error('❌ [Cart] Error loading cart:', error);
+    cart = [];
+  } finally {
+    isCartLoading = false;
+    renderCart();
+  }
+}
+
+// Fetch book details for cart items that only have book IDs
+async function fetchMissingBookDetails() {
+  const itemsNeedingDetails = cart.filter(item => item.needsBookDetails);
+  
+  if (itemsNeedingDetails.length === 0) {
+    console.log('🔍 [Cart] No items need book details');
+    return;
+  }
+
+  console.log('🔍 [Cart] Fetching details for', itemsNeedingDetails.length, 'books...');
+
+  // Fetch details for each book
+  const promises = itemsNeedingDetails.map(async (item) => {
+    try {
+      console.log('📖 [Cart] Fetching book details for ID:', item.id);
+      const response = await window.ApiService.getBookById(item.id);
+      
+      if (response.success && response.book) {
+        const book = response.book;
+        
+        // Update cart item with real book details
+        const cartIndex = cart.findIndex(cartItem => cartItem.id === item.id);
+        if (cartIndex !== -1) {
+          cart[cartIndex] = {
+            ...cart[cartIndex],
+            name: book.title || cart[cartIndex].name,
+            author: book.author?.name || book.author || cart[cartIndex].author,
+            image: getBookImageForCart(book),
+            needsBookDetails: false
+          };
+          console.log('✅ [Cart] Updated book details for:', book.title);
+        }
+      } else {
+        console.warn('⚠️ [Cart] Failed to fetch book details for ID:', item.id);
+      }
+    } catch (error) {
+      console.error('❌ [Cart] Error fetching book details for ID:', item.id, error);
+    }
+  });
+
+  await Promise.all(promises);
+  
+  // Re-render cart with updated book details
+  renderCart();
+  console.log('🔄 [Cart] Updated cart with book details');
+}
+
+// Transform cart item to consistent format
+function transformCartItem(item) {
+  console.log('🔄 [Cart] Transforming item:', JSON.stringify(item, null, 2));
+  
+  // Handle different item structures
+  let book, bookId, title, author, price, quantity;
+  
+  if (item.book && typeof item.book === 'object') {
+    // Item has book object: { book: {...}, quantity: 1 }
+    book = item.book;
+    bookId = book._id || book.id;
+    title = book.title || book.name;
+    author = book.author?.name || book.author;
+    price = book.price || item.price; // Fallback to item.price
+    quantity = item.quantity;
+  } else if (item.book && typeof item.book === 'string') {
+    // Item has book ID: { book: "id_string", quantity: 1, price: 107500 }
+    bookId = item.book;
+    title = `Book ${bookId.slice(-6)}`; // Use last 6 chars of ID as temp title
+    author = 'Unknown Author';
+    price = item.price;
+    quantity = item.quantity;
+    book = { _id: bookId }; // Create minimal book object for image handling
+  } else {
+    // Item is the book itself: { _id, title, author, price, quantity? }
+    book = item;
+    bookId = item._id || item.id || item.bookId;
+    title = item.title || item.name;
+    author = item.author?.name || item.author;
+    price = item.price;
+    quantity = item.quantity || 1;
+  }
+  
+  // Validate required fields
+  if (!bookId) {
+    console.warn('⚠️ [Cart] Item missing ID:', item);
+    bookId = 'unknown_' + Date.now();
+  }
+  
+  // For items with only book ID, we need to fetch book details later
+  // For now, use placeholder title that can be updated
+  if (!title || title.startsWith('Book ')) {
+    title = `Book ${bookId.slice(-6)}...`; // Placeholder title
+    console.log('📝 [Cart] Using placeholder title for book ID:', bookId);
+  }
+  
+  const transformed = {
+    id: bookId,
+    name: title,
+    author: author || 'Unknown Author',
+    price: parseInt(price) || 0,
+    image: getBookImageForCart(book),
+    quantity: parseInt(quantity) || 1,
+    needsBookDetails: typeof item.book === 'string' // Flag to fetch book details later
+  };
+  
+  console.log('✅ [Cart] Transformed:', transformed);
+  return transformed;
+}
+
+// Get book image for cart display
+function getBookImageForCart(book) {
+  if (!book) return getDefaultCartImage();
+  
+  if (!book.imageUrl || book.imageUrl.trim() === '') {
+    return getDefaultCartImage();
+  }
+  
+  return convertGoogleDriveLinkForCart(book.imageUrl);
+}
+
+function convertGoogleDriveLinkForCart(url) {
+  if (!url) return getDefaultCartImage();
+
+  if (url.includes('drive.google.com/uc?')) {
+    return url;
+  }
+
+  const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const match = url.match(driveRegex);
+
+  if (match && match[1]) {
+    const fileId = match[1];
+    return `https://drive.google.com/uc?id=${fileId}&export=view`;
+  }
+
+  return url;
+}
+
+function getDefaultCartImage() {
+  return '../assets/images/default_image.jpg';
+}
+
 // Render cart items
 function renderCart() {
   const cartItems = document.getElementById('cartItems');
   const cartBadge = document.querySelector('.cart-badge');
+  const cartTotal = document.getElementById('cartTotal');
+  
   if (!cartItems) return;
 
-  cartItems.innerHTML = '';
-  let total = 0;
-
-  if (cart.length === 0) {
-    cartItems.innerHTML = `<div class="text-gray-500 text-center" id="cartEmptyMsg">Chưa có sản phẩm nào trong giỏ hàng.</div>`;
-    if (cartBadge) cartBadge.removeAttribute('data-count');
-    document.getElementById('cartTotal').textContent = formatVND(0);
+  // Show loading state
+  if (isCartLoading) {
+    cartItems.innerHTML = `
+      <div class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primarynavy"></div>
+        <span class="ml-3 text-gray-600">Đang tải giỏ hàng...</span>
+      </div>
+    `;
     return;
   }
 
+  cartItems.innerHTML = '';
+  let total = 0;
+  let totalItems = 0;
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = `
+      <div class="text-center py-8">
+        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+          <i class="ri-shopping-cart-line text-2xl text-gray-400"></i>
+        </div>
+        <div class="text-gray-500 mb-2">Giỏ hàng trống</div>
+        <div class="text-sm text-gray-400">Thêm sản phẩm để bắt đầu mua sắm</div>
+      </div>
+    `;
+    
+    // Update badge and total
+    if (cartBadge) cartBadge.removeAttribute('data-count');
+    if (cartTotal) cartTotal.textContent = formatVND(0);
+    
+    // Hide checkout buttons when cart is empty
+    const checkoutBtns = document.querySelectorAll('.cart-checkout-btn');
+    checkoutBtns.forEach(btn => btn.style.display = 'none');
+    
+    return;
+  }
+
+  // Show checkout buttons when cart has items
+  const checkoutBtns = document.querySelectorAll('.cart-checkout-btn');
+  checkoutBtns.forEach(btn => btn.style.display = 'block');
+
   cart.forEach((item, idx) => {
     total += item.price * item.quantity;
+    totalItems += item.quantity;
+    
     const itemDiv = document.createElement('div');
-    itemDiv.className = "flex items-center gap-3";
+    itemDiv.className = "flex items-start gap-3 p-3 bg-gray-50 rounded-lg mb-3 cart-item";
+    itemDiv.setAttribute('data-book-id', item.id);
+    
     itemDiv.innerHTML = `
-      <img src="${item.image}" alt="Sách" class="w-14 h-20 object-cover rounded border" />
-      <div class="flex-1">
-        <div class="font-medium text-gray-800">${item.name}</div>
-        <div class="text-sm text-gray-500">${item.author}</div>
-        <div class="flex items-center gap-2 mt-1">
-          <span class="text-primarynavy font-semibold">${formatVND(item.price)}</span>
-          ${item.oldPrice ? `<span class="text-xs text-gray-400 line-through">${formatVND(item.oldPrice)}</span>` : ''}
+      <img src="${item.image}" alt="${escapeHtmlForCart(item.name)}" 
+           class="w-16 h-20 object-cover rounded border border-gray-200 flex-shrink-0"
+           onerror="this.src='${getDefaultCartImage()}'"/>
+      <div class="flex-1 min-w-0">
+        <h4 class="font-medium text-gray-800 text-sm line-clamp-2 mb-1">${escapeHtmlForCart(item.name)}</h4>
+        <p class="text-xs text-gray-500 mb-2">${escapeHtmlForCart(item.author)}</p>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-primarynavy font-semibold text-sm">${formatVND(item.price)}</span>
+          <span class="text-xs text-gray-400">× ${item.quantity}</span>
         </div>
-        <div class="flex items-center gap-2 mt-2">
-          <button class="px-2 py-1 border rounded" data-action="decrease" data-idx="${idx}">-</button>
-          <input type="number" min="1" value="${item.quantity}" class="w-12 text-center border rounded focus:outline-none focus:ring-2 focus:ring-primarynavy no-spinner" data-idx="${idx}" />
-          <button class="px-2 py-1 border rounded" data-action="increase" data-idx="${idx}">+</button>
-          <button class="ml-2 text-red-500 hover:underline text-l" data-action="remove" data-idx="${idx}">Xóa</button>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded bg-white hover:bg-gray-50 transition" 
+                    data-action="decrease" data-idx="${idx}" data-book-id="${item.id}">
+              <i class="ri-subtract-line text-sm"></i>
+            </button>
+            <span class="w-8 text-center text-sm font-medium">${item.quantity}</span>
+            <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded bg-white hover:bg-gray-50 transition" 
+                    data-action="increase" data-idx="${idx}" data-book-id="${item.id}">
+              <i class="ri-add-line text-sm"></i>
+            </button>
+          </div>
+          <button class="text-red-500 hover:text-red-700 transition text-xs font-medium" 
+                  data-action="remove" data-idx="${idx}" data-book-id="${item.id}" title="Xóa khỏi giỏ hàng">
+            <i class="ri-delete-bin-line"></i>
+          </button>
         </div>
       </div>
     `;
+    
     cartItems.appendChild(itemDiv);
   });
 
-  document.getElementById('cartTotal').textContent = formatVND(total);
-  if (cartBadge) cartBadge.setAttribute('data-count', cart.reduce((s, i) => s + i.quantity, 0));
+  // Update total and badge
+  if (cartTotal) cartTotal.textContent = formatVND(total);
+  if (cartBadge) {
+    cartBadge.setAttribute('data-count', totalItems);
+    // Update cart badge style
+    if (totalItems > 0) {
+      cartBadge.classList.add('cart-has-items');
+    } else {
+      cartBadge.classList.remove('cart-has-items');
+    }
+  }
+
+  console.log('🛒 [Cart] Rendered', cart.length, 'items, total:', formatVND(total));
+}
+
+// Escape HTML for cart display
+function escapeHtmlForCart(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Xử lý sự kiện tăng/giảm/xóa/nhập số lượng
-function cartEventHandler(e) {
-  const target = e.target;
-  if (target.matches('[data-action="decrease"]')) {
-    const idx = +target.getAttribute('data-idx');
-    if (cart[idx].quantity > 1) cart[idx].quantity--;
-    renderCart();
+async function cartEventHandler(e) {
+  const target = e.target.closest('[data-action]');
+  if (!target) return;
+
+  const action = target.getAttribute('data-action');
+  const idx = parseInt(target.getAttribute('data-idx'));
+  const bookId = target.getAttribute('data-book-id');
+
+  // Prevent multiple clicks
+  if (target.disabled || isCartLoading) return;
+  target.disabled = true;
+
+  try {
+    console.log('🛒 [Cart] Action:', action, 'for book:', bookId, 'index:', idx);
+
+    if (action === 'decrease') {
+      if (cart[idx] && cart[idx].quantity > 1) {
+        await updateCartQuantity(bookId, cart[idx].quantity - 1);
+      } else {
+        console.log('🛒 [Cart] Cannot decrease below 1, consider removing item');
+        showCartError('Số lượng tối thiểu là 1');
+      }
+    } else if (action === 'increase') {
+      if (cart[idx]) {
+        await updateCartQuantity(bookId, cart[idx].quantity + 1);
+      } else {
+        console.error('❌ [Cart] Item not found in cart for increase action');
+        showCartError('Không tìm thấy sản phẩm trong giỏ hàng');
+      }
+    } else if (action === 'remove') {
+      // Confirm removal for better UX
+      console.log('🗑️ [Cart] Removing item:', bookId);
+      await removeFromCart(bookId);
+    } else {
+      console.warn('⚠️ [Cart] Unknown action:', action);
+    }
+  } catch (error) {
+    console.error('❌ [Cart] Error handling cart action:', error);
+    showCartError('Có lỗi xảy ra khi cập nhật giỏ hàng: ' + (error.message || 'Unknown error'));
+  } finally {
+    target.disabled = false;
   }
-  if (target.matches('[data-action="increase"]')) {
-    const idx = +target.getAttribute('data-idx');
-    cart[idx].quantity++;
-    renderCart();
+}
+
+// Update cart item quantity via API
+async function updateCartQuantity(bookId, newQuantity) {
+  if (!window.ApiService || !window.AuthManager?.isAuthenticated()) {
+    throw new Error('Cần đăng nhập để cập nhật giỏ hàng');
   }
-  if (target.matches('[data-action="remove"]')) {
-    const idx = +target.getAttribute('data-idx');
-    cart.splice(idx, 1);
-    renderCart();
+
+  try {
+    console.log('🛒 [Cart] Updating quantity for book:', bookId, 'to:', newQuantity);
+    
+    // Use updateCartItem method instead of addToCart to set absolute quantity
+    const response = await window.ApiService.updateCartItem(bookId, newQuantity, 'buy');
+    
+    if (response.success || response.message) {
+      // Reload cart to get updated data
+      await loadCart();
+      console.log('✅ [Cart] Quantity updated successfully');
+    } else {
+      throw new Error(response.error || 'Failed to update cart');
+    }
+  } catch (error) {
+    console.error('❌ [Cart] Error updating cart quantity:', error);
+    
+    // Fallback to addToCart with difference calculation if updateCartItem fails
+    try {
+      console.log('🔄 [Cart] Trying fallback with addToCart difference...');
+      
+      // Find current quantity in cart
+      const currentItem = cart.find(item => item.id === bookId);
+      const currentQuantity = currentItem ? currentItem.quantity : 0;
+      
+      // Calculate the difference to send to API (since backend adds to existing quantity)
+      const quantityDifference = newQuantity - currentQuantity;
+      
+      console.log('🧮 [Cart] Current:', currentQuantity, 'New:', newQuantity, 'Difference:', quantityDifference);
+      
+      if (quantityDifference !== 0) {
+        const fallbackResponse = await window.ApiService.addToCart(bookId, quantityDifference, 'buy');
+        
+        if (fallbackResponse.success || fallbackResponse.message) {
+          await loadCart();
+          console.log('✅ [Cart] Quantity updated via fallback');
+        } else {
+          throw new Error(fallbackResponse.error || 'Fallback failed');
+        }
+      }
+    } catch (fallbackError) {
+      console.error('❌ [Cart] Fallback also failed:', fallbackError);
+      throw error; // Throw original error
+    }
   }
-  if (target.matches('input[type="number"][data-idx]')) {
-    const idx = +target.getAttribute('data-idx');
-    let val = parseInt(target.value, 10);
-    if (isNaN(val) || val < 1) val = 1;
-    cart[idx].quantity = val;
-    renderCart();
+}
+
+// Remove item from cart via API
+async function removeFromCart(bookId) {
+  if (!window.ApiService || !window.AuthManager?.isAuthenticated()) {
+    throw new Error('Cần đăng nhập để xóa sản phẩm');
   }
+
+  try {
+    console.log('🛒 [Cart] Removing book from cart:', bookId);
+    
+    // Find item in local cart
+    const itemIndex = cart.findIndex(item => item.id === bookId);
+    if (itemIndex === -1) {
+      throw new Error('Sản phẩm không tồn tại trong giỏ hàng');
+    }
+
+    // Use dedicated remove API (backend issue has been fixed)
+    console.log('🗑️ [Cart] Calling removeCartItem API for book:', bookId);
+    const response = await window.ApiService.removeCartItem(bookId);
+    
+    if (response.success || response.message || response.msg) {
+      // Remove from local cart immediately for better UX
+      cart.splice(itemIndex, 1);
+      renderCart();
+      
+      // Reload cart to ensure consistency
+      setTimeout(loadCart, 100);
+      
+      showCartSuccess('Đã xóa sản phẩm khỏi giỏ hàng');
+      console.log('✅ [Cart] Item removed successfully');
+    } else {
+      console.error('❌ [Cart] Unexpected response format:', response);
+      
+      // Last resort: reload cart to check if item was actually removed
+      console.log('🔄 [Cart] Reloading cart to verify removal...');
+      await loadCart();
+      
+      // Check if item is still in cart after reload
+      const stillExists = cart.find(item => item.id === bookId);
+      if (!stillExists) {
+        showCartSuccess('Đã xóa sản phẩm khỏi giỏ hàng');
+        console.log('✅ [Cart] Item was removed despite unclear response');
+      } else {
+        throw new Error('Không thể xóa sản phẩm khỏi giỏ hàng');
+      }
+    }
+  } catch (error) {
+    console.error('❌ [Cart] Error removing from cart:', error);
+    throw error;
+  }
+}
+
+// Show cart success message
+function showCartSuccess(message) {
+  showCartMessage(message, 'success');
+}
+
+// Show cart error message
+function showCartError(message) {
+  showCartMessage(message, 'error');
+}
+
+// Show cart message
+function showCartMessage(message, type = 'info') {
+  const messageDiv = document.createElement('div');
+  const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  
+  messageDiv.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-[10001] flex items-center space-x-2 transform translate-x-full transition-transform duration-300`;
+  messageDiv.innerHTML = `
+    <i class="ri-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-warning' : 'information'}-line"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(messageDiv);
+
+  // Slide in
+  setTimeout(() => {
+    messageDiv.classList.remove('translate-x-full');
+  }, 10);
+
+  // Slide out and remove
+  setTimeout(() => {
+    messageDiv.classList.add('translate-x-full');
+    setTimeout(() => {
+      if (messageDiv.parentNode) {
+        messageDiv.remove();
+      }
+    }, 300);
+  }, 3000);
 }
 
 function initCartPanel() {
@@ -284,8 +758,19 @@ function initCartPanel() {
 
   if (!cartBtn || !cartPanel || !closeCartPanelBtn || !cartItems) return;
 
-  cartBtn.onclick = openCartPanel;
-  closeCartPanelBtn.onclick = closeCartPanel;
+  // Cart button click handler - load cart when opening
+  cartBtn.onclick = function(e) {
+    e.preventDefault();
+    console.log('🛒 [Cart] Cart button clicked');
+    openCartPanel();
+    // Load cart data when panel opens
+    loadCart();
+  };
+
+  closeCartPanelBtn.onclick = function(e) {
+    e.preventDefault(); 
+    closeCartPanel();
+  };
 
   // Đóng panel khi click ra ngoài panel
   document.addEventListener('mousedown', function (e) {
@@ -300,12 +785,81 @@ function initCartPanel() {
     }
   });
 
-  // Sự kiện cho các nút trong cart
+  // Sự kiện cho các nút trong cart - use event delegation
   cartItems.addEventListener('click', cartEventHandler);
-  cartItems.addEventListener('change', cartEventHandler);
 
-  renderCart();
+  // Initial cart load
+  if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+    loadCart();
+  } else {
+    renderCart(); // Show empty cart
+  }
+
+  console.log('🛒 [Cart] Cart panel initialized');
 }
+
+// Add to cart function for external use
+async function addToCartFromExternal(bookId, quantity = 1, type = 'buy') {
+  if (!window.ApiService) {
+    console.error('❌ [Cart] ApiService not available');
+    showCartError('Dịch vụ không khả dụng');
+    return false;
+  }
+
+  if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+    console.log('🔐 [Cart] User not authenticated, redirecting to login');
+    showCartError('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1500);
+    return false;
+  }
+
+  try {
+    console.log('🛒 [Cart] Adding to cart:', { bookId, quantity, type });
+    
+    const response = await window.ApiService.addToCart(bookId, quantity, type);
+    
+    if (response.success || response.message) {
+      const actionText = type === 'rent' ? 'thuê' : 'mua';
+      showCartSuccess(`Đã thêm sách ${actionText} vào giỏ hàng`);
+      // Reload cart to update display
+      await loadCart();
+      console.log('✅ [Cart] Added to cart successfully');
+      return true;
+    } else {
+      throw new Error(response.error || 'Failed to add to cart');
+    }
+  } catch (error) {
+    console.error('❌ [Cart] Error adding to cart:', error);
+    showCartError('Có lỗi xảy ra khi thêm vào giỏ hàng');
+    return false;
+  }
+}
+
+// Refresh cart data (for external use)
+async function refreshCart() {
+  console.log('🔄 [Cart] Refreshing cart data...');
+  await loadCart();
+}
+
+// Debug function for cart
+function debugCart() {
+  console.log('=== CART DEBUG ===');
+  console.log('isCartLoading:', isCartLoading);
+  console.log('cart array:', cart);
+  console.log('cart length:', cart.length);
+  console.log('AuthManager available:', !!window.AuthManager);
+  console.log('ApiService available:', !!window.ApiService);
+  console.log('User authenticated:', window.AuthManager?.isAuthenticated());
+  console.log('==================');
+  return { isCartLoading, cart, authAvailable: !!window.AuthManager, apiAvailable: !!window.ApiService };
+}
+
+// Make functions globally available
+window.addToCartFromExternal = addToCartFromExternal;
+window.refreshCart = refreshCart;
+window.debugCart = debugCart;
 
 // Search overlay logic
 function showSearchOverlay() {
@@ -790,6 +1344,13 @@ function loadHeaderFooter() {
         window._headerAuthStateChanged = function () {
           console.log('🔄 [callHeaderFooter] Auth state changed event received');
           updateHeaderAuthState();
+          // Reload cart when auth state changes
+          if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+            loadCart();
+          } else {
+            cart = [];
+            renderCart();
+          }
         };
         window.addEventListener('authStateChanged', window._headerAuthStateChanged, true);
         // Storage event for cross-tab sync

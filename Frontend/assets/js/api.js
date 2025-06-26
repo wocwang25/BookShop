@@ -2,6 +2,9 @@
 const API_BASE_URL = window.location.origin + '/api';
 
 class ApiService {
+    // Debounce mechanism to prevent multiple calls
+    static _pendingOperations = new Set();
+    
     static async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
 
@@ -122,19 +125,34 @@ class ApiService {
     }
 
     // Cart API
-    static async addToCart(bookId, quantity = 1) {
+    static async addToCart(bookId, quantity = 1, type = 'buy') {
+        const operationKey = `addToCart-${bookId}`;
+        
+        // Prevent duplicate operations
+        if (this._pendingOperations.has(operationKey)) {
+            console.log('🛒 [API] Skipping duplicate addToCart operation for:', bookId);
+            return { success: false, message: 'Operation already in progress' };
+        }
+        
         try {
-            console.log(bookId, quantity);
-            return await this.request('/cart', {
+            this._pendingOperations.add(operationKey);
+            console.log('🛒 [API] Adding to cart:', { bookId, quantity, type });
+            
+            const result = await this.request('/cart', {
                 method: 'POST',
                 body: JSON.stringify({
                     bookId,
-                    quantity
+                    quantity,
+                    type
                 })
             });
+            
+            return result;
         } catch (error) {
             console.error('Error adding to cart:', error);
             throw error;
+        } finally {
+            this._pendingOperations.delete(operationKey);
         }
     }
 
@@ -147,32 +165,87 @@ class ApiService {
         }
     }
 
+    static async updateCartItem(bookId, quantity, type = 'buy') {
+        try {
+            console.log('🛒 [API] Updating cart item:', { bookId, quantity, type });
+            return await this.request('/cart', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    bookId,
+                    quantity,
+                    type
+                })
+            });
+        } catch (error) {
+            console.error('Error updating cart item:', error);
+            throw error;
+        }
+    }
+
+    static async removeCartItem(bookId) {
+        try {
+            console.log('🛒 [API] Removing cart item:', bookId);
+            return await this.request(`/cart/${bookId}`, {
+                method: 'DELETE'
+            });
+        } catch (error) {
+            console.error('Error removing cart item:', error);
+            throw error;
+        }
+    }
+
     // Favourite API
     static async addToFavourites(bookId) {
+        const operationKey = `addToFav-${bookId}`;
+        
+        // Prevent duplicate operations
+        if (this._pendingOperations.has(operationKey)) {
+            console.log('💖 [API] Skipping duplicate addToFavourites operation for:', bookId);
+            return { success: false, message: 'Operation already in progress' };
+        }
+        
         try {
+            this._pendingOperations.add(operationKey);
             console.log('➕ [API] Adding to favourites, bookId:', bookId);
+            
             const result = await this.request(`/favourite/${bookId}`, {
                 method: 'POST'
             });
+            
             console.log('✅ [API] Add to favourites successful:', result);
             return result;
         } catch (error) {
             console.error('❌ [API] Error adding to favourite:', error);
             throw error;
+        } finally {
+            this._pendingOperations.delete(operationKey);
         }
     }
 
     static async removeFromFavourites(bookId) {
+        const operationKey = `removeFav-${bookId}`;
+        
+        // Prevent duplicate operations
+        if (this._pendingOperations.has(operationKey)) {
+            console.log('💖 [API] Skipping duplicate removeFromFavourites operation for:', bookId);
+            return { success: false, message: 'Operation already in progress' };
+        }
+        
         try {
+            this._pendingOperations.add(operationKey);
             console.log('➖ [API] Removing from favourites, bookId:', bookId);
+            
             const result = await this.request(`/favourite/${bookId}`, {
                 method: 'PATCH'
             });
+            
             console.log('✅ [API] Remove from favourites successful:', result);
             return result;
         } catch (error) {
             console.error('❌ [API] Error removing from favourites:', error);
             throw error;
+        } finally {
+            this._pendingOperations.delete(operationKey);
         }
     }
 
