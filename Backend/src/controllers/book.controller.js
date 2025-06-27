@@ -79,7 +79,8 @@ const BookController = {
                 .populate({
                     path: 'category',
                     select: 'name'
-                });
+                })
+                .populate('availableStock')
 
             // Áp dụng sort nếu có
             if (sort) {

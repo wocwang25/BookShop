@@ -14,8 +14,8 @@ const CartService = {
             const cartItem = {
                 book: book._id,
                 price: book.price,
-                type: item.type,
-                quantity: item.quantity
+                type: item.type || 'buy', // Default to 'buy' if not specified
+                quantity: item.quantity || 1
             };
             if (!cart) {
                 // Nếu chưa có giỏ hàng, tạo mới
@@ -59,19 +59,32 @@ const CartService = {
     },
 
     async getCartItems(userId) {
-        const cart = await Cart.findOne({ customer: userId });
+        const cart = await Cart.findOne({ customer: userId })
+            .populate({
+                path: 'items.book',
+                populate: [
+                    { path: 'author', select: 'name' },
+                    { path: 'category', select: 'name' }
+                ]
+            });
         if (!cart) {
-            throw new Error('Không tìm thấy giỏ hàng');
+            return [];
         }
         return cart.items;
     },
 
     async getItems(userId, type) {
-        const cart = await Cart.findOne({ customer: userId }).populate('items.book');
+        const cart = await Cart.findOne({ customer: userId })
+            .populate({
+                path: 'items.book',
+                populate: [
+                    { path: 'author', select: 'name' },
+                    { path: 'category', select: 'name' }
+                ]
+            });
         if (!cart) {
             throw new Error('Không tìm thấy giỏ hàng');
         }
-        // Lọc các item theo type
         const filteredItems = cart.items.filter(item => item.type === type);
         return filteredItems;
     }

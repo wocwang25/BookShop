@@ -413,6 +413,16 @@
       
       // Lấy quantity từ các field có thể có
       maxQuantity = book.quantity || book.availableStock || book.stock || 0;
+      
+      // Debug stock quantity
+      console.log('📦 [bookDetail] Stock debug for book:', book.title, {
+          bookId: book._id,
+          quantity: book.quantity,
+          availableStock: book.availableStock,
+          stock: book.stock,
+          finalStock: maxQuantity,
+          allFields: Object.keys(book)
+      });
 
       // Update page title
       document.title = `${book.title} | Readify`;

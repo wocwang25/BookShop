@@ -228,6 +228,19 @@ function displayBooks() {
 function createBookCard(book) {
     const bookId = book._id || book.id;
     
+    // Get stock quantity from various possible fields
+    const stockQuantity = book.quantity || book.availableStock || book.stock || 0;
+    
+    // Debug stock quantity
+    console.log('📦 [books.js] Stock debug for book:', book.title, {
+        bookId: bookId,
+        quantity: book.quantity,
+        availableStock: book.availableStock,
+        stock: book.stock,
+        finalStock: stockQuantity,
+        allFields: Object.keys(book)
+    });
+    
     // Check if book is in cart or favourites
     const isInCart = userCartBookIds.some(cartId =>
         cartId === bookId || cartId === String(bookId)
@@ -236,9 +249,28 @@ function createBookCard(book) {
         favId === bookId || favId === String(favId)
     );
 
+    // Determine stock status
+    let stockBadge = '';
+    let buttonText = 'Thêm vào giỏ';
+    let buttonClass = 'bg-gray-200 text-gray-800';
+    let buttonDisabled = false;
+
+    if (isInCart) {
+        buttonText = '✔ Đã thêm';
+        buttonClass = 'bg-green-500 text-white';
+        buttonDisabled = true;
+    } else if (stockQuantity <= 0) {
+        buttonText = 'Hết hàng';
+        buttonClass = 'bg-gray-400 text-gray-600 cursor-not-allowed';
+        buttonDisabled = true;
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">Hết hàng</span>`;
+    } else if (stockQuantity <= 5) {
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full">Còn ${stockQuantity}</span>`;
+    }
+
     return `
         <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" 
-             data-id="${bookId}" onclick="viewBookDetail('${bookId}')">
+             data-id="${bookId}" data-stock="${stockQuantity}" onclick="viewBookDetail('${bookId}')">
             <div class="relative h-96 w-full flex-shrink-0">
                 <img src="${getBookImage(book)}" alt="${escapeHtml(book.title)}" 
                      class="w-full h-full object-cover object-top" 
@@ -252,6 +284,7 @@ function createBookCard(book) {
                         <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
                     </span>
                 ` : ''}
+                ${stockBadge}
             </div>
             <div class="p-4 flex flex-col flex-1">
                 <div class="text-sm text-gray-500 mb-2">${escapeHtml(book.category?.name || book.category || 'Sách')}</div>
@@ -259,9 +292,9 @@ function createBookCard(book) {
                 <p class="text-gray-600 mb-3">${escapeHtml(book.author?.name || book.author || 'Unknown Author')}</p>
                 <div class="flex justify-between items-center mt-auto">
                     <span class="font-semibold text-primarynavy">${formatPrice(book.price)}</span>
-                    <button class="${isInCart ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 !rounded-button whitespace-nowrap transition" 
-                            onclick="addToCart(event, '${bookId}')" ${isInCart ? 'disabled' : ''}>
-                        ${isInCart ? '✔ Đã thêm' : 'Thêm vào giỏ'}
+                    <button class="${buttonClass} px-4 py-2 !rounded-button whitespace-nowrap transition" 
+                            onclick="addToCart(event, '${bookId}')" ${buttonDisabled ? 'disabled' : ''}>
+                        ${buttonText}
                     </button>
                 </div>
             </div>
@@ -510,6 +543,17 @@ async function addToCart(event, bookId) {
     // Check if already in cart or if button is processing
     if (button.disabled) return;
     
+    // Get stock from book card data
+    const bookCard = button.closest('.book-card-item');
+    const stockQuantity = parseInt(bookCard?.dataset?.stock || '0');
+    
+    // Validate stock before proceeding
+    if (stockQuantity <= 0) {
+        console.log('📚 [books.js] Book out of stock:', bookId);
+        alert('Sách này hiện đã hết hàng!');
+        return;
+    }
+    
     // Check if already in cart by ID
     const isInCart = userCartBookIds.some(cartId =>
         cartId === bookId || cartId === String(bookId)
@@ -553,14 +597,23 @@ async function addToCart(event, bookId) {
         }
     } catch (error) {
         console.error('❌ [books.js] Error adding to cart:', error);
-        button.textContent = 'Lỗi!';
-        button.className = 'bg-red-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
         
-        setTimeout(() => {
-            button.textContent = originalText;
-            button.className = originalClasses;
-            button.disabled = false;
-        }, 2000);
+        // Check if error is related to stock
+        if (error.message.includes('stock') || error.message.includes('hết hàng') || error.message.includes('insufficient')) {
+            button.textContent = 'Hết hàng';
+            button.className = 'bg-gray-400 text-gray-600 cursor-not-allowed px-4 py-2 !rounded-button whitespace-nowrap transition';
+            button.disabled = true;
+            alert('Sách này hiện đã hết hàng!');
+        } else {
+            button.textContent = 'Lỗi!';
+            button.className = 'bg-red-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.className = originalClasses;
+                button.disabled = false;
+            }, 2000);
+        }
     }
 }
 

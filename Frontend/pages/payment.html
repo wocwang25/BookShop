@@ -45,6 +45,7 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="payment.css">
   <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/api.js"></script>
 
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 
@@ -108,97 +109,11 @@
       <div class="w-full md:w-1/3 bg-white pt-6 p-6 rounded-lg shadow-sm">
         <h2 class="font-bold text-xl mb-6 text-center">Đơn hàng</h2>
         <div class="space-y-4 mb-6" id="product-list">
-
-          <!-- Sản phẩm 1 -->
-          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="15500">
-            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
-              <img
-                src="https://readdy.ai/api/search-image?query=book%20cover%20with%20red%20background%20and%20white%20text%2C%20minimalist%20design&width=64&height=80&seq=1&orientation=portrait"
-                alt="Book cover" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-grow">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h3 class="font-medium">It ends with us</h3>
-                  <p class="text-sm text-gray-500">By Colleen Hoover</p>
-                </div>
-                <button class="remove-item text-gray-400 hover:text-red-500">
-                  <i class="ri-close-line"></i>
-                </button>
-              </div>
-              <div class="flex items-center justify-between mt-2">
-                <div class="flex items-center border rounded-md">
-                  <button
-                    class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
-                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
-                  <button
-                    class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
-                </div>
-                <span class="item-total font-medium">15.500 VNĐ</span>
-              </div>
-            </div>
+          <!-- Cart items will be loaded dynamically -->
+          <div class="text-center py-8">
+            <i class="ri-loader-4-line text-2xl text-gray-400 animate-spin mb-2"></i>
+            <p class="text-gray-500">Đang tải giỏ hàng...</p>
           </div>
-
-          <!-- Sản phẩm 2 -->
-          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="12800">
-            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
-              <img
-                src="https://readdy.ai/api/search-image?query=book%20cover%20with%20pet%20theme%2C%20minimalist%20design%20with%20silhouette%20of%20a%20dog%20or%20cat&width=64&height=80&seq=2&orientation=portrait"
-                alt="Book cover" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-grow">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h3 class="font-medium">Pet</h3>
-                  <p class="text-sm text-gray-500">By Akwaeke Emezi</p>
-                </div>
-                <button class="remove-item text-gray-400 hover:text-red-500">
-                  <i class="ri-close-line"></i>
-                </button>
-              </div>
-              <div class="flex items-center justify-between mt-2">
-                <div class="flex items-center border rounded-md">
-                  <button
-                    class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
-                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
-                  <button
-                    class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
-                </div>
-                <span class="item-total font-medium">12.800 VNĐ</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sản phẩm 3 -->
-          <div class="product-item flex items-start gap-3 pb-3 border-b border-gray-200" data-price="10000">
-            <div class="w-16 h-20 bg-gray-100 flex-shrink-0">
-              <img
-                src="https://readdy.ai/api/search-image?query=book%20cover%20with%20blue%20background%20and%20abstract%20design%2C%20contemporary%20fiction%20book%20cover&width=64&height=80&seq=3&orientation=portrait"
-                alt="Book cover" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-grow">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h3 class="font-medium">Yinka, where is your husband?</h3>
-                  <p class="text-sm text-gray-500">By Lizzie Damilola Blackburn</p>
-                </div>
-                <button class="remove-item text-gray-400 hover:text-red-500">
-                  <i class="ri-close-line"></i>
-                </button>
-              </div>
-              <div class="flex items-center justify-between mt-2">
-                <div class="flex items-center border rounded-md">
-                  <button
-                    class="decrease w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-md">-</button>
-                  <input type="number" value="1" class="quantity-input w-10 h-8 text-center border-x" min="1">
-                  <button
-                    class="increase w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-md">+</button>
-                </div>
-                <span class="item-total font-medium">10.000 VNĐ</span>
-              </div>
-            </div>
-          </div>
-
         </div>
         <!-- Tổng tiền -->
         <div class="space-y-3 text-sm mt-8" id="totals">
@@ -254,30 +169,56 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Tóm tắt thông tin giao hàng -->
           <div class="bg-gray-50 p-6 rounded-lg">
-            <h3 class="font-medium text-lg mb-4">Thông tin giao hàng</h3>
-            <div class="space-y-3" id="shipping-info">
-              <div>
-                <p class="text-sm text-gray-500">Người nhận</p>
-                <p class="font-medium" id="display-name"></p>
+            <h3 class="font-medium text-lg mb-4 flex items-center gap-2">
+              <i class="ri-truck-line text-xl text-primary"></i>
+              Thông tin giao hàng
+            </h3>
+            <div class="space-y-4" id="shipping-info">
+              <!-- Initial loading state -->
+              <div class="text-center py-4" id="shipping-loading">
+                <i class="ri-loader-4-line text-xl text-gray-400 animate-spin mb-2"></i>
+                <p class="text-gray-500 text-sm">Đang tải thông tin giao hàng...</p>
               </div>
-              <div>
-                <p class="text-sm text-gray-500">Số điện thoại</p>
-                <p class="font-medium" id="display-phone"></p>
-              </div>
-              <div>
-                <p class="text-sm text-gray-500">Email</p>
-                <p class="font-medium" id="display-email"></p>
-              </div>
-              <div>
-                <p class="text-sm text-gray-500">Địa chỉ</p>
-                <p class="font-medium" id="display-address"></p>
+              
+              <!-- Shipping info content (hidden initially) -->
+              <div class="space-y-3 hidden" id="shipping-content">
+                <div class="flex items-start gap-3">
+                  <i class="ri-user-line text-gray-400 mt-1"></i>
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-500">Người nhận</p>
+                    <p class="font-medium text-gray-800" id="display-name">Đang tải...</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <i class="ri-phone-line text-gray-400 mt-1"></i>
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-500">Số điện thoại</p>
+                    <p class="font-medium text-gray-800" id="display-phone">Đang tải...</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <i class="ri-mail-line text-gray-400 mt-1"></i>
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="font-medium text-gray-800" id="display-email">Đang tải...</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <i class="ri-map-pin-line text-gray-400 mt-1"></i>
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-500">Địa chỉ giao hàng</p>
+                    <p class="font-medium text-gray-800" id="display-address">Đang tải...</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <a href="/settings"
-              class="mt-4 text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1">
-              <i class="ri-edit-line"></i>
-              <span>Chỉnh sửa</span>
-            </a>
+            <div class="mt-6 pt-4 border-t border-gray-200">
+              <a href="/settings"
+                class="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="ri-edit-line"></i>
+                <span>Chỉnh sửa thông tin</span>
+              </a>
+            </div>
           </div>
           <!-- Phương thức thanh toán -->
           <div class="bg-white p-6 rounded-lg border border-gray-200">
@@ -339,7 +280,7 @@
     </div>
   </div>
 
-  <script src="./assets/js/payment.js"></script>
+  <script src="../assets/js/payment.js"></script>
 </body>
 
 </html>

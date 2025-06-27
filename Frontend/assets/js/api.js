@@ -53,6 +53,17 @@ class ApiService {
             const endpoint = `/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
             const response = await this.request(endpoint);
 
+            // Debug API response
+            console.log('📚 [API] getAllBooks response:', response);
+            if (response.books && response.books.length > 0) {
+                console.log('📚 [API] Sample book from getAllBooks:', response.books[0]);
+                console.log('📚 [API] Sample book stock fields:', {
+                    quantity: response.books[0].quantity,
+                    availableStock: response.books[0].availableStock,
+                    stock: response.books[0].stock
+                });
+            }
+
             // Đảm bảo response có định dạng phù hợp
             return {
                 success: true,
@@ -77,6 +88,17 @@ class ApiService {
             }
 
             const response = await this.request(`/books/${id}`);
+
+            // Debug API response
+            console.log('📖 [API] getBookById response:', response);
+            if (response.book) {
+                console.log('📖 [API] Book from getBookById:', response.book);
+                console.log('📖 [API] Book stock fields:', {
+                    quantity: response.book.quantity,
+                    availableStock: response.book.availableStock,
+                    stock: response.book.stock
+                });
+            }
 
             // Kiểm tra định dạng response từ backend
             if (response.success && response.book) {
@@ -106,6 +128,17 @@ class ApiService {
             if (keyword) queryParams.append('keyword', keyword);
 
             const response = await this.request(`/books/search?${queryParams.toString()}`);
+
+            // Debug API response
+            console.log('🔍 [API] searchBooks response:', response);
+            if (response.books && response.books.length > 0) {
+                console.log('🔍 [API] Sample book from searchBooks:', response.books[0]);
+                console.log('🔍 [API] Sample book stock fields:', {
+                    quantity: response.books[0].quantity,
+                    availableStock: response.books[0].availableStock,
+                    stock: response.books[0].stock
+                });
+            }
 
             // Đảm bảo response có định dạng phù hợp
             return {
@@ -190,6 +223,53 @@ class ApiService {
             });
         } catch (error) {
             console.error('Error removing cart item:', error);
+            throw error;
+        }
+    }
+
+    // Sales Invoice API
+    static async createSalesInvoice(customerName, items) {
+        try {
+            console.log('📄 [API] Creating sales invoice:', { customerName, items });
+            
+            // Validate input
+            if (!customerName || customerName.trim() === '') {
+                throw new Error('Customer name is required');
+            }
+            
+            if (!items || !Array.isArray(items) || items.length === 0) {
+                throw new Error('Items array is required and cannot be empty');
+            }
+            
+            // Validate each item
+            for (const item of items) {
+                if (!item.title || !item.quantity) {
+                    console.error('❌ Invalid item:', item);
+                    throw new Error('Each item must have title and quantity');
+                }
+            }
+            
+            const requestData = {
+                customer_name: customerName,
+                items: items
+            };
+            
+            console.log('📤 [API] Sending request data:', requestData);
+            
+            // Check if user is authenticated
+            if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+                throw new Error('User not authenticated. Please login first.');
+            }
+            
+            const token = window.AuthManager.getToken();
+            console.log('🔑 [API] Token available:', !!token);
+            
+            return await this.request('/invoice/sale', {
+                method: 'POST',
+                body: JSON.stringify(requestData)
+            });
+        } catch (error) {
+            console.error('❌ [API] Error creating sales invoice:', error);
             throw error;
         }
     }

@@ -269,10 +269,38 @@
       const discount = Math.random() * 0.25; // 0-25%
       const newPrice = Math.round(price * (1 - discount));
       const rating = (Math.random() * 0.5 + 4.5).toFixed(2);
+      
+      // Get stock quantity from various possible fields
+      const stockQuantity = book.quantity || book.availableStock || book.stock || 0;
+      
+      // Debug stock quantity
+      console.log('📦 [searchBooks] Stock debug for book:', book.title, {
+          bookId: book._id || book.id,
+          quantity: book.quantity,
+          availableStock: book.availableStock,
+          stock: book.stock,
+          finalStock: stockQuantity,
+          allFields: Object.keys(book)
+      });
+      
+      // Determine stock status and button state
+      let stockBadge = '';
+      let buttonText = 'Thêm vào giỏ';
+      let buttonClass = 'bg-gray-100 text-primarynavy hover:bg-primarynavy hover:text-white';
+      let buttonDisabled = false;
+
+      if (stockQuantity <= 0) {
+        buttonText = 'Hết hàng';
+        buttonClass = 'bg-gray-400 text-gray-600 cursor-not-allowed';
+        buttonDisabled = true;
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">Hết hàng</span>`;
+      } else if (stockQuantity <= 5) {
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full">Còn ${stockQuantity}</span>`;
+      }
 
       return `
         <div class="bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg hover:-translate-y-1 duration-200 transition group cursor-pointer book-card-item flex flex-col h-full" 
-             data-id="${book._id || book.id}" onclick="viewBookDetail('${book._id || book.id}')">
+             data-id="${book._id || book.id}" data-stock="${stockQuantity}" onclick="viewBookDetail('${book._id || book.id}')">
           <div class="relative h-80 w-full flex-shrink-0 bg-gray-50 flex items-center justify-center">
             <img src="${getBookImage(book)}" alt="${escapeHtml(book.title)}" 
                  class="w-full h-full object-cover object-top rounded-t-xl"
@@ -284,6 +312,7 @@
             <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
               <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${rating}
             </span>
+            ${stockBadge}
           </div>
           <div class="p-3 flex flex-col flex-1 min-h-0">
             <div class="text-xs text-gray-500 mb-1">${escapeHtml(book.category?.name || book.category || '')}</div>
@@ -294,9 +323,9 @@
                 <span class="font-semibold text-primarynavy text-base">${newPrice.toLocaleString()}₫</span>
                 ${price > newPrice ? `<span class="text-xs text-gray-400 line-through">${price.toLocaleString()}₫</span>` : ""}
               </div>
-              <button class="add-to-cart-btn px-3 py-1 rounded-md bg-gray-100 text-primarynavy text-xs font-medium shadow-sm hover:bg-primarynavy hover:text-white transition whitespace-nowrap w-full"
-                      onclick="addToCart(event, '${book._id || book.id}')" data-book-id="${book._id || book.id}">
-                Thêm vào giỏ
+              <button class="add-to-cart-btn px-3 py-1 rounded-md ${buttonClass} text-xs font-medium shadow-sm transition whitespace-nowrap w-full"
+                      onclick="addToCart(event, '${book._id || book.id}')" data-book-id="${book._id || book.id}" ${buttonDisabled ? 'disabled' : ''}>
+                ${buttonText}
               </button>
             </div>
           </div>
@@ -691,8 +720,23 @@
       const button = event.target;
       const originalText = button.textContent;
       const originalWidth = button.offsetWidth;
+      const originalClasses = button.className;
 
-      console.log('🛒 [Cart] Adding book to cart:', bookId);
+      // Check if button is already disabled or processing
+      if (button.disabled) return;
+
+      // Get stock from book card data
+      const bookCard = button.closest('.book-card-item');
+      const stockQuantity = parseInt(bookCard?.dataset?.stock || '0');
+
+      // Validate stock before proceeding
+      if (stockQuantity <= 0) {
+        console.log('🛒 [Cart] Book out of stock:', bookId);
+        alert('Sách này hiện đã hết hàng!');
+        return;
+      }
+
+      console.log('🛒 [Cart] Adding book to cart:', bookId, 'Stock:', stockQuantity);
 
       try {
         // Disable button and show loading state
@@ -723,22 +767,31 @@
       } catch (error) {
         console.error('❌ [Cart] Error adding to cart:', error);
 
-        // Error feedback
-        button.textContent = 'Lỗi!';
-        button.classList.remove('opacity-75');
-        button.classList.add('!bg-red-500', '!text-white');
+        // Check if error is related to stock
+        if (error.message.includes('stock') || error.message.includes('hết hàng') || error.message.includes('insufficient')) {
+          button.textContent = 'Hết hàng';
+          button.className = 'add-to-cart-btn px-3 py-1 rounded-md bg-gray-400 text-gray-600 cursor-not-allowed text-xs font-medium shadow-sm transition whitespace-nowrap w-full';
+          button.disabled = true;
+          alert('Sách này hiện đã hết hàng!');
+        } else {
+          // Error feedback
+          button.textContent = 'Lỗi!';
+          button.classList.remove('opacity-75');
+          button.classList.add('!bg-red-500', '!text-white');
 
-        // Show error message
-        alert('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + error.message);
+          // Show error message
+          alert('Có lỗi xảy ra khi thêm vào giỏ hàng: ' + error.message);
 
-        // Reset after delay
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove('!bg-red-500', '!text-white');
-          button.style.width = '';
-          button.style.minWidth = '';
-          button.disabled = false;
-        }, 1500);
+          // Reset after delay
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('!bg-red-500', '!text-white');
+            button.className = originalClasses;
+            button.style.width = '';
+            button.style.minWidth = '';
+            button.disabled = false;
+          }, 1500);
+        }
       }
     }
 

@@ -192,20 +192,24 @@
     // State
     let searchKeyword = getQueryParam('query') || '';
 
-    // Sửa fetchBooksFromBackend để lấy đúng các trường từ API mới
+    // Sửa fetchBooksFromBackend để lấy đúng các trường từ API mới (use ApiService for consistency)
     async function fetchBooksFromBackend() {
       try {
-        let url;
+        let response;
         if (searchKeyword) {
-          url = `http://localhost:5000/api/books/search?keyword=${encodeURIComponent(searchKeyword)}`;
+          console.log('📦 [books.html] Using searchBooks API for:', searchKeyword);
+          response = await ApiService.searchBooks(searchKeyword);
         } else {
-          url = 'http://localhost:5000/api/books';
+          console.log('📦 [books.html] Using getAllBooks API');
+          response = await ApiService.getAllBooks();
         }
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Lỗi khi lấy dữ liệu sách');
-        const data = await response.json();
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Lỗi khi lấy dữ liệu sách');
+        }
+        
         // API trả về mảng sách với các trường: _id, title, author (object), category (object), price, imageUrl, ...
-        const rawBooks = Array.isArray(data) ? data : (data.books || data.Books || data.data || []);
+        const rawBooks = response.books || [];
         books = rawBooks.map((book, idx) => {
           const price = Number(book.price) || 0;
           const discount = Math.random() * 0.25; // 0-25%
@@ -214,6 +218,15 @@
           const rating = (Math.random() * 0.5 + 4.5).toFixed(2);
           // Random n_review từ 10 đến 200
           const n_review = Math.floor(Math.random() * 191) + 10;
+
+          // Debug original book data
+          console.log('📦 [books.html fetchBooks] Original book:', book.title, {
+            quantity: book.quantity,
+            availableStock: book.availableStock,
+            stock: book.stock,
+            allFields: Object.keys(book)
+          });
+
           return {
             id: book._id || book.id || idx + 1,
             title: book.title || '',
@@ -224,7 +237,10 @@
             image: book.imageUrl || book.cover_link || '',
             rating: Number(rating),
             n_review: n_review,
-            quantity: Number(book.quantity) || 0
+            // Keep all stock-related fields for consistency with bookDetail
+            quantity: Number(book.quantity) || 0,
+            availableStock: Number(book.availableStock) || 0,
+            stock: Number(book.stock) || 0
           };
         });
         filteredBooks = books;
@@ -276,8 +292,38 @@
             favId === book.id || favId === book._id || favId === String(book.id) || favId === String(book._id)
           );
 
+          // Get stock quantity and determine stock status (update to match bookDetail logic)
+          const stockQuantity = book.quantity || book.availableStock || book.stock || 0;
+          
+          // Debug stock quantity
+          console.log('📦 [books.html] Stock debug for book:', book.title, {
+              bookId: book.id,
+              quantity: book.quantity,
+              availableStock: book.availableStock,
+              stock: book.stock,
+              finalStock: stockQuantity,
+              allFields: Object.keys(book)
+          });
+          let stockBadge = '';
+          let buttonText = 'Thêm vào giỏ';
+          let buttonClass = 'bg-gray-200 text-gray-800';
+          let buttonDisabled = false;
+
+          if (isInCart) {
+            buttonText = '✔ Đã thêm';
+            buttonClass = 'bg-green-500 text-white';
+            buttonDisabled = true;
+          } else if (stockQuantity <= 0) {
+            buttonText = 'Hết hàng';
+            buttonClass = 'bg-gray-400 text-gray-600 cursor-not-allowed';
+            buttonDisabled = true;
+            stockBadge = `<span class="absolute bottom-2 left-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">Hết hàng</span>`;
+          } else if (stockQuantity <= 5) {
+            stockBadge = `<span class="absolute bottom-2 left-2 bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full">Còn ${stockQuantity}</span>`;
+          }
+
           grid.innerHTML += `
-      <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}">
+      <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}" data-stock="${stockQuantity}">
         <div class="relative h-96 w-full flex-shrink-0">
           <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover object-top">
           <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center fav-btn bg-[#eaeaea]/90 rounded-full transition shadow-sm ${isFaved ? 'faved' : ''}" title="Yêu thích" data-id="${book.id}">
@@ -286,6 +332,7 @@
           <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
               <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
           </span>
+          ${stockBadge}
         </div>
         <div class="p-4 flex flex-col flex-1">
           <div class="text-xs text-gray-500 mb-1">${book.category}</div>
@@ -296,8 +343,8 @@
               <span class="font-semibold text-primarynavy">${book.price.toLocaleString()}₫</span>
               ${book.oldPrice ? `<span class="text-sm text-gray-500 line-through ml-2">${book.oldPrice.toLocaleString()}₫</span>` : ""}
             </div>
-            <button class="add-to-cart-btn ${isInCart ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded-[8px] whitespace-nowrap transition" data-id="${book.id}" ${isInCart ? 'disabled' : ''}>
-              ${isInCart ? '✔ Đã thêm' : 'Thêm vào giỏ'}
+            <button class="add-to-cart-btn ${buttonClass} px-4 py-2 rounded-[8px] whitespace-nowrap transition" data-id="${book.id}" ${buttonDisabled ? 'disabled' : ''}>
+              ${buttonText}
             </button>
           </div>
         </div>
@@ -325,6 +372,17 @@
               e.stopPropagation();
               const bookId = btn.getAttribute('data-id');
 
+              // Get stock from book card data
+              const bookCard = btn.closest('.book-card-item');
+              const stockQuantity = parseInt(bookCard?.dataset?.stock || '0');
+
+              // Validate stock before proceeding
+              if (stockQuantity <= 0) {
+                console.log('📚 [books.html AddToCart] Book out of stock:', bookId);
+                alert('Sách này hiện đã hết hàng!');
+                return;
+              }
+
               // Check if already in cart
               const isInCart = userCartBookIds.some(cartId =>
                 cartId === bookId || cartId === String(bookId)
@@ -341,7 +399,7 @@
               btn.innerHTML = "Đang thêm...";
               btn.disabled = true;
               try {
-                console.log('📚 [books.html AddToCart] Adding book to cart:', bookId);
+                console.log('📚 [books.html AddToCart] Adding book to cart:', bookId, 'Stock:', stockQuantity);
 
                 // Use global function if available
                 if (window.addToCartFromExternal) {
@@ -375,14 +433,24 @@
                 }
               } catch (error) {
                 console.error('❌ [books.html AddToCart] Error:', error);
-                btn.innerHTML = "Lỗi!";
-                btn.classList.add("bg-red-500", "text-white");
-                setTimeout(() => {
-                  btn.innerHTML = "Thêm vào giỏ";
-                  btn.classList.remove("bg-red-500", "text-white");
-                  btn.classList.add("bg-gray-200", "text-gray-800");
-                  btn.disabled = false;
-                }, 2000);
+                
+                // Check if error is related to stock
+                if (error.message.includes('stock') || error.message.includes('hết hàng') || error.message.includes('insufficient')) {
+                  btn.innerHTML = "Hết hàng";
+                  btn.classList.remove("bg-gray-200", "text-gray-800");
+                  btn.classList.add("bg-gray-400", "text-gray-600", "cursor-not-allowed");
+                  btn.disabled = true;
+                  alert('Sách này hiện đã hết hàng!');
+                } else {
+                  btn.innerHTML = "Lỗi!";
+                  btn.classList.add("bg-red-500", "text-white");
+                  setTimeout(() => {
+                    btn.innerHTML = "Thêm vào giỏ";
+                    btn.classList.remove("bg-red-500", "text-white");
+                    btn.classList.add("bg-gray-200", "text-gray-800");
+                    btn.disabled = false;
+                  }, 2000);
+                }
               }
             });
           });
@@ -615,8 +683,39 @@
       const isFaved = userFavouriteBookIds.some(favId =>
         favId === book.id || favId === book._id || favId === String(book.id) || favId === String(book._id)
       );
+
+      // Get stock quantity and determine stock status (update to match bookDetail logic)
+      const stockQuantity = book.quantity || book.availableStock || book.stock || 0;
+      
+      // Debug stock quantity  
+      console.log('📦 [books.html Special] Stock debug for book:', book.title, {
+          bookId: book.id,
+          quantity: book.quantity,
+          availableStock: book.availableStock,
+          stock: book.stock,
+          finalStock: stockQuantity,
+          allFields: Object.keys(book)
+      });
+      let stockBadge = '';
+      let buttonText = 'Thêm vào giỏ';
+      let buttonClass = 'bg-gray-200 text-gray-800';
+      let buttonDisabled = false;
+
+      if (isInCart) {
+        buttonText = '✔ Đã thêm';
+        buttonClass = 'bg-green-500 text-white';
+        buttonDisabled = true;
+      } else if (stockQuantity <= 0) {
+        buttonText = 'Hết hàng';
+        buttonClass = 'bg-gray-400 text-gray-600 cursor-not-allowed';
+        buttonDisabled = true;
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">Hết hàng</span>`;
+      } else if (stockQuantity <= 5) {
+        stockBadge = `<span class="absolute bottom-2 left-2 bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full">Còn ${stockQuantity}</span>`;
+      }
+
       return `
-    <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}">
+    <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full transition group cursor-pointer book-card-item" data-id="${book.id}" data-stock="${stockQuantity}">
       <div class="relative h-96 w-full flex-shrink-0">
         <img src="${book.image}" alt="${book.title}" class="w-full h-full object-cover object-top">
         <button class="absolute top-2 right-2 w-9 h-9 flex items-center justify-center fav-btn bg-[#eaeaea]/90 rounded-full transition shadow-sm ${isFaved ? 'faved' : ''}" title="Yêu thích" data-id="${book.id}">
@@ -625,6 +724,7 @@
         <span class="absolute top-2 left-2 bg-[#eaeaea]/90 text-[#f7931e] shadow-sm text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm" title="Đánh giá">
             <i class="ri-star-s-fill text-[#f7931e] text-base"></i> ${book.rating.toFixed(1)}
         </span>
+        ${stockBadge}
       </div>
       <div class="p-4 flex flex-col flex-1">
         <div class="text-xs text-gray-500 mb-1">${book.category}</div>
@@ -635,8 +735,8 @@
             <span class="font-semibold text-primarynavy">${book.price.toLocaleString()}₫</span>
             ${book.oldPrice ? `<span class="text-sm text-gray-500 line-through ml-2">${book.oldPrice.toLocaleString()}₫</span>` : ""}
           </div>
-          <button class="add-to-cart-btn ${isInCart ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded-[8px] whitespace-nowrap transition" data-id="${book.id}" ${isInCart ? 'disabled' : ''}>
-            ${isInCart ? '✔ Đã thêm' : 'Thêm vào giỏ'}
+          <button class="add-to-cart-btn ${buttonClass} px-4 py-2 rounded-[8px] whitespace-nowrap transition" data-id="${book.id}" ${buttonDisabled ? 'disabled' : ''}>
+            ${buttonText}
           </button>
         </div>
       </div>
@@ -731,6 +831,17 @@
           e.stopPropagation();
           const bookId = btn.getAttribute('data-id');
 
+          // Get stock from book card data
+          const bookCard = btn.closest('.book-card-item');
+          const stockQuantity = parseInt(bookCard?.dataset?.stock || '0');
+
+          // Validate stock before proceeding
+          if (stockQuantity <= 0) {
+            console.log('📚 [Special AddToCart] Book out of stock:', bookId);
+            alert('Sách này hiện đã hết hàng!');
+            return;
+          }
+
           // Check if already in cart
           const isInCart = userCartBookIds.some(cartId =>
             cartId === bookId || cartId === String(bookId)
@@ -747,7 +858,7 @@
           btn.innerHTML = "Đang thêm...";
           btn.disabled = true;
           try {
-            console.log('📚 [Special AddToCart] Adding book to cart:', bookId);
+            console.log('📚 [Special AddToCart] Adding book to cart:', bookId, 'Stock:', stockQuantity);
 
             // Use global function if available
             if (window.addToCartFromExternal) {
@@ -781,14 +892,24 @@
             }
           } catch (error) {
             console.error('❌ [Special AddToCart] Error:', error);
-            btn.innerHTML = "Lỗi!";
-            btn.classList.add("bg-red-500", "text-white");
-            setTimeout(() => {
-              btn.innerHTML = "Thêm vào giỏ";
-              btn.classList.remove("bg-red-500", "text-white");
-              btn.classList.add("bg-gray-200", "text-gray-800");
-              btn.disabled = false;
-            }, 2000);
+            
+            // Check if error is related to stock
+            if (error.message.includes('stock') || error.message.includes('hết hàng') || error.message.includes('insufficient')) {
+              btn.innerHTML = "Hết hàng";
+              btn.classList.remove("bg-gray-200", "text-gray-800");
+              btn.classList.add("bg-gray-400", "text-gray-600", "cursor-not-allowed");
+              btn.disabled = true;
+              alert('Sách này hiện đã hết hàng!');
+            } else {
+              btn.innerHTML = "Lỗi!";
+              btn.classList.add("bg-red-500", "text-white");
+              setTimeout(() => {
+                btn.innerHTML = "Thêm vào giỏ";
+                btn.classList.remove("bg-red-500", "text-white");
+                btn.classList.add("bg-gray-200", "text-gray-800");
+                btn.disabled = false;
+              }, 2000);
+            }
           }
         });
       });
