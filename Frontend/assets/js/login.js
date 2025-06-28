@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Kiểm tra nếu user đã đăng nhập thì redirect
     try {
         if (typeof AuthManager !== 'undefined' && AuthManager.isAuthenticated()) {
@@ -74,34 +74,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    showRegister.addEventListener('click', function(e) {
+    showRegister.addEventListener('click', function (e) {
         e.preventDefault();
         showForm(registerForm, loginForm, toggleToLogin, toggleToRegister);
     });
 
-    showLogin.addEventListener('click', function(e) {
+    showLogin.addEventListener('click', function (e) {
         e.preventDefault();
         showForm(loginForm, registerForm, toggleToRegister, toggleToLogin);
     });
 
     // Xử lý đăng nhập
-    const loginButton = loginForm.querySelector('button[type="button"]:not(.social-btn)') || 
-                       Array.from(loginForm.querySelectorAll('button[type="button"]')).find(btn => 
-                           btn.textContent.includes('Đăng nhập') && !btn.classList.contains('social-btn'));
-    
+    const loginButton = loginForm.querySelector('button[type="button"]:not(.social-btn)') ||
+        Array.from(loginForm.querySelectorAll('button[type="button"]')).find(btn =>
+            btn.textContent.includes('Đăng nhập') && !btn.classList.contains('social-btn'));
+
     console.log('Login button found:', loginButton);
-    
+
     if (loginButton) {
-        loginButton.addEventListener('click', async function(e) {
+        loginButton.addEventListener('click', async function (e) {
             e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
+
+            const identifier = document.getElementById('identifier').value.trim();
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
 
             // Validation
-            if (!email || !password) {
-                showMessage('Vui lòng nhập đầy đủ email và mật khẩu');
+            if (!identifier || !password) {
+                showMessage('Vui lòng nhập đầy đủ thông tin đăng nhập');
                 return;
             }
 
@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded', function() {
             loginButton.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Đang đăng nhập...';
 
             try {
-                const response = await ApiService.login(email, password);
-                
+                const response = await ApiService.login(identifier, password);
+
                 if (response.success) {
                     // Lưu token và thông tin user
                     AuthManager.saveAuth(response.token, response.user, remember);
 
                     showMessage('Đăng nhập thành công! Đang chuyển hướng...', 'success');
-                    
+
                     // Force update header if function is available
                     if (typeof window.updateHeaderAuthState === 'function') {
                         console.log('🔄 [login] Triggering header update after login...');
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.updateHeaderAuthState();
                         }, 100);
                     }
-                    
+
                     // Chuyển hướng dựa vào role
                     setTimeout(() => {
                         AuthManager.redirectByRole(response.user);
@@ -143,21 +143,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Xử lý đăng ký với event delegation
-    document.addEventListener('click', async function(e) {
+    document.addEventListener('click', async function (e) {
         const target = e.target;
-        
+
         // Kiểm tra xem có phải là register button không
-        if (target.tagName === 'BUTTON' && 
-            target.type === 'button' && 
-            target.textContent.includes('Đăng ký') && 
+        if (target.tagName === 'BUTTON' &&
+            target.type === 'button' &&
+            target.innerText.trim().startsWith('Đăng ký') &&
             !target.classList.contains('social-btn') &&
             registerForm && registerForm.contains(target)) {
-            
+
             console.log('🎯 REGISTER BUTTON CLICKED VIA DELEGATION!');
             e.preventDefault();
-            
+
             const email = document.getElementById('reg-email').value.trim();
             const name = document.getElementById('reg-name').value.trim();
+            const username = document.getElementById('reg-username').value.trim();
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm').value;
 
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Validation
-            if (!email || !name || !password || !confirmPassword) {
+            if (!email || !name || !username || !password || !confirmPassword) {
                 console.log('Validation failed - missing fields');
                 showMessage('Vui lòng điền đầy đủ thông tin');
                 return;
@@ -197,19 +198,19 @@ document.addEventListener('DOMContentLoaded', function() {
             target.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Đang đăng ký...';
 
             try {
-                // Tạo username từ email (lấy phần trước @)
-                const username = email.split('@')[0];
-                
+                // // Tạo username từ email (lấy phần trước @)
+                // const username = email.split('@')[0];
+
                 console.log('Calling API register with:', { name, username, email });
                 const response = await ApiService.register(name, username, email, password);
                 console.log('API response:', response);
-                
+
                 if (response.success) {
                     showMessage('Đăng ký thành công! Bạn đã được tự động đăng nhập.', 'success');
-                    
+
                     // Lưu token và thông tin user
                     AuthManager.saveAuth(response.token, response.user, false);
-                    
+
                     // Force update header if function is available
                     if (typeof window.updateHeaderAuthState === 'function') {
                         console.log('🔄 [register] Triggering header update after register...');
@@ -217,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.updateHeaderAuthState();
                         }, 100);
                     }
-                    
+
                     // Chuyển về trang chủ sau 2 giây
                     setTimeout(() => {
                         AuthManager.redirectByRole(response.user);

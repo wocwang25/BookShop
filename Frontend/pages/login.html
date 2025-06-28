@@ -1,251 +1,286 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Readify - Đăng nhập</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <link rel="stylesheet" href="./assets/css/home.css">
-    <link rel="stylesheet" href="./assets/css/login.css">
-    <script src="../assets/js/clearAuth.js"></script>
-    <script src="../assets/js/api.js"></script>
-    <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/login.js" defer></script>
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#FF9A8B',
-              secondary: '#5D87FF',
-              primarynavy: '#1a365d',
-              primaryblue: '#2d5aa0'
-            },
-            borderRadius: {
-              'none': '0px',
-              'sm': '4px',
-              DEFAULT: '8px',
-              'md': '12px',
-              'lg': '16px',
-              'xl': '20px',
-              '2xl': '24px',
-              '3xl': '32px',
-              'full': '9999px',
-              'button': '8px'
-            }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Readify - Đăng nhập</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <link rel="stylesheet" href="./assets/css/home.css">
+  <link rel="stylesheet" href="./assets/css/login.css">
+  <script src="../assets/js/clearAuth.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/login.js" defer></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF9A8B',
+            secondary: '#5D87FF',
+            primarynavy: '#1a365d',
+            primaryblue: '#2d5aa0'
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '4px',
+            DEFAULT: '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '20px',
+            '2xl': '24px',
+            '3xl': '32px',
+            'full': '9999px',
+            'button': '8px'
           }
         }
       }
-    </script>
+    }
+  </script>
 </head>
+
 <body class="min-h-screen bg-gradient-to-r from-somecolor to-somecolor p-0 m-0">
-    <main class="flex items-center justify-center w-screen min-h-screen">
-        <div class="w-full min-h-screen flex flex-col md:flex-row rounded-none card-shadow bg-white">
-            <!-- Left Column - Login Form -->
-            <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col">
-           <a href="/" class="logo flex items-center space-x-2">
-            <img src="assets/images/logo-navy.svg" alt="Readify" class="h-8 w-8 object-contain" />
-            <span class="logo ">Readify</span>
+  <main class="flex items-center justify-center w-screen min-h-screen">
+    <div class="w-full min-h-screen flex flex-col md:flex-row rounded-none card-shadow bg-white">
+      <!-- Left Column - Login Form -->
+      <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col">
+        <a href="/" class="logo flex items-center space-x-2">
+          <img src="assets/images/logo-navy.svg" alt="Readify" class="h-8 w-8 object-contain" />
+          <span class="logo ">Readify</span>
+        </a>
+
+        <div class="my-6">
+          <h1 class="text-2xl font-bold text-primarynavy">Chào mừng trở lại</h1>
+          <p class="text-gray-600 mt-2">Vui lòng nhập thông tin tài khoản của bạn</p>
+        </div>
+
+        <form id="login-form" class="flex flex-col space-y-5 flex-grow transition-all duration-700 ease-in-out">
+          <div class="space-y-2">
+            <label for="identifier" class="text-sm font-medium text-gray-700">Email/Username</label>
+            <input type="identifier" id="identifier" placeholder="Email/Username"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none">
+          </div>
+          <div class="space-y-2">
+            <label for="password" class="text-sm font-medium text-gray-700">Mật khẩu</label>
+            <input type="password" id="password" placeholder="••••••••"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none">
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center space-x-2 cursor-pointer select-none">
+              <input type="checkbox" id="remember" class="hidden peer">
+              <span
+                class="custom-checkbox w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-all duration-200 peer-checked:bg-primarynavy peer-checked:border-primarynavy peer-checked:shadow-md">
+                <i
+                  class="ri-check-line text-white text-base opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
+              </span>
+              <span class="text-sm text-gray-600 ml-2">Ghi nhớ đăng nhập</span>
+            </label>
+            <a href="#" class="text-sm text-gray-600 hover:text-primaryblue transition-colors duration-200">Quên mật
+              khẩu?</a>
+          </div>
+          <button type="button"
+            class="w-full py-3 bg-primarynavy text-white font-medium rounded-button shadow-md hover:bg-primaryblue hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 !rounded-button whitespace-nowrap">Đăng
+            nhập</button>
+          <div class="flex items-center my-4">
+            <div class="flex-grow h-px bg-gray-200"></div>
+            <span class="px-4 text-sm text-gray-500">hoặc đăng nhập với</span>
+            <div class="flex-grow h-px bg-gray-200"></div>
+          </div>
+          <div class="flex space-x-3 justify-center">
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-google-fill text-[#EA4335] text-xl"></i>
+            </button>
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-github-fill text-[#333] text-xl"></i>
+            </button>
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-facebook-fill text-[#1877F2] text-xl"></i>
+            </button>
+          </div>
+        </form>
+        <!-- Register Form (hidden by default) -->
+        <form id="register-form"
+          class="flex flex-col space-y-5 flex-grow transition-all duration-700 ease-in-out hidden">
+          <div class="space-y-2">
+            <label for="reg-email" class="text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="reg-email" placeholder="email@example.com"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none">
+          </div>
+          <div class="space-y-2">
+            <label for="reg-name" class="text-sm font-medium text-gray-700">Họ và tên</label>
+            <input type="text" id="reg-name" placeholder="Họ và tên"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none">
+          </div>
+          <div class="space-y-2">
+            <label for="reg-username" class="text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="reg-username" placeholder="username"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none">
+          </div>
+          <div class="space-y-2 relative">
+            <label for="reg-password" class="text-sm font-medium text-gray-700">Mật khẩu</label>
+            <input type="password" id="reg-password" placeholder="••••••••"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none pr-12">
+            <button type="button" class="absolute right-3 top-9 text-gray-400 hover:text-primaryblue"
+              onclick="togglePassword('reg-password', this)">
+              <i class="ri-eye-off-line"></i>
+            </button>
+          </div>
+          <div class="space-y-2 relative">
+            <label for="reg-confirm" class="text-sm font-medium text-gray-700">Nhập lại mật khẩu</label>
+            <input type="password" id="reg-confirm" placeholder="••••••••"
+              class="w-full px-4 py-3 rounded input-field focus:outline-none pr-12">
+            <button type="button" class="absolute right-3 top-9 text-gray-400 hover:text-primaryblue"
+              onclick="togglePassword('reg-confirm', this)">
+              <i class="ri-eye-off-line"></i>
+            </button>
+          </div>
+          <button type="button"
+            class="w-full py-3 bg-primarynavy text-white font-medium rounded-button shadow-md hover:bg-primaryblue hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 !rounded-button whitespace-nowrap">Đăng
+            ký</button>
+          <div class="flex items-center my-4">
+            <div class="flex-grow h-px bg-gray-200"></div>
+            <span class="px-4 text-sm text-gray-500">hoặc đăng ký với</span>
+            <div class="flex-grow h-px bg-gray-200"></div>
+          </div>
+          <div class="flex space-x-3 justify-center">
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-google-fill text-[#EA4335] text-xl"></i>
+            </button>
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-github-fill text-[#333] text-xl"></i>
+            </button>
+            <button type="button"
+              class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
+              <i class="ri-facebook-fill text-[#1877F2] text-xl"></i>
+            </button>
+          </div>
+        </form>
+        <!-- Toggle between login/register -->
+        <div id="toggle-auth" class="mt-6 text-center text-sm text-gray-600">
+          <span id="toggle-to-register">Chưa có tài khoản? <a href="#" id="show-register"
+              class="font-medium text-primaryblue hover:text-gray-700 transition">Đăng ký ngay</a></span>
+          <span id="toggle-to-login" class="hidden">Đã có tài khoản? <a href="#" id="show-login"
+              class="font-medium text-primaryblue hover:text-gray-700 transition">Đăng nhập</a></span>
+        </div>
+        <div class="mt-2 text-center">
+          <a href="/" class="inline-flex items-center text-sm text-primaryblue hover:text-gray-700 transition">
+            <i class="ri-arrow-left-line mr-1"></i> Quay lại trang chủ
           </a>
-            
-            <div class="my-6">
-                <h1 class="text-2xl font-bold text-primarynavy">Chào mừng trở lại</h1>
-                <p class="text-gray-600 mt-2">Vui lòng nhập thông tin tài khoản của bạn</p>
-            </div>
-            
-            <form id="login-form" class="flex flex-col space-y-5 flex-grow transition-all duration-700 ease-in-out">
-                <div class="space-y-2">
-                    <label for="email" class="text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" placeholder="email@example.com" class="w-full px-4 py-3 rounded input-field focus:outline-none">
-                </div>
-                <div class="space-y-2">
-                    <label for="password" class="text-sm font-medium text-gray-700">Mật khẩu</label>
-                    <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3 rounded input-field focus:outline-none">
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center space-x-2 cursor-pointer select-none">
-    <input type="checkbox" id="remember" class="hidden peer">
-    <span class="custom-checkbox w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-all duration-200 peer-checked:bg-primarynavy peer-checked:border-primarynavy peer-checked:shadow-md">
-        <i class="ri-check-line text-white text-base opacity-0 peer-checked:opacity-100 transition-opacity duration-200"></i>
-    </span>
-    <span class="text-sm text-gray-600 ml-2">Ghi nhớ đăng nhập</span>
-</label>
-                    <a href="#" class="text-sm text-gray-600 hover:text-primaryblue transition-colors duration-200">Quên mật khẩu?</a>
-                </div>
-                <button type="button" class="w-full py-3 bg-primarynavy text-white font-medium rounded-button shadow-md hover:bg-primaryblue hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 !rounded-button whitespace-nowrap">Đăng nhập</button>
-                <div class="flex items-center my-4">
-                    <div class="flex-grow h-px bg-gray-200"></div>
-                    <span class="px-4 text-sm text-gray-500">hoặc đăng nhập với</span>
-                    <div class="flex-grow h-px bg-gray-200"></div>
-                </div>
-                <div class="flex space-x-3 justify-center">
-                    <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-                        <i class="ri-google-fill text-[#EA4335] text-xl"></i>
-                    </button>
-                    <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-                        <i class="ri-github-fill text-[#333] text-xl"></i>
-                    </button>
-                    <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-                        <i class="ri-facebook-fill text-[#1877F2] text-xl"></i>
-                    </button>
-                </div>
-            </form>
-            <!-- Register Form (hidden by default) -->
-            <form id="register-form" class="flex flex-col space-y-5 flex-grow transition-all duration-700 ease-in-out hidden">
-                <div class="space-y-2">
-                    <label for="reg-email" class="text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="reg-email" placeholder="email@example.com" class="w-full px-4 py-3 rounded input-field focus:outline-none">
-                </div>
-                <div class="space-y-2">
-                    <label for="reg-name" class="text-sm font-medium text-gray-700">Họ và tên</label>
-                    <input type="text" id="reg-name" placeholder="Họ và tên" class="w-full px-4 py-3 rounded input-field focus:outline-none">
-                </div>
-                <div class="space-y-2 relative">
-                    <label for="reg-password" class="text-sm font-medium text-gray-700">Mật khẩu</label>
-                    <input type="password" id="reg-password" placeholder="••••••••" class="w-full px-4 py-3 rounded input-field focus:outline-none pr-12">
-                    <button type="button" class="absolute right-3 top-9 text-gray-400 hover:text-primaryblue" onclick="togglePassword('reg-password', this)">
-                        <i class="ri-eye-off-line"></i>
-                    </button>
-                </div>
-                <div class="space-y-2 relative">
-                    <label for="reg-confirm" class="text-sm font-medium text-gray-700">Nhập lại mật khẩu</label>
-                    <input type="password" id="reg-confirm" placeholder="••••••••" class="w-full px-4 py-3 rounded input-field focus:outline-none pr-12">
-                    <button type="button" class="absolute right-3 top-9 text-gray-400 hover:text-primaryblue" onclick="togglePassword('reg-confirm', this)">
-                        <i class="ri-eye-off-line"></i>
-                    </button>
-                </div>
-                <button type="button" class="w-full py-3 bg-primarynavy text-white font-medium rounded-button shadow-md hover:bg-primaryblue hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200 !rounded-button whitespace-nowrap">Đăng ký</button>
-                <div class="flex items-center my-4">
-                    <div class="flex-grow h-px bg-gray-200"></div>
-                    <span class="px-4 text-sm text-gray-500">hoặc đăng ký với</span>
-                    <div class="flex-grow h-px bg-gray-200"></div>
-                </div>
-                <div class="flex space-x-3 justify-center">
-                    <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-                        <i class="ri-google-fill text-[#EA4335] text-xl"></i>
-                    </button>
-                    <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-    <i class="ri-github-fill text-[#333] text-xl"></i>
-  </button>
-  <button type="button" class="social-btn w-12 h-12 rounded-full flex items-center justify-center hover:bg-primarynavy hover:text-white hover:-translate-y-1 hover:shadow-lg active:scale-95 transition-all duration-200">
-    <i class="ri-facebook-fill text-[#1877F2] text-xl"></i>
-  </button>
-</div>
-            </form>
-            <!-- Toggle between login/register -->
-            <div id="toggle-auth" class="mt-6 text-center text-sm text-gray-600">
-                <span id="toggle-to-register">Chưa có tài khoản? <a href="#" id="show-register" class="font-medium text-primaryblue hover:text-gray-700 transition">Đăng ký ngay</a></span>
-                <span id="toggle-to-login" class="hidden">Đã có tài khoản? <a href="#" id="show-login" class="font-medium text-primaryblue hover:text-gray-700 transition">Đăng nhập</a></span>
-            </div>
-            <div class="mt-2 text-center">
-                <a href="/" class="inline-flex items-center text-sm text-primaryblue hover:text-gray-700 transition">
-                    <i class="ri-arrow-left-line mr-1"></i> Quay lại trang chủ
-                </a>
-            </div>
         </div>
-        
-        <!-- Right Column - Testimonial -->
-        <div class="w-full md:w-1/2 relative">
-            <div class="h-full flex flex-col">
-                <!-- Main Testimonial Card -->
-                <div class="quote-card text-white p-8 md:p-10 rounded-2xl m-4 md:m-6 flex-grow overflow-hidden relative">
-                    <div id="testimonial-container" class="opacity-100 transition-all duration-700 ease-in-out will-change-transform will-change-opacity min-h-[260px]">
-                        <!-- Nội dung testimonial sẽ được JS render ở đây -->
-                    </div>
-                    <!-- Nút chuyển testimonial cố định góc phải dưới -->
-                    <div class="absolute bottom-6 right-8 flex space-x-3 z-10">
-                        <button id="prev-testimonial" type="button"
-                            class="w-11 h-11 rounded-full bg-gray-700 flex items-center justify-center shadow-lg hover:bg-primarynavy hover:-translate-y-1 hover:shadow-xl active:scale-95 transition-all duration-300 border-2 border-white/10">
-                            <i class="ri-arrow-left-s-line text-white text-2xl"></i>
-                        </button>
-                        <button id="next-testimonial" type="button"
-                            class="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-lg hover:bg-primaryblue hover:-translate-y-1 hover:shadow-xl active:scale-95 transition-all duration-300 border-2 border-white/10">
-                            <i class="ri-arrow-right-s-line text-white text-2xl"></i>
-                        </button>
-                    </div>
+      </div>
+
+      <!-- Right Column - Testimonial -->
+      <div class="w-full md:w-1/2 relative">
+        <div class="h-full flex flex-col">
+          <!-- Main Testimonial Card -->
+          <div class="quote-card text-white p-8 md:p-10 rounded-2xl m-4 md:m-6 flex-grow overflow-hidden relative">
+            <div id="testimonial-container"
+              class="opacity-100 transition-all duration-700 ease-in-out will-change-transform will-change-opacity min-h-[260px]">
+              <!-- Nội dung testimonial sẽ được JS render ở đây -->
+            </div>
+            <!-- Nút chuyển testimonial cố định góc phải dưới -->
+            <div class="absolute bottom-6 right-8 flex space-x-3 z-10">
+              <button id="prev-testimonial" type="button"
+                class="w-11 h-11 rounded-full bg-gray-700 flex items-center justify-center shadow-lg hover:bg-primarynavy hover:-translate-y-1 hover:shadow-xl active:scale-95 transition-all duration-300 border-2 border-white/10">
+                <i class="ri-arrow-left-s-line text-white text-2xl"></i>
+              </button>
+              <button id="next-testimonial" type="button"
+                class="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-lg hover:bg-primaryblue hover:-translate-y-1 hover:shadow-xl active:scale-95 transition-all duration-300 border-2 border-white/10">
+                <i class="ri-arrow-right-s-line text-white text-2xl"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- CTA Card -->
+          <div class="cta-card p-6 rounded-2xl mx-4 md:mx-6 mb-4 md:mb-6 relative overflow-hidden">
+            <div class="flex items-center">
+
+              <!-- Nội dung căn đều -->
+              <div class="flex-1 flex flex-col justify-center">
+                <h3 class="text-lg font-bold text-gray-800 mb-2 text-left md:text-justify">Tìm kiếm sách yêu thích của
+                  bạn ngay</h3>
+                <p class="text-sm text-gray-600 mb-4 text-left md:text-justify">
+                  Hãy là một trong những người đầu tiên trải nghiệm cách dễ dàng nhất để khám phá thế giới sách.
+                </p>
+                <div class="flex -space-x-2">
+                  <img
+                    src="https://img.freepik.com/free-psd/3d-illustration-with-online-avatar_23-2151303050.jpg?semt=ais_hybrid&w=740"
+                    alt="User 1" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-200 shadow" />
+                  <img src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg"
+                    alt="User 2" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-300 shadow" />
+                  <img
+                    src="https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869149.jpg?semt=ais_hybrid&w=740"
+                    alt="User 3" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-400 shadow" />
                 </div>
-                
-                <!-- CTA Card -->
-                <div class="cta-card p-6 rounded-2xl mx-4 md:mx-6 mb-4 md:mb-6 relative overflow-hidden">
-    <div class="flex items-center">
-        
-        <!-- Nội dung căn đều -->
-        <div class="flex-1 flex flex-col justify-center">
-            <h3 class="text-lg font-bold text-gray-800 mb-2 text-left md:text-justify">Tìm kiếm sách yêu thích của bạn ngay</h3>
-            <p class="text-sm text-gray-600 mb-4 text-left md:text-justify">
-                Hãy là một trong những người đầu tiên trải nghiệm cách dễ dàng nhất để khám phá thế giới sách.
-            </p>
-            <div class="flex -space-x-2">
-                <img src="https://img.freepik.com/free-psd/3d-illustration-with-online-avatar_23-2151303050.jpg?semt=ais_hybrid&w=740"
-                     alt="User 1" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-200 shadow" />
-                <img src="https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg"
-                     alt="User 2" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-300 shadow" />
-                <img src="https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869149.jpg?semt=ais_hybrid&w=740"
-                     alt="User 3" class="w-8 h-8 rounded-full border-2 border-white object-cover bg-gray-400 shadow" />
+              </div>
+              <!-- Ảnh sách bên phải -->
+              <div class="w-28 h-28 flex-shrink-0 ml-5 hidden md:flex items-center justify-center">
+                <img src="https://i.pinimg.com/736x/fa/3b/3e/fa3b3ee736ea39d66bab5e88b7bddf7f.jpg" alt="Book stack"
+                  class="rounded-xl object-cover w-full h-full shadow-md border border-gray-200">
+              </div>
             </div>
+          </div>
         </div>
-        <!-- Ảnh sách bên phải -->
-        <div class="w-28 h-28 flex-shrink-0 ml-5 hidden md:flex items-center justify-center">
-            <img src="https://i.pinimg.com/736x/fa/3b/3e/fa3b3ee736ea39d66bab5e88b7bddf7f.jpg"
-                 alt="Book stack" class="rounded-xl object-cover w-full h-full shadow-md border border-gray-200">
-        </div>
-    </div>
-</div>
-            </div>
-        </div>
+      </div>
     </div>
 
-<script id="checkbox-script">
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkbox = document.getElementById('remember');
-            const indicator = document.getElementById('checkbox-indicator');
-            if (checkbox && indicator) {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        indicator.classList.remove('hidden');
-                    } else {
-                        indicator.classList.add('hidden');
-                    }
-                });
+    <script id="checkbox-script">
+      document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('remember');
+        const indicator = document.getElementById('checkbox-indicator');
+        if (checkbox && indicator) {
+          checkbox.addEventListener('change', function () {
+            if (this.checked) {
+              indicator.classList.remove('hidden');
+            } else {
+              indicator.classList.add('hidden');
             }
-        });
+          });
+        }
+      });
     </script>
-<script>
-const testimonials = [
-  {
-    text: `"Khám phá thế giới qua từng trang sách chưa bao giờ dễ dàng đến thế. Chỉ cần duyệt qua và chọn một cuốn sách nếu bạn cần thư giãn hoặc học hỏi điều mới."`,
-    name: "Nguyễn Minh Tuấn",
-    role: "Người tiêu dùng",
-    avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP_NXJ7JPKM0jxW55WBCBMf9HlqEs7KYXCgw&s"
-  },
-  {
-    text: `"Tôi đã tìm được rất nhiều cuốn sách hay nhờ Readify. Giao diện thân thiện, dễ sử dụng và nhiều ưu đãi hấp dẫn!"`,
-    name: "Trần Thị Mai",
-    role: "Sinh viên Đại học Kinh tế",
-    avatarUrl: "https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869153.jpg"
-  }
-];
+    <script>
+      const testimonials = [
+        {
+          text: `"Khám phá thế giới qua từng trang sách chưa bao giờ dễ dàng đến thế. Chỉ cần duyệt qua và chọn một cuốn sách nếu bạn cần thư giãn hoặc học hỏi điều mới."`,
+          name: "Nguyễn Minh Tuấn",
+          role: "Người tiêu dùng",
+          avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQP_NXJ7JPKM0jxW55WBCBMf9HlqEs7KYXCgw&s"
+        },
+        {
+          text: `"Tôi đã tìm được rất nhiều cuốn sách hay nhờ Readify. Giao diện thân thiện, dễ sử dụng và nhiều ưu đãi hấp dẫn!"`,
+          name: "Trần Thị Mai",
+          role: "Sinh viên Đại học Kinh tế",
+          avatarUrl: "https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869153.jpg"
+        }
+      ];
 
-let currentTestimonial = 0;
-let isTransitioning = false;
-let testimonialTimer = null;
+      let currentTestimonial = 0;
+      let isTransitioning = false;
+      let testimonialTimer = null;
 
-function renderTestimonial(idx, direction = 0) {
-  const container = document.getElementById('testimonial-container');
-  if (!container) return;
-  if (isTransitioning) return;
-  isTransitioning = true;
+      function renderTestimonial(idx, direction = 0) {
+        const container = document.getElementById('testimonial-container');
+        if (!container) return;
+        if (isTransitioning) return;
+        isTransitioning = true;
 
-  // Tạo node mới cho hiệu ứng slide-in
-  const t = testimonials[idx];
-  const newNode = document.createElement('div');
-  newNode.innerHTML = `
+        // Tạo node mới cho hiệu ứng slide-in
+        const t = testimonials[idx];
+        const newNode = document.createElement('div');
+        newNode.innerHTML = `
     <div>
       <div class="mb-6">
         <i class="ri-double-quotes-l text-4xl text-primary opacity-80"></i>
@@ -263,57 +298,57 @@ function renderTestimonial(idx, direction = 0) {
       </div>
     </div>
   `;
-  newNode.className = `absolute inset-0 transition-all duration-700 ease-in-out will-change-transform will-change-opacity`;
-  newNode.style.opacity = 0;
-  newNode.style.transform = `translateX(${direction > 0 ? '60px' : direction < 0 ? '-60px' : '0'}) scale(0.96)`;
+        newNode.className = `absolute inset-0 transition-all duration-700 ease-in-out will-change-transform will-change-opacity`;
+        newNode.style.opacity = 0;
+        newNode.style.transform = `translateX(${direction > 0 ? '60px' : direction < 0 ? '-60px' : '0'}) scale(0.96)`;
 
-  // Đảm bảo container position relative
-  container.style.position = "relative";
-  // Lấy node cũ
-  const oldNode = container.firstElementChild;
+        // Đảm bảo container position relative
+        container.style.position = "relative";
+        // Lấy node cũ
+        const oldNode = container.firstElementChild;
 
-  // Thêm node mới vào
-  container.appendChild(newNode);
+        // Thêm node mới vào
+        container.appendChild(newNode);
 
-  // Bắt đầu hiệu ứng node cũ (slide out)
-  if (oldNode) {
-    oldNode.style.transition = "all 0.7s cubic-bezier(.4,0,.2,1)";
-    oldNode.style.opacity = 0;
-    oldNode.style.transform = `translateX(${direction > 0 ? '-60px' : direction < 0 ? '60px' : '0'}) scale(0.96)`;
-  }
+        // Bắt đầu hiệu ứng node cũ (slide out)
+        if (oldNode) {
+          oldNode.style.transition = "all 0.7s cubic-bezier(.4,0,.2,1)";
+          oldNode.style.opacity = 0;
+          oldNode.style.transform = `translateX(${direction > 0 ? '-60px' : direction < 0 ? '60px' : '0'}) scale(0.96)`;
+        }
 
-  // Bắt đầu hiệu ứng node mới (slide in)
-  setTimeout(() => {
-    newNode.style.opacity = 1;
-    newNode.style.transform = "translateX(0) scale(1)";
-  }, 10);
+        // Bắt đầu hiệu ứng node mới (slide in)
+        setTimeout(() => {
+          newNode.style.opacity = 1;
+          newNode.style.transform = "translateX(0) scale(1)";
+        }, 10);
 
-  // Sau khi hiệu ứng xong, xóa node cũ, giữ node mới
-  setTimeout(() => {
-    if (oldNode) container.removeChild(oldNode);
-    newNode.className = "";
-    newNode.style = "";
-    isTransitioning = false;
-    resetTestimonialTimer(); // Reset timer sau khi chuyển xong
-  }, 700);
-}
+        // Sau khi hiệu ứng xong, xóa node cũ, giữ node mới
+        setTimeout(() => {
+          if (oldNode) container.removeChild(oldNode);
+          newNode.className = "";
+          newNode.style = "";
+          isTransitioning = false;
+          resetTestimonialTimer(); // Reset timer sau khi chuyển xong
+        }, 700);
+      }
 
-// Tự động chuyển testimonial sau 5s
-function resetTestimonialTimer() {
-  if (testimonialTimer) clearTimeout(testimonialTimer);
-  testimonialTimer = setTimeout(() => {
-    const next = (currentTestimonial + 1) % testimonials.length;
-    currentTestimonial = next;
-    renderTestimonial(currentTestimonial, 1);
-  }, 4000);
-}
+      // Tự động chuyển testimonial sau 5s
+      function resetTestimonialTimer() {
+        if (testimonialTimer) clearTimeout(testimonialTimer);
+        testimonialTimer = setTimeout(() => {
+          const next = (currentTestimonial + 1) % testimonials.length;
+          currentTestimonial = next;
+          renderTestimonial(currentTestimonial, 1);
+        }, 4000);
+      }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const container = document.getElementById('testimonial-container');
-  if (container) {
-    // Khởi tạo node đầu tiên
-    const t = testimonials[currentTestimonial];
-    container.innerHTML = `
+      document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('testimonial-container');
+        if (container) {
+          // Khởi tạo node đầu tiên
+          const t = testimonials[currentTestimonial];
+          container.innerHTML = `
       <div>
         <div class="mb-6">
           <i class="ri-double-quotes-l text-4xl text-primary opacity-80"></i>
@@ -331,22 +366,23 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     `;
-    resetTestimonialTimer();
-  }
-  document.getElementById('prev-testimonial').addEventListener('click', function() {
-    if (isTransitioning) return;
-    const prev = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
-    currentTestimonial = prev;
-    renderTestimonial(currentTestimonial, -1);
-  });
-  document.getElementById('next-testimonial').addEventListener('click', function() {
-    if (isTransitioning) return;
-    const next = (currentTestimonial + 1) % testimonials.length;
-    currentTestimonial = next;
-    renderTestimonial(currentTestimonial, 1);
-  });
-});
-</script>
-    </main>
+          resetTestimonialTimer();
+        }
+        document.getElementById('prev-testimonial').addEventListener('click', function () {
+          if (isTransitioning) return;
+          const prev = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+          currentTestimonial = prev;
+          renderTestimonial(currentTestimonial, -1);
+        });
+        document.getElementById('next-testimonial').addEventListener('click', function () {
+          if (isTransitioning) return;
+          const next = (currentTestimonial + 1) % testimonials.length;
+          currentTestimonial = next;
+          renderTestimonial(currentTestimonial, 1);
+        });
+      });
+    </script>
+  </main>
 </body>
+
 </html>
