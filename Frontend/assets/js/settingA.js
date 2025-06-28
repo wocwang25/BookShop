@@ -309,17 +309,29 @@ async function saveUserInfo() {
                 console.log('📷 Avatar saved successfully, temp data cleared');
             }
 
-            // Update AuthManager if name changed
-            if (formData.name && typeof AuthManager !== 'undefined') {
+            // Update AuthManager if name or avatar changed
+            if ((formData.name || formData.avatar) && typeof AuthManager !== 'undefined') {
                 const currentUser = AuthManager.getUser();
                 if (currentUser) {
-                    currentUser.name = formData.name;
+                    if (formData.name) {
+                        currentUser.name = formData.name;
+                    }
+                    
+                    // Update avatar in user data
+                    if (formData.avatar) {
+                        if (!currentUser.customerProfile) {
+                            currentUser.customerProfile = {};
+                        }
+                        currentUser.customerProfile.avatar = formData.avatar;
+                        console.log('📷 Updated user avatar in AuthManager');
+                    }
+                    
                     localStorage.setItem('userData', JSON.stringify(currentUser));
 
                     // Trigger header update
                     setTimeout(() => {
                         if (typeof window.updateHeaderAuthState === 'function') {
-                            console.log('🔄 Updating header with new user name...');
+                            console.log('🔄 Updating header with new user info...');
                             window.updateHeaderAuthState();
                         }
                     }, 100);
@@ -454,16 +466,22 @@ function updateAvatarPreview(imageSrc) {
         sidebarAvatar.src = imageSrc;
     }
 
-    // Update header avatar if exists
-    const headerAvatar = document.querySelector('#userInfo img, #userInfoBtn img');
-    if (headerAvatar) {
-        headerAvatar.src = imageSrc;
+    // Update header avatars using the global function
+    const headerUserAvatar = document.getElementById('headerUserAvatar');
+    if (headerUserAvatar) {
+        headerUserAvatar.src = imageSrc;
+    }
+
+    // Update panel avatar
+    const panelUserAvatar = document.getElementById('panelUserAvatar');
+    if (panelUserAvatar) {
+        panelUserAvatar.src = imageSrc;
     }
 
     // Update any other avatar elements
     const allAvatars = document.querySelectorAll('[id*="avatar"], [class*="avatar"] img');
     allAvatars.forEach(avatar => {
-        if (avatar.tagName === 'IMG') {
+        if (avatar.tagName === 'IMG' && avatar.id !== 'headerUserAvatar' && avatar.id !== 'panelUserAvatar') {
             avatar.src = imageSrc;
         }
     });

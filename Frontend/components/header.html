@@ -72,9 +72,13 @@
             <div class="text-xs text-green-600 font-medium">● Đã đăng nhập</div>
           </div>
           <button id="userInfoBtn"
-            class="w-10 h-10 flex items-center justify-center rounded-full bg-primarynavy text-white transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primarynavy"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden transition-all duration-200 hover:border-primarynavy focus:outline-none focus:ring-2 focus:ring-primarynavy"
             aria-label="User Menu">
-            <i class="ri-user-3-fill text-xl"></i>
+            <img id="headerUserAvatar" 
+                 src="../assets/images/default_image.jpg" 
+                 alt="User Avatar"
+                 class="w-full h-full object-cover"
+                 onerror="this.src='../assets/images/default_image.jpg'" />
           </button>
         </div>
 
@@ -126,8 +130,12 @@
       <!-- User profile section -->
       <div id="userWelcome" class="px-4 py-3 bg-gradient-to-r from-primarynavy to-blue-600 rounded-lg text-white mb-4">
         <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <i class="ri-user-3-fill text-2xl"></i>
+          <div class="w-12 h-12 rounded-full overflow-hidden bg-white/20 border-2 border-white/30">
+            <img id="panelUserAvatar" 
+                 src="../assets/images/default_image.jpg" 
+                 alt="User Avatar"
+                 class="w-full h-full object-cover"
+                 onerror="this.src='../assets/images/default_image.jpg'" />
           </div>
           <div>
             <div class="text-sm opacity-90">Xin chào,</div>

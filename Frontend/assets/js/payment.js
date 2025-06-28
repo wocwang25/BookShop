@@ -12,15 +12,15 @@ function getBookImage(book) {
     image: book.image,
     coverImage: book.coverImage
   });
-  
+
   // Check various image fields
   let imageUrl = book.imageUrl || book.image || book.coverImage;
-  
+
   if (!imageUrl || imageUrl.trim() === '') {
     console.log('🖼️ [Payment] No image found, using default');
     return '../assets/images/default_image.jpg';
   }
-  
+
   // Convert Google Drive links if needed
   if (imageUrl.includes('drive.google.com/file/d/')) {
     const match = imageUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -29,7 +29,7 @@ function getBookImage(book) {
       console.log('🖼️ [Payment] Converted Google Drive URL:', imageUrl);
     }
   }
-  
+
   return imageUrl;
 }
 
@@ -40,63 +40,63 @@ function getAuthorName(book) {
     authorType: typeof book.author,
     authorName: book.author?.name
   });
-  
+
   if (!book.author) {
     return 'Tác giả không rõ';
   }
-  
+
   // Author could be string or object
   if (typeof book.author === 'string') {
     return book.author;
   }
-  
+
   if (typeof book.author === 'object' && book.author.name) {
     return book.author.name;
   }
-  
+
   return 'Tác giả không rõ';
 }
 
 // Helper function to format address
 function formatAddress(address) {
   if (!address) return 'Chưa cập nhật địa chỉ';
-  
+
   if (typeof address === 'string') {
     return address.trim() || 'Chưa cập nhật địa chỉ';
   }
-  
+
   if (typeof address === 'object') {
     const parts = [];
-    
+
     // Add street/detail
     if (address.detail || address.street || address.line1) {
       parts.push(address.detail || address.street || address.line1);
     }
-    
+
     // Add ward
     if (address.ward || address.commune) {
       parts.push(address.ward || address.commune);
     }
-    
+
     // Add district
     if (address.district) {
       parts.push(address.district);
     }
-    
+
     // Add province/city
     if (address.province || address.city || address.state) {
       parts.push(address.province || address.city || address.state);
     }
-    
+
     // Add country if available and not Vietnam
     if (address.country && address.country.toLowerCase() !== 'vietnam' && address.country.toLowerCase() !== 'vn') {
       parts.push(address.country);
     }
-    
+
     const formatted = parts.filter(part => part && part.trim()).join(', ');
     return formatted || 'Chưa cập nhật địa chỉ';
   }
-  
+
   return 'Chưa cập nhật địa chỉ';
 }
 
@@ -104,20 +104,20 @@ function formatAddress(address) {
 async function loadCartData() {
   try {
     console.log('🛒 [Payment] Loading cart data...');
-    
+
     // Check if services are available
     if (!window.AuthManager) {
       console.error('❌ AuthManager not available');
       showError('Lỗi hệ thống: AuthManager không khả dụng');
       return;
     }
-    
+
     if (!window.ApiService) {
       console.error('❌ ApiService not available');
       showError('Lỗi hệ thống: ApiService không khả dụng');
       return;
     }
-    
+
     // Check if user is authenticated
     if (!window.AuthManager.isAuthenticated()) {
       console.log('User not authenticated, redirecting to login');
@@ -130,9 +130,9 @@ async function loadCartData() {
     console.log('📦 [Payment] Cart response:', response);
     console.log('📦 [Payment] Response type:', typeof response);
     console.log('📦 [Payment] Is array:', Array.isArray(response));
-    
+
     let cartItems = [];
-    
+
     // Handle different response formats
     if (Array.isArray(response)) {
       cartItems = response;
@@ -145,14 +145,14 @@ async function loadCartData() {
       showEmptyCart();
       return;
     }
-    
+
     console.log('📦 [Payment] Processed cart items:', cartItems);
-    
+
     if (cartItems.length > 0) {
       // Filter buy items for payment (treat items without type as 'buy')
       cartData = cartItems.filter(item => !item.type || item.type === 'buy');
       console.log('✅ [Payment] Filtered cart data:', cartData);
-      
+
       // Debug each cart item
       cartData.forEach((item, index) => {
         console.log(`📦 [Payment] Cart item ${index}:`, {
@@ -165,7 +165,7 @@ async function loadCartData() {
           type: item.type
         });
       });
-      
+
       renderCartItems();
       updateTotals();
     } else {
@@ -181,7 +181,7 @@ async function loadCartData() {
 // Render cart items in the payment page
 function renderCartItems() {
   const productList = document.getElementById('product-list');
-  
+
   if (!cartData || cartData.length === 0) {
     showEmptyCart();
     return;
@@ -191,7 +191,7 @@ function renderCartItems() {
 
   cartData.forEach((item, index) => {
     const book = item.book;
-    
+
     // Debug cart item structure
     console.log('🛒 [Payment] Cart item:', item);
     console.log('📖 [Payment] Book data:', book);
@@ -206,7 +206,7 @@ function renderCartItems() {
       imageUrl: book.imageUrl,
       coverImage: book.coverImage
     });
-    
+
     const productItem = document.createElement('div');
     productItem.className = 'product-item flex items-start gap-3 pb-3 border-b border-gray-200';
     productItem.dataset.price = item.price;
@@ -214,7 +214,7 @@ function renderCartItems() {
 
     // Get book image with proper fallback
     const bookImage = getBookImage(book);
-    
+
     // Get author name with proper fallback
     const authorName = getAuthorName(book);
 
@@ -314,7 +314,7 @@ function updateItemDisplay(index) {
   if (productItem) {
     const quantityInput = productItem.querySelector('.quantity-input');
     const itemTotal = productItem.querySelector('.item-total');
-    
+
     quantityInput.value = item.quantity;
     itemTotal.textContent = formatCurrency(item.price * item.quantity);
   }
@@ -325,29 +325,29 @@ async function removeCartItem(index) {
   try {
     const item = cartData[index];
     console.log('🗑️ [Payment] Removing item:', item);
-    
+
     if (!item.book) {
       throw new Error('Invalid book data for removal');
     }
-    
+
     // Get book ID (try different fields)
     const bookId = item.book._id || item.book.id;
     if (!bookId) {
       throw new Error('Book ID not found');
     }
-    
+
     console.log('🗑️ [Payment] Using book ID for removal:', bookId);
-    
+
     // Remove from backend
     await window.ApiService.removeCartItem(bookId);
-    
+
     // Remove from local data
     cartData.splice(index, 1);
-    
+
     // Re-render cart
     renderCartItems();
     updateTotals();
-    
+
     console.log('✅ [Payment] Item removed successfully');
   } catch (error) {
     console.error('❌ [Payment] Error removing item:', error);
@@ -357,12 +357,13 @@ async function removeCartItem(index) {
 
 function updateTotals() {
   let subtotal = 0;
-  
+
   cartData.forEach(item => {
     subtotal += item.price * item.quantity;
   });
 
-  const tax = Math.round(subtotal * 0.135);
+  // const tax = Math.round(subtotal * 0.135);
+  const tax = 0;
   const total = subtotal + tax;
 
   document.getElementById("subtotal").textContent = formatCurrency(subtotal);
@@ -387,7 +388,7 @@ function showEmptyCart() {
       </a>
     </div>
   `;
-  
+
   document.getElementById("subtotal").textContent = "0 VNĐ";
   document.getElementById("tax").textContent = "0 VNĐ";
   document.getElementById("total").textContent = "0 VNĐ";
@@ -423,7 +424,7 @@ async function processPayment() {
     showError('Lỗi hệ thống: AuthManager không khả dụng');
     return;
   }
-  
+
   if (!window.ApiService) {
     showError('Lỗi hệ thống: ApiService không khả dụng');
     return;
@@ -440,17 +441,17 @@ async function processPayment() {
     // Prepare invoice items
     const invoiceItems = cartData.map(item => {
       console.log('📋 [Payment] Processing cart item for invoice:', item);
-      
+
       if (!item.book) {
         console.error('❌ [Payment] Missing book data:', item);
         throw new Error(`Missing book data for item: ${JSON.stringify(item)}`);
       }
-      
+
       const bookTitle = item.book.title || 'Sách không rõ tên';
       const quantity = item.quantity || 1;
-      
+
       console.log('📋 [Payment] Mapped item:', { title: bookTitle, quantity: quantity });
-      
+
       return {
         title: bookTitle,
         quantity: quantity
@@ -462,10 +463,10 @@ async function processPayment() {
 
     // Create sales invoice
     const response = await window.ApiService.createSalesInvoice(customerName, invoiceItems);
-    
+
     if (response && (response.message || response.data)) {
       console.log('✅ [Payment] Invoice created successfully:', response);
-      
+
       // Clear cart from backend (remove all items)
       for (const item of cartData) {
         try {
@@ -474,10 +475,10 @@ async function processPayment() {
           console.warn('⚠️ [Payment] Error clearing cart item:', error);
         }
       }
-      
+
       // Show success popup
       showSuccessPopup(response.data?.salesInvoice?._id || 'Unknown');
-      
+
     } else {
       throw new Error('Invalid response from server');
     }
@@ -493,11 +494,11 @@ async function processPayment() {
 function showSuccessPopup(invoiceId) {
   const popup = document.getElementById("success-popup");
   const orderIdElement = popup.querySelector('.text-blue-600, .text-\\[\\#1e40af\\]');
-  
+
   if (orderIdElement) {
     orderIdElement.textContent = `#INV${invoiceId}`;
   }
-  
+
   popup.classList.remove("hidden");
   setTimeout(() => popup.classList.add("show"), 10);
 }
@@ -506,7 +507,7 @@ function showSuccessPopup(invoiceId) {
 async function loadShippingInfo() {
   try {
     console.log('📦 [Payment] Loading shipping info...');
-    
+
     // Check if user is authenticated (same as settingA.js)
     if (typeof window.AuthManager === 'undefined' || !window.AuthManager.isAuthenticated()) {
       console.log('⚠️ [Payment] User not authenticated');
@@ -524,7 +525,7 @@ async function loadShippingInfo() {
     } else {
       throw new Error('Failed to load profile');
     }
-    
+
   } catch (error) {
     console.error('❌ [Payment] Error loading shipping info:', error);
     showShippingError('Không thể tải thông tin giao hàng. Vui lòng thử lại.');
@@ -534,7 +535,7 @@ async function loadShippingInfo() {
 // Populate shipping data (using settingA.js logic)
 function populateShippingData(user) {
   console.log('👤 [Payment] Populating shipping data for user:', user);
-  
+
   // Use customerProfile as primary source (same as settingA.js)
   const customerProfile = user.customerProfile || {};
   console.log('👤 [Payment] Customer profile:', customerProfile);
@@ -542,14 +543,14 @@ function populateShippingData(user) {
   // Hide loading and show content
   const loadingElement = document.getElementById("shipping-loading");
   const contentElement = document.getElementById("shipping-content");
-  
+
   if (loadingElement) loadingElement.classList.add('hidden');
   if (contentElement) contentElement.classList.remove('hidden');
-  
+
   // Define field mapping (same as settingA.js)
   const fields = {
     'display-name': customerProfile.name || user.name || 'Chưa cập nhật',
-    'display-email': customerProfile.email || user.email || 'Chưa cập nhật', 
+    'display-email': customerProfile.email || user.email || 'Chưa cập nhật',
     'display-phone': customerProfile.phone || 'Chưa cập nhật',
     'display-address': customerProfile.address || 'Chưa cập nhật địa chỉ'
   };
@@ -571,12 +572,12 @@ function populateShippingData(user) {
     console.log('📍 [Payment] No API address, trying localStorage...');
     const localUserInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
     const addressList = JSON.parse(localStorage.getItem("deliveryAddresses") || "[]");
-    
+
     console.log('📍 [Payment] LocalStorage data:', {
       userInfo: localUserInfo,
       addresses: addressList
     });
-    
+
     if (localUserInfo && localUserInfo.addressIndex !== undefined) {
       const index = parseInt(localUserInfo.addressIndex, 10);
       if (!isNaN(index) && addressList[index]) {
@@ -598,10 +599,10 @@ function showShippingError(message) {
   // Hide loading
   const loadingElement = document.getElementById("shipping-loading");
   const contentElement = document.getElementById("shipping-content");
-  
+
   if (loadingElement) loadingElement.classList.add('hidden');
   if (contentElement) contentElement.classList.add('hidden');
-  
+
   const shippingInfo = document.getElementById('shipping-info');
   if (shippingInfo) {
     // Create error element
@@ -615,7 +616,7 @@ function showShippingError(message) {
         Cập nhật thông tin
       </a>
     `;
-    
+
     // Replace content
     shippingInfo.innerHTML = '';
     shippingInfo.appendChild(errorDiv);
@@ -626,18 +627,18 @@ function showShippingError(message) {
 async function waitForServices() {
   let attempts = 0;
   const maxAttempts = 10;
-  
+
   while (attempts < maxAttempts) {
     if (window.AuthManager && window.ApiService) {
       console.log('✅ [Payment] Services available');
       return true;
     }
-    
+
     console.log(`⏳ [Payment] Waiting for services... (${attempts + 1}/${maxAttempts})`);
     await new Promise(resolve => setTimeout(resolve, 200));
     attempts++;
   }
-  
+
   console.error('❌ [Payment] Services not available after waiting');
   return false;
 }
@@ -645,26 +646,26 @@ async function waitForServices() {
 // Initialize page
 document.addEventListener("DOMContentLoaded", async () => {
   console.log('🚀 [Payment] Initializing payment page...');
-  
+
   // Wait for services to be available
   const servicesReady = await waitForServices();
   if (!servicesReady) {
     showError('Lỗi tải trang. Vui lòng refresh trang.');
     return;
   }
-  
+
   // Load shipping info
   await loadShippingInfo();
-  
+
   // Load cart data
   await loadCartData();
-  
+
   // Add payment button event listener
   const confirmPaymentBtn = document.getElementById("confirm-payment-btn");
   if (confirmPaymentBtn) {
     confirmPaymentBtn.addEventListener("click", processPayment);
   }
-  
+
   // Add paid button event listener (simulate payment confirmation)
   const paidButtons = document.querySelectorAll('button');
   paidButtons.forEach(btn => {
@@ -675,14 +676,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
   });
-  
+
   console.log('✅ [Payment] Payment page initialized');
 });
 
 // Test function for debugging
 async function testSalesInvoiceAPI() {
   console.log('🧪 [Test] Testing sales invoice API...');
-  
+
   try {
     const testData = {
       customer_name: 'Test Customer',
@@ -693,14 +694,14 @@ async function testSalesInvoiceAPI() {
         }
       ]
     };
-    
+
     console.log('🧪 [Test] Sending test data:', testData);
-    
+
     const response = await window.ApiService.createSalesInvoice(
       testData.customer_name,
       testData.items
     );
-    
+
     console.log('✅ [Test] API test successful:', response);
     return response;
   } catch (error) {
@@ -712,20 +713,20 @@ async function testSalesInvoiceAPI() {
 // Test with real cart data
 async function testWithCartData() {
   console.log('🧪 [Test] Testing with current cart data...');
-  
+
   if (!cartData || cartData.length === 0) {
     console.log('⚠️ [Test] No cart data available');
     return;
   }
-  
+
   try {
     const userProfile = window.AuthManager.getUser();
     const customerName = userProfile?.name || 'Test Customer';
-    
+
     // Prepare invoice items (same as in processPayment)
     const invoiceItems = cartData.map(item => {
       console.log('📋 [Test] Cart item:', item);
-      
+
       return {
         title: item.book.title,
         quantity: item.quantity || 1
@@ -736,7 +737,7 @@ async function testWithCartData() {
     console.log('👤 [Test] Customer name:', customerName);
 
     const response = await window.ApiService.createSalesInvoice(customerName, invoiceItems);
-    
+
     console.log('✅ [Test] Cart data test successful:', response);
     return response;
   } catch (error) {

@@ -433,6 +433,62 @@ class ApiService {
         }
     }
 
+    // Customer API
+    static async getMyInvoices() {
+        try {
+            console.log('📄 [API] Getting my invoices...');
+            
+            // Check if user is authenticated
+            if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+                throw new Error('User not authenticated. Please login first.');
+            }
+            
+            const response = await this.request('/customer/profile');
+            
+            // Debug API response
+            console.log('👤 [API] Profile response:', response);
+            console.log('👤 [API] Customer profile:', response.user?.customerProfile);
+            
+            // Extract invoices from profile
+            const user = response.user;
+            const customerProfile = user?.customerProfile;
+            
+            if (!customerProfile) {
+                console.warn('⚠️ No customer profile found');
+                return {
+                    success: true,
+                    salesInvoices: [],
+                    rentalInvoices: [],
+                    total: 0
+                };
+            }
+            
+            const salesInvoices = customerProfile.salesInvoices || [];
+            const rentalInvoices = customerProfile.rentalInvoices || [];
+            
+            console.log('📊 [API] Found invoices:', {
+                sales: salesInvoices.length,
+                rental: rentalInvoices.length
+            });
+            
+            return {
+                success: true,
+                salesInvoices,
+                rentalInvoices,
+                total: salesInvoices.length + rentalInvoices.length
+            };
+        } catch (error) {
+            console.error('❌ [API] Error getting my invoices:', error);
+            return {
+                success: false,
+                salesInvoices: [],
+                rentalInvoices: [],
+                total: 0,
+                error: error.message
+            };
+        }
+    }
+
     // Auth API
     static async login(identifier, password) {
         try {

@@ -27,8 +27,28 @@ const CustomerService = {
         const user = await User.findById(customerId).populate({
             path: 'customerProfile',
             populate: [
-                { path: 'salesInvoices' },
-                { path: 'rentalInvoices' }
+                {
+                    path: 'salesInvoices',
+                    populate: {
+                        path: 'items.book',
+                        select: 'title author imageUrl salePrice price category',
+                        populate: [
+                            { path: 'author', select: 'name' },
+                            { path: 'category', select: 'name' }
+                        ]
+                    }
+                },
+                {
+                    path: 'rentalInvoices',
+                    populate: {
+                        path: 'items.book',
+                        select: 'title author imageUrl rentalPrice price category',
+                        populate: [
+                            { path: 'author', select: 'name' },
+                            { path: 'category', select: 'name' }
+                        ]
+                    }
+                }
             ]
         });
         if (!user) {
@@ -78,7 +98,7 @@ const CustomerService = {
             // Separate User fields from Customer fields
             const userFields = {};
             const customerFields = {};
-            
+
             Object.keys(updateData).forEach(key => {
                 if (['name', 'email'].includes(key)) {
                     userFields[key] = updateData[key];
@@ -86,7 +106,7 @@ const CustomerService = {
                     customerFields[key] = updateData[key];
                 }
             });
-            
+
             // Check email uniqueness if email is being updated
             if (userFields.email && userFields.email !== user.email) {
                 const existingUserWithEmail = await User.findOne({ email: userFields.email }).session(session);
@@ -94,7 +114,7 @@ const CustomerService = {
                     throw new Error("Email này đã được sử dụng bởi tài khoản khác.");
                 }
             }
-            
+
             // Update User fields if any
             if (Object.keys(userFields).length > 0) {
                 await User.findByIdAndUpdate(
@@ -103,7 +123,7 @@ const CustomerService = {
                     { new: true, session }
                 );
             }
-            
+
             // Update Customer fields if any
             if (Object.keys(customerFields).length > 0) {
                 await Customer.findByIdAndUpdate(
@@ -125,8 +145,7 @@ const CustomerService = {
         } finally {
             session.endSession();
         }
-    },
-
+    }
 
 };
 

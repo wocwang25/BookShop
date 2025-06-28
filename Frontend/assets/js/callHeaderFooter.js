@@ -75,6 +75,8 @@ function updateHeaderAuthState() {
   const userName = document.getElementById('userName');
   const headerUserName = document.getElementById('headerUserName');
   const userInfoBtn = document.getElementById('userInfoBtn');
+  const headerUserAvatar = document.getElementById('headerUserAvatar');
+  const panelUserAvatar = document.getElementById('panelUserAvatar');
 
   if (typeof window.AuthManager !== 'undefined' && window.AuthManager.isAuthenticated()) {
     const user = window.AuthManager.getUser();
@@ -89,6 +91,9 @@ function updateHeaderAuthState() {
       const displayName = user.name || user.username || 'User';
       if (userName) userName.textContent = displayName;
       if (headerUserName) headerUserName.textContent = displayName;
+
+      // Update user avatars
+      updateUserAvatars(user);
 
       // Update panel actions
       if (guestActions) guestActions.classList.add('hidden');
@@ -124,6 +129,9 @@ function updateHeaderAuthState() {
     // Show guest actions in panel
     if (guestActions) guestActions.classList.remove('hidden');
     if (userActions) userActions.classList.add('hidden');
+
+    // Reset avatars to default
+    resetUserAvatars();
   }
 }
 
@@ -163,8 +171,89 @@ function handleLogout() {
   }
 }
 
+// Avatar management functions
+function getDefaultAvatar() {
+  return '../assets/images/default_image.jpg';
+}
+
+function convertGoogleDriveLink(url) {
+  if (!url || url.trim() === '') return getDefaultAvatar();
+
+  // If already a direct link, return as is
+  if (url.includes('drive.google.com/uc?')) {
+    return url;
+  }
+
+  // Convert Google Drive share link to direct link
+  const driveRegex = /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const match = url.match(driveRegex);
+
+  if (match && match[1]) {
+    const fileId = match[1];
+    return `https://drive.google.com/uc?id=${fileId}&export=view`;
+  }
+
+  // If not a Google Drive link, return as is
+  return url;
+}
+
+function updateUserAvatars(user) {
+  console.log('🖼️ [callHeaderFooter] Updating user avatars for user:', user);
+
+  const headerUserAvatar = document.getElementById('headerUserAvatar');
+  const panelUserAvatar = document.getElementById('panelUserAvatar');
+
+  let avatarUrl = getDefaultAvatar();
+
+  // Check for avatar in different possible locations
+  if (user.customerProfile?.avatar) {
+    avatarUrl = convertGoogleDriveLink(user.customerProfile.avatar);
+  } else if (user.avatar) {
+    avatarUrl = convertGoogleDriveLink(user.avatar);
+  }
+
+  // Update header avatar
+  if (headerUserAvatar) {
+    headerUserAvatar.src = avatarUrl;
+    headerUserAvatar.onerror = function () {
+      this.src = getDefaultAvatar();
+      console.log('⚠️ [callHeaderFooter] Header avatar failed to load, using default');
+    };
+  }
+
+  // Update panel avatar
+  if (panelUserAvatar) {
+    panelUserAvatar.src = avatarUrl;
+    panelUserAvatar.onerror = function () {
+      this.src = getDefaultAvatar();
+      console.log('⚠️ [callHeaderFooter] Panel avatar failed to load, using default');
+    };
+  }
+
+  console.log('✅ [callHeaderFooter] Avatars updated successfully');
+}
+
+function resetUserAvatars() {
+  console.log('🔄 [callHeaderFooter] Resetting avatars to default');
+
+  const headerUserAvatar = document.getElementById('headerUserAvatar');
+  const panelUserAvatar = document.getElementById('panelUserAvatar');
+
+  const defaultAvatar = getDefaultAvatar();
+
+  if (headerUserAvatar) {
+    headerUserAvatar.src = defaultAvatar;
+  }
+
+  if (panelUserAvatar) {
+    panelUserAvatar.src = defaultAvatar;
+  }
+}
+
 // Make functions globally available
 window.updateHeaderAuthState = updateHeaderAuthState;
+window.updateUserAvatars = updateUserAvatars;
+window.resetUserAvatars = resetUserAvatars;
 
 function openCartPanel() {
   const cartPanel = document.getElementById('cartPanel');
@@ -217,7 +306,7 @@ async function loadCart() {
     isCartLoading = true;
     renderCart(); // Show loading state immediately
     console.log('🛒 [Cart] Loading cart from API...');
-    
+
     const response = await window.ApiService.getCart();
     console.log('🛒 [Cart] Raw API response:', JSON.stringify(response, null, 2));
 
@@ -239,7 +328,7 @@ async function loadCart() {
       console.log('✅ [Cart] Cart loaded (direct array):', cart.length, 'items');
     } else if (response && response.success && response.cart) {
       console.log('🛒 [Cart] Using success format, cart:', response.cart);
-      
+
       if (response.cart.items && Array.isArray(response.cart.items)) {
         // Format: { success: true, cart: { items: [...] } }
         cart = response.cart.items.map(item => {
@@ -265,7 +354,7 @@ async function loadCart() {
       }
     } else if (response && response.cart) {
       console.log('🛒 [Cart] Using direct cart format, cart:', response.cart);
-      
+
       if (response.cart.items && Array.isArray(response.cart.items)) {
         // Format: { cart: { items: [...] } }
         cart = response.cart.items.map(item => {
@@ -312,7 +401,7 @@ async function loadCart() {
 // Fetch book details for cart items that only have book IDs
 async function fetchMissingBookDetails() {
   const itemsNeedingDetails = cart.filter(item => item.needsBookDetails);
-  
+
   if (itemsNeedingDetails.length === 0) {
     console.log('🔍 [Cart] No items need book details');
     return;
@@ -325,10 +414,10 @@ async function fetchMissingBookDetails() {
     try {
       console.log('📖 [Cart] Fetching book details for ID:', item.id);
       const response = await window.ApiService.getBookById(item.id);
-      
+
       if (response.success && response.book) {
         const book = response.book;
-        
+
         // Update cart item with real book details
         const cartIndex = cart.findIndex(cartItem => cartItem.id === item.id);
         if (cartIndex !== -1) {
@@ -350,7 +439,7 @@ async function fetchMissingBookDetails() {
   });
 
   await Promise.all(promises);
-  
+
   // Re-render cart with updated book details
   renderCart();
   console.log('🔄 [Cart] Updated cart with book details');
@@ -359,10 +448,10 @@ async function fetchMissingBookDetails() {
 // Transform cart item to consistent format
 function transformCartItem(item) {
   console.log('🔄 [Cart] Transforming item:', JSON.stringify(item, null, 2));
-  
+
   // Handle different item structures
   let book, bookId, title, author, price, quantity;
-  
+
   if (item.book && typeof item.book === 'object') {
     // Item has book object: { book: {...}, quantity: 1 }
     book = item.book;
@@ -388,20 +477,20 @@ function transformCartItem(item) {
     price = item.price;
     quantity = item.quantity || 1;
   }
-  
+
   // Validate required fields
   if (!bookId) {
     console.warn('⚠️ [Cart] Item missing ID:', item);
     bookId = 'unknown_' + Date.now();
   }
-  
+
   // For items with only book ID, we need to fetch book details later
   // For now, use placeholder title that can be updated
   if (!title || title.startsWith('Book ')) {
     title = `Book ${bookId.slice(-6)}...`; // Placeholder title
     console.log('📝 [Cart] Using placeholder title for book ID:', bookId);
   }
-  
+
   const transformed = {
     id: bookId,
     name: title,
@@ -411,7 +500,7 @@ function transformCartItem(item) {
     quantity: parseInt(quantity) || 1,
     needsBookDetails: typeof item.book === 'string' // Flag to fetch book details later
   };
-  
+
   console.log('✅ [Cart] Transformed:', transformed);
   return transformed;
 }
@@ -419,11 +508,11 @@ function transformCartItem(item) {
 // Get book image for cart display
 function getBookImageForCart(book) {
   if (!book) return getDefaultCartImage();
-  
+
   if (!book.imageUrl || book.imageUrl.trim() === '') {
     return getDefaultCartImage();
   }
-  
+
   return convertGoogleDriveLinkForCart(book.imageUrl);
 }
 
@@ -454,7 +543,7 @@ function renderCart() {
   const cartItems = document.getElementById('cartItems');
   const cartBadge = document.querySelector('.cart-badge');
   const cartTotal = document.getElementById('cartTotal');
-  
+
   if (!cartItems) return;
 
   // Show loading state
@@ -482,15 +571,15 @@ function renderCart() {
         <div class="text-sm text-gray-400">Thêm sản phẩm để bắt đầu mua sắm</div>
       </div>
     `;
-    
+
     // Update badge and total
     if (cartBadge) cartBadge.removeAttribute('data-count');
     if (cartTotal) cartTotal.textContent = formatVND(0);
-    
+
     // Hide checkout buttons when cart is empty
     const checkoutBtns = document.querySelectorAll('.cart-checkout-btn');
     checkoutBtns.forEach(btn => btn.style.display = 'none');
-    
+
     return;
   }
 
@@ -501,11 +590,11 @@ function renderCart() {
   cart.forEach((item, idx) => {
     total += item.price * item.quantity;
     totalItems += item.quantity;
-    
+
     const itemDiv = document.createElement('div');
     itemDiv.className = "flex items-start gap-3 p-3 bg-gray-50 rounded-lg mb-3 cart-item";
     itemDiv.setAttribute('data-book-id', item.id);
-    
+
     itemDiv.innerHTML = `
       <img src="${item.image}" alt="${escapeHtmlForCart(item.name)}" 
            class="w-16 h-20 object-cover rounded border border-gray-200 flex-shrink-0"
@@ -536,7 +625,7 @@ function renderCart() {
         </div>
       </div>
     `;
-    
+
     cartItems.appendChild(itemDiv);
   });
 
@@ -616,10 +705,10 @@ async function updateCartQuantity(bookId, newQuantity) {
 
   try {
     console.log('🛒 [Cart] Updating quantity for book:', bookId, 'to:', newQuantity);
-    
+
     // Use updateCartItem method instead of addToCart to set absolute quantity
     const response = await window.ApiService.updateCartItem(bookId, newQuantity, 'buy');
-    
+
     if (response.success || response.message) {
       // Reload cart to get updated data
       await loadCart();
@@ -629,23 +718,23 @@ async function updateCartQuantity(bookId, newQuantity) {
     }
   } catch (error) {
     console.error('❌ [Cart] Error updating cart quantity:', error);
-    
+
     // Fallback to addToCart with difference calculation if updateCartItem fails
     try {
       console.log('🔄 [Cart] Trying fallback with addToCart difference...');
-      
+
       // Find current quantity in cart
       const currentItem = cart.find(item => item.id === bookId);
       const currentQuantity = currentItem ? currentItem.quantity : 0;
-      
+
       // Calculate the difference to send to API (since backend adds to existing quantity)
       const quantityDifference = newQuantity - currentQuantity;
-      
+
       console.log('🧮 [Cart] Current:', currentQuantity, 'New:', newQuantity, 'Difference:', quantityDifference);
-      
+
       if (quantityDifference !== 0) {
         const fallbackResponse = await window.ApiService.addToCart(bookId, quantityDifference, 'buy');
-        
+
         if (fallbackResponse.success || fallbackResponse.message) {
           await loadCart();
           console.log('✅ [Cart] Quantity updated via fallback');
@@ -668,7 +757,7 @@ async function removeFromCart(bookId) {
 
   try {
     console.log('🛒 [Cart] Removing book from cart:', bookId);
-    
+
     // Find item in local cart
     const itemIndex = cart.findIndex(item => item.id === bookId);
     if (itemIndex === -1) {
@@ -678,24 +767,24 @@ async function removeFromCart(bookId) {
     // Use dedicated remove API (backend issue has been fixed)
     console.log('🗑️ [Cart] Calling removeCartItem API for book:', bookId);
     const response = await window.ApiService.removeCartItem(bookId);
-    
+
     if (response.success || response.message || response.msg) {
       // Remove from local cart immediately for better UX
       cart.splice(itemIndex, 1);
       renderCart();
-      
+
       // Reload cart to ensure consistency
       setTimeout(loadCart, 100);
-      
+
       showCartSuccess('Đã xóa sản phẩm khỏi giỏ hàng');
       console.log('✅ [Cart] Item removed successfully');
     } else {
       console.error('❌ [Cart] Unexpected response format:', response);
-      
+
       // Last resort: reload cart to check if item was actually removed
       console.log('🔄 [Cart] Reloading cart to verify removal...');
       await loadCart();
-      
+
       // Check if item is still in cart after reload
       const stillExists = cart.find(item => item.id === bookId);
       if (!stillExists) {
@@ -725,13 +814,13 @@ function showCartError(message) {
 function showCartMessage(message, type = 'info') {
   const messageDiv = document.createElement('div');
   const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-  
+
   messageDiv.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-[10001] flex items-center space-x-2 transform translate-x-full transition-transform duration-300`;
   messageDiv.innerHTML = `
     <i class="ri-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-warning' : 'information'}-line"></i>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(messageDiv);
 
   // Slide in
@@ -759,7 +848,7 @@ function initCartPanel() {
   if (!cartBtn || !cartPanel || !closeCartPanelBtn || !cartItems) return;
 
   // Cart button click handler - load cart when opening
-  cartBtn.onclick = function(e) {
+  cartBtn.onclick = function (e) {
     e.preventDefault();
     console.log('🛒 [Cart] Cart button clicked');
     openCartPanel();
@@ -767,8 +856,8 @@ function initCartPanel() {
     loadCart();
   };
 
-  closeCartPanelBtn.onclick = function(e) {
-    e.preventDefault(); 
+  closeCartPanelBtn.onclick = function (e) {
+    e.preventDefault();
     closeCartPanel();
   };
 
@@ -817,9 +906,9 @@ async function addToCartFromExternal(bookId, quantity = 1, type = 'buy') {
 
   try {
     console.log('🛒 [Cart] Adding to cart:', { bookId, quantity, type });
-    
+
     const response = await window.ApiService.addToCart(bookId, quantity, type);
-    
+
     if (response.success || response.message) {
       const actionText = type === 'rent' ? 'thuê' : 'mua';
       showCartSuccess(`Đã thêm sách ${actionText} vào giỏ hàng`);
@@ -909,7 +998,7 @@ async function loadWishlist() {
     isWishlistLoading = true;
     renderWishlist(); // Show loading state immediately
     console.log('❤️ [Wishlist] Loading wishlist from API...');
-    
+
     const response = await window.ApiService.getFavourites();
     console.log('❤️ [Wishlist] Raw API response:', JSON.stringify(response, null, 2));
 
@@ -931,7 +1020,7 @@ async function loadWishlist() {
       console.log('✅ [Wishlist] Wishlist loaded (direct array):', wishlist.length, 'items');
     } else if (response && response.success && response.favourites) {
       console.log('❤️ [Wishlist] Using success format, favourites:', response.favourites);
-      
+
       if (Array.isArray(response.favourites)) {
         wishlist = response.favourites.map(item => {
           try {
@@ -971,10 +1060,10 @@ async function loadWishlist() {
 // Transform wishlist item to consistent format
 function transformWishlistItem(item) {
   console.log('🔄 [Wishlist] Transforming item:', JSON.stringify(item, null, 2));
-  
+
   // Handle different item structures - similar to cart but for books
   let book, bookId, title, author, price;
-  
+
   if (item.book && typeof item.book === 'object') {
     // Item has book object: { book: {...} }
     book = item.book;
@@ -997,13 +1086,13 @@ function transformWishlistItem(item) {
     author = item.author?.name || item.author;
     price = item.price;
   }
-  
+
   // Validate required fields
   if (!bookId) {
     console.warn('⚠️ [Wishlist] Item missing ID:', item);
     bookId = 'unknown_' + Date.now();
   }
-  
+
   const transformed = {
     id: bookId,
     name: title || 'Untitled Book',
@@ -1011,7 +1100,7 @@ function transformWishlistItem(item) {
     price: parseInt(price) || 0,
     image: getBookImageForWishlist(book)
   };
-  
+
   console.log('✅ [Wishlist] Transformed:', transformed);
   return transformed;
 }
@@ -1019,11 +1108,11 @@ function transformWishlistItem(item) {
 // Get book image for wishlist display
 function getBookImageForWishlist(book) {
   if (!book) return getDefaultWishlistImage();
-  
+
   if (!book.imageUrl || book.imageUrl.trim() === '') {
     return getDefaultWishlistImage();
   }
-  
+
   return convertGoogleDriveLinkForWishlist(book.imageUrl);
 }
 
@@ -1054,7 +1143,7 @@ function renderWishlist() {
   const wishlistItems = document.getElementById('wishlistItems');
   const wishlistBadge = document.querySelector('.wishlist-badge');
   const wishlistCount = document.getElementById('wishlistCount');
-  
+
   if (!wishlistItems) return;
 
   // Show loading state
@@ -1081,15 +1170,15 @@ function renderWishlist() {
         <div class="text-sm text-gray-400">Thêm sách vào danh sách yêu thích để xem tại đây</div>
       </div>
     `;
-    
+
     // Update badge and count
     if (wishlistBadge) wishlistBadge.removeAttribute('data-count');
     if (wishlistCount) wishlistCount.textContent = '0 sách';
-    
+
     // Hide view all button when wishlist is empty
     const viewBtn = document.querySelector('.wishlist-view-btn');
     if (viewBtn) viewBtn.style.display = 'none';
-    
+
     return;
   }
 
@@ -1099,11 +1188,11 @@ function renderWishlist() {
 
   wishlist.forEach((item, idx) => {
     totalItems += 1;
-    
+
     const itemDiv = document.createElement('div');
     itemDiv.className = "flex items-start gap-3 p-3 bg-gray-50 rounded-lg mb-3 wishlist-item";
     itemDiv.setAttribute('data-book-id', item.id);
-    
+
     itemDiv.innerHTML = `
       <img src="${item.image}" alt="${escapeHtmlForWishlist(item.name)}" 
            class="w-16 h-20 object-cover rounded border border-gray-200 flex-shrink-0"
@@ -1126,7 +1215,7 @@ function renderWishlist() {
         </div>
       </div>
     `;
-    
+
     wishlistItems.appendChild(itemDiv);
   });
 
@@ -1197,7 +1286,7 @@ async function removeFromWishlist(bookId) {
 
   try {
     console.log('❤️ [Wishlist] Removing book from wishlist:', bookId);
-    
+
     // Find item in local wishlist
     const itemIndex = wishlist.findIndex(item => item.id === bookId);
     if (itemIndex === -1) {
@@ -1206,24 +1295,24 @@ async function removeFromWishlist(bookId) {
 
     console.log('🗑️ [Wishlist] Calling removeFromFavourites API for book:', bookId);
     const response = await window.ApiService.removeFromFavourites(bookId);
-    
+
     if (response.success || response.message || response.msg) {
       // Remove from local wishlist immediately for better UX
       wishlist.splice(itemIndex, 1);
       renderWishlist();
-      
+
       // Reload wishlist to ensure consistency
       setTimeout(loadWishlist, 100);
-      
+
       showWishlistSuccess('Đã xóa sách khỏi danh sách yêu thích');
       console.log('✅ [Wishlist] Item removed successfully');
     } else {
       console.error('❌ [Wishlist] Unexpected response format:', response);
-      
+
       // Last resort: reload wishlist to check if item was actually removed
       console.log('🔄 [Wishlist] Reloading wishlist to verify removal...');
       await loadWishlist();
-      
+
       // Check if item is still in wishlist after reload
       const stillExists = wishlist.find(item => item.id === bookId);
       if (!stillExists) {
@@ -1253,13 +1342,13 @@ function showWishlistError(message) {
 function showWishlistMessage(message, type = 'info') {
   const messageDiv = document.createElement('div');
   const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-  
+
   messageDiv.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-[10001] flex items-center space-x-2 transform translate-x-full transition-transform duration-300`;
   messageDiv.innerHTML = `
     <i class="ri-${type === 'success' ? 'check-circle' : type === 'error' ? 'error-warning' : 'information'}-line"></i>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(messageDiv);
 
   // Slide in
@@ -1287,7 +1376,7 @@ function initWishlistPanel() {
   if (!wishlistBtn || !wishlistPanel || !closeWishlistPanelBtn || !wishlistItems) return;
 
   // Wishlist button click handler - load wishlist when opening
-  wishlistBtn.onclick = function(e) {
+  wishlistBtn.onclick = function (e) {
     e.preventDefault();
     console.log('❤️ [Wishlist] Wishlist button clicked');
     openWishlistPanel();
@@ -1295,8 +1384,8 @@ function initWishlistPanel() {
     loadWishlist();
   };
 
-  closeWishlistPanelBtn.onclick = function(e) {
-    e.preventDefault(); 
+  closeWishlistPanelBtn.onclick = function (e) {
+    e.preventDefault();
     closeWishlistPanel();
   };
 
@@ -1345,9 +1434,9 @@ async function addToWishlistFromExternal(bookId) {
 
   try {
     console.log('❤️ [Wishlist] Adding to wishlist:', bookId);
-    
+
     const response = await window.ApiService.addToFavourites(bookId);
-    
+
     if (response.success || response.message) {
       showWishlistSuccess('Đã thêm sách vào danh sách yêu thích');
       // Reload wishlist to update display
@@ -1391,7 +1480,7 @@ window.debugWishlist = debugWishlist;
 // Search overlay logic
 function showSearchOverlay() {
   console.log('🔍 [Search] Showing search overlay');
-  
+
   // Tạo overlay nếu chưa có
   let searchOverlay = document.getElementById('searchOverlay');
   if (!searchOverlay) {
@@ -1434,10 +1523,10 @@ function showSearchOverlay() {
       }
     }, 50);
   }
-  
+
   // Ngăn scroll nền và thêm animation
   document.body.style.overflow = 'hidden';
-  
+
   // Fade in animation
   setTimeout(() => {
     searchOverlay.style.opacity = '1';
@@ -1644,7 +1733,7 @@ function initSearchBarButton() {
   if (!headerContent) return;
   const searchBtn = headerContent.querySelector('.search-btn');
   if (!searchBtn) return;
-  
+
   // Đảm bảo không gắn nhiều lần
   if (!searchBtn._searchHandlerAdded) {
     searchBtn.onclick = function (e) {
@@ -1674,7 +1763,7 @@ async function loadCategories() {
   try {
     console.log('🏷️ [callHeaderFooter] Loading categories...');
     const response = await window.ApiService.getAllCategory();
-    
+
     if (response.success && response.categories && response.categories.length > 0) {
       renderCategories(response.categories);
       console.log('✅ [callHeaderFooter] Categories loaded successfully:', response.categories.length, 'categories');
@@ -1744,7 +1833,7 @@ function getCategoryIcon(categoryName) {
     'Tranh Truyện': 'ri-landscape-line',
     'Triết Học': 'ri-brain-line'
   };
-  
+
   return iconMap[categoryName] || 'ri-book-line'; // Default icon
 }
 
@@ -1769,7 +1858,7 @@ function renderCategories(categories) {
   // Calculate items per column (aim for 4 columns)
   const itemsPerColumn = Math.ceil(categories.length / 4);
   const columns = [];
-  
+
   // Split categories into 4 columns
   for (let i = 0; i < 4; i++) {
     const start = i * itemsPerColumn;
@@ -1800,18 +1889,18 @@ function renderCategories(categories) {
 
     columnCategories.forEach(category => {
       const li = document.createElement('li');
-      
+
       const link = document.createElement('a');
       link.href = `/searchBooks?category=${encodeURIComponent(category.name)}`;
       link.setAttribute('data-category', category.name);
       link.className = 'flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium';
-      
+
       const icon = document.createElement('i');
       icon.className = getCategoryIcon(category.name);
-      
+
       link.appendChild(icon);
       link.appendChild(document.createTextNode(category.name));
-      
+
       li.appendChild(link);
       ul.appendChild(li);
     });
@@ -1838,7 +1927,7 @@ function loadHeaderFooter() {
       if (typeof initWishlistPanel === 'function') initWishlistPanel();
       if (typeof initSearchBarButton === 'function') initSearchBarButton();
       if (typeof initSearchOverlay === 'function') initSearchOverlay();
-      
+
       // Load categories after header is loaded
       setTimeout(() => {
         if (typeof window.ApiService !== 'undefined') {

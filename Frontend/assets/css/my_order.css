@@ -332,6 +332,26 @@ body {
   justify-content: center;
 }
 
+.circle.processing {
+  background-color: #2563eb;
+  border-radius: 9999px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle.pending {
+  background-color: #f59e0b;
+  border-radius: 9999px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .icon-white {
   color: white;
   font-size: 16px;

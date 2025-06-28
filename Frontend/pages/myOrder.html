@@ -15,10 +15,10 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-  <script src="../assets/js/auth.js"></script>
-
   <script src="../assets/js/callHeaderFooter.js"></script>
-
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/myOrder.js"></script>
 
   <script>
     tailwind.config = {
@@ -45,16 +45,11 @@
       }
     }
   </script>
-
 </head>
 
-
 <body>
-  <!-- Header -->
   <div id="header-placeholder"></div>
-
   <div class="min-h-screen bg-light">
-    <!-- Main Content -->
     <main class="my-container main-content">
       <h1>Đơn hàng gần đây</h1>
       <div class="table-wrapper">
@@ -69,202 +64,81 @@
               <th class="text-right">Tổng tiền</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Lặp lại đơn hàng -->
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>335465465452</td>
-              <td>
-                <div class="book-info">
-                  <img src="assets/images/sach1.png" alt="Book" />
-                  <div>
-                    <div class="book-title">Nội giới và Ngoại giới</div>
-                    <div class="book-meta">120,000đ Số lượng: 1</div>
-                  </div>
-                </div>
-              </td>
-              <td>01/06/2025</td>
-              <td><a href="javascript:void(0);" class="status-link text-[#2d5aa0] hover:underline">Đang giao hàng</a>
-              </td>
-              <td class="text-right">376,000 đ</td>
-            </tr>
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>335465465452</td>
-              <td>
-                <div class="book-info">
-                  <img src="assets/images/sach1.png" alt="Book" />
-                  <div>
-                    <div class="book-title">Nội giới và Ngoại giới</div>
-                    <div class="book-meta">120,000đ Số lượng: 1</div>
-                  </div>
-                </div>
-              </td>
-              <td>01/06/2025</td>
-              <td><a href="javascript:void(0);" class="status-link text-[#2d5aa0] hover:underline">Đang giao hàng</a>
-              </td>
-              <td class="text-right">376,000 đ</td>
-            </tr>
-            <!-- Thêm nhiều đơn hàng khác nếu cần -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </main>
   </div>
-  <!-- Modal: Chi tiết đơn hàng -->
+
+  <!-- Modal chi tiết đơn hàng -->
   <div id="orderModal" class="modal hidden">
     <div class="modal-overlay" onclick="closeModal()"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">×</button>
-
-      <!-- Chi tiết đơn hàng -->
       <div class="modal-inner">
         <div class="card">
           <div class="card-content">
-
-            <!-- Header -->
             <div class="modal-header">
-              <h1>Mã : 3354654654526</h1>
+              <h1>Mã: </h1>
               <div class="modal-meta">
-                <span>Ngày đặt <strong>11 tháng 6, 2025</strong></span>
+                <span>Ngày đặt <strong></strong></span>
                 <div class="modal-status">
-                  <div class="circle success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-white" width="16" height="16" fill="white"
-                      viewBox="0 0 24 24">
-                      <path
-                        d="M12 0C5.371 0 0 5.371 0 12s5.371 12 12 12 12-5.371 12-12S18.629 0 12 0zm6 9l-7 7-3-3 1.5-1.5L11 13l5.5-5.5L18 9z" />
-                    </svg>
-                  </div>
-                  <span class="status-text">Dự kiến nhận hàng: 16 tháng 6, 2025</span>
+                  <div class="circle success"></div>
+                  <span class="status-text"></span>
                 </div>
               </div>
             </div>
-
-            <!-- Progress Steps -->
-            <div class="flex items-center justify-between mb-6">
-              <!-- Xác nhận -->
-              <div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
-                <div class="w-5 h-5 rounded-full bg-[#12b76a] mb-2"></div>
-                <span class="text-sm font-medium text-[#12b76a]">Xác nhận đơn hàng</span>
-                <span class="text-xs text-[#667085] mt-1">Th 4, 11 tháng 6</span>
-              </div>
-
-              <div class="flex-1 h-0.5 bg-[#d0d5dd] mx-2"></div>
-
-              <!-- Gửi hàng -->
-              <div class="flex flex-col items-center flex-shrink-0 w-20 text-center">
-                <div class="w-5 h-5 rounded-full bg-[#d0d5dd] mb-2"></div>
-                <span class="text-sm text-[#667085]">Gửi hàng</span>
-                <span class="text-xs text-[#667085] mt-1">Th 4, 11 tháng 6</span>
-              </div>
-
-              <div class="flex-1 h-0.5 bg-[#d0d5dd] mx-2"></div>
-
-              <!-- Đang giao hàng -->
-              <div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
-                <div class="w-5 h-5 rounded-full bg-[#d0d5dd] mb-2"></div>
-                <span class="text-sm text-[#667085]">Đang giao hàng</span>
-                <span class="text-xs text-[#667085] mt-1">Th 4, 11 tháng 6</span>
-              </div>
-
-              <div class="flex-1 h-0.5 bg-[#d0d5dd] mx-2"></div>
-
-              <!-- Đã nhận hàng -->
-              <div class="flex flex-col items-center flex-shrink-0 w-24 text-center">
-                <div class="w-5 h-5 rounded-full bg-[#d0d5dd] mb-2"></div>
-                <span class="text-sm text-[#667085]">Đã nhận hàng</span>
-                <span class="text-xs text-[#667085] mt-1">Dự kiến Th 2, 16 tháng 6</span>
-              </div>
-            </div>
-
-            <!-- Products -->
-            <div class="products">
-              <div class="product">
-                <div class="thumb"><img src="/placeholder.svg" alt="Tủ rách thành oách"></div>
-                <div class="details">
-                  <h3>Tủ rách thành "oách"</h3>
-                </div>
-                <div class="price">
-                  <strong>120.000đ</strong>
-                  <div class="qty">Số lượng: 1</div>
-                </div>
-              </div>
-              <div class="product">
-                <div class="thumb"><img src="assets/images/sach1.png" alt="Nói giới và Ngoại giới"></div>
-                <div class="details">
-                  <h3>Nói giới và Ngoại giới</h3>
-                </div>
-                <div class="price">
-                  <strong>250.000đ</strong>
-                  <div class="qty">Số lượng: 1</div>
-                </div>
-              </div>
-              <div class="product">
-                <div class="thumb"><img src="assets/images/sach2.png" alt="Khám phá Cố đô Huế"></div>
-                <div class="details">
-                  <h3>Khám phá Cố đô Huế</h3>
-                </div>
-                <div class="price">
-                  <strong>100.000đ</strong>
-                  <div class="qty">Số lượng: 1</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Delivery Address -->
+            <div class="products"></div>
             <div class="delivery">
               <h3>Giao hàng</h3>
-              <p>Địa chỉ: 227 Nguyễn Văn Cừ, Quận 5, Hồ Chí Minh</p>
+              <p>Địa chỉ: </p>
             </div>
-
             <hr class="separator" />
-
-            <!-- Order Summary -->
             <div class="summary">
               <h3>Tổng thanh toán</h3>
-              <div class="row">
-                <span>Giá gốc</span><span>470.000đ</span>
-              </div>
-              <div class="row">
-                <span>Giảm giá</span><span>(20%) - 94.000đ</span>
-              </div>
-              <div class="row">
-                <span>Phí giao hàng</span><span>0đ</span>
-              </div>
+              <div class="row"><span>Giá gốc</span><span></span></div>
+              <div class="row"><span>Giảm giá</span><span>0đ</span></div>
+              <div class="row"><span>Phí giao hàng</span><span>0đ</span></div>
               <hr class="separator" />
-              <div class="row total">
-                <span>Tổng cộng</span><span>376.000đ</span>
-              </div>
+              <div class="row total"><span>Tổng cộng</span><span></span></div>
             </div>
-
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Footer -->
   <div id="footer-placeholder"></div>
 
-
+  <script>
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // The main logic is now in myOrder.js
+        console.log('📱 MyOrder HTML loaded');
+        
+        // Check if user is authenticated
+        if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
+            console.warn('⚠️ User not authenticated, redirecting to login');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // Show loading message while myOrder.js loads the data
+        const tbody = document.querySelector('.order-table tbody');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span class="text-gray-500">Đang tải đơn hàng...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    });
+  </script>
 </body>
 
 </html>
-
-<script>
-  function openModal() {
-    document.getElementById("orderModal").classList.remove("hidden");
-  }
-
-  function closeModal() {
-    document.getElementById("orderModal").classList.add("hidden");
-  }
-
-  // Gắn sự kiện cho trạng thái "Đang giao hàng"
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".status-link").forEach(function (el) {
-      el.addEventListener("click", openModal);
-    });
-  });
-</script>
