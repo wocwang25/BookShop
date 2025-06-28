@@ -35,11 +35,11 @@
                     Danh mục thể loại
                   </h3>
                   <div class="text-sm text-gray-500">
-                    <i class="ri-arrow-left-right-line"></i>
+                    <i class="ri-arrow-up-down-line"></i>
                     Cuộn để xem thêm
                   </div>
                 </div>
-                <div id="categoryContainer" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <div id="categoryContainer" class="grid grid-cols-4 gap-3 max-h-[400px] overflow-y-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   <!-- Categories will be dynamically loaded here -->
                 </div>
               </div>
@@ -398,7 +398,7 @@
   }
 
   #categoryContainer::-webkit-scrollbar {
-    height: 6px;
+    width: 6px;
   }
 
   #categoryContainer::-webkit-scrollbar-track {
@@ -422,12 +422,12 @@
   }
 
   /* Category card animations */
-  #categoryContainer .group {
+  #categoryContainer > div {
     transform: translateY(0);
     transition: all 0.2s ease;
   }
 
-  #categoryContainer .group:hover {
+  #categoryContainer > div:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
@@ -439,6 +439,10 @@
       right: 2rem;
       max-width: none;
     }
+    
+    #categoryContainer {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   @media (max-width: 768px) {
@@ -448,8 +452,16 @@
       padding: 1rem;
     }
     
-    #categoryContainer .group {
-      min-width: 180px;
+    #categoryContainer {
+      grid-template-columns: repeat(2, 1fr);
+      max-height: 300px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #categoryContainer {
+      grid-template-columns: 1fr;
+      max-height: 250px;
     }
   }
 </style>

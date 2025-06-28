@@ -1837,7 +1837,7 @@ function getCategoryIcon(categoryName) {
   return iconMap[categoryName] || 'ri-book-line'; // Default icon
 }
 
-// Render categories into the mega menu with horizontal scrollable layout
+// Render categories into the mega menu with grid layout (4 columns, vertical scroll)
 function renderCategories(categories) {
   const megaMenu = document.getElementById('categoryMegaMenu');
   if (!megaMenu) {
@@ -1855,10 +1855,10 @@ function renderCategories(categories) {
   // Clear existing content
   container.innerHTML = '';
 
-  // Create category items as horizontal scrollable cards
+  // Create category items as grid cards
   categories.forEach(category => {
     const categoryCard = document.createElement('div');
-    categoryCard.className = 'flex-shrink-0 min-w-[200px] max-w-[250px] bg-gray-50 hover:bg-primarynavy/10 border border-gray-200 hover:border-primarynavy/30 rounded-lg p-3 transition-all duration-200 cursor-pointer group';
+    categoryCard.className = 'bg-gray-50 hover:bg-primarynavy/10 border border-gray-200 hover:border-primarynavy/30 rounded-lg p-3 transition-all duration-200 cursor-pointer group';
 
     const link = document.createElement('a');
     link.href = `/searchBooks?category=${encodeURIComponent(category.name)}`;
@@ -1866,7 +1866,7 @@ function renderCategories(categories) {
     link.className = 'flex items-center gap-3 text-gray-700 group-hover:text-primarynavy transition-colors no-underline';
 
     const iconWrapper = document.createElement('div');
-    iconWrapper.className = 'w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:bg-primarynavy group-hover:text-white transition-all';
+    iconWrapper.className = 'w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:bg-primarynavy group-hover:text-white transition-all flex-shrink-0';
 
     const icon = document.createElement('i');
     icon.className = getCategoryIcon(category.name) + ' text-lg';
@@ -1893,10 +1893,10 @@ function renderCategories(categories) {
 
   // Add scroll indicators if content overflows
   setTimeout(() => {
-    const scrollWidth = container.scrollWidth;
-    const clientWidth = container.clientWidth;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
     
-    if (scrollWidth > clientWidth) {
+    if (scrollHeight > clientHeight) {
       // Show scroll indicator
       const scrollIndicator = megaMenu.querySelector('.text-sm.text-gray-500');
       if (scrollIndicator) {
@@ -1905,7 +1905,7 @@ function renderCategories(categories) {
     }
   }, 100);
 
-  console.log('✅ [callHeaderFooter] Categories rendered in horizontal scrollable layout:', categories.length, 'items');
+  console.log('✅ [callHeaderFooter] Categories rendered in grid layout (4 columns):', categories.length, 'items');
 }
 
 // Main header/footer loader
