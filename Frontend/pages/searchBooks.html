@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/css/home.css">
   <link rel="stylesheet" href="./assets/css/books.css">
+  <link rel="stylesheet" href="./assets/css/header-fix.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -99,7 +100,7 @@
         </div>
         
         <div class="filter-section">
-          <div class="filter-accordion open" id="filter-category">
+          <div class="filter-accordion" id="filter-category">
             <div class="filter-accordion-title" onclick="toggleAccordion('filter-category')">
               <div class="filter-accordion-label">
                 <i class="ri-book-open-line text-lg"></i>
@@ -110,7 +111,7 @@
             <div class="filter-accordion-content" id="categoryFilters"></div>
           </div>
           
-          <div class="filter-accordion open" id="filter-author">
+          <div class="filter-accordion" id="filter-author">
             <div class="filter-accordion-title" onclick="toggleAccordion('filter-author')">
               <div class="filter-accordion-label">
                 <i class="ri-user-line text-lg"></i>
@@ -121,7 +122,7 @@
             <div class="filter-accordion-content" id="authorFilters"></div>
           </div>
           
-          <div class="filter-accordion open" id="filter-price">
+          <div class="filter-accordion" id="filter-price">
             <div class="filter-accordion-title" onclick="toggleAccordion('filter-price')">
               <div class="filter-accordion-label">
                 <i class="ri-money-dollar-circle-line text-lg"></i>
@@ -182,7 +183,22 @@
         arrow.style.transform = accordion.classList.contains('open') 
           ? 'rotate(180deg)' 
           : 'rotate(0deg)';
+        arrow.style.transition = 'transform 0.3s ease';
       }
+    }
+
+    // Initialize accordion arrows to closed state
+    function initializeAccordions() {
+      const accordions = document.querySelectorAll('.filter-accordion');
+      accordions.forEach(accordion => {
+        const arrow = accordion.querySelector('.accordion-arrow');
+        if (arrow) {
+          arrow.style.transform = accordion.classList.contains('open') 
+            ? 'rotate(180deg)' 
+            : 'rotate(0deg)';
+          arrow.style.transition = 'transform 0.3s ease';
+        }
+      });
     }
 
     // Mobile filter functionality
@@ -256,8 +272,11 @@
       });
     }
 
-    // Initialize mobile filters when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initMobileFilters);
+    // Initialize mobile filters and accordions when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      initMobileFilters();
+      initializeAccordions();
+    });
 
     // Global filter variables
     let selectedAuthor = 'all';

@@ -1,0 +1,166 @@
+/* Header Navigation Fix - Prevent Menu Items from Wrapping */
+
+/* Base header layout improvements */
+.header-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important; /* Ngăn không cho xuống dòng */
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Navigation menu improvements */
+.nav {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  min-width: 0 !important; /* Cho phép thu nhỏ khi cần */
+}
+
+.nav-menu {
+  display: flex !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-wrap: nowrap !important; /* Ngăn xuống dòng */
+  align-items: center !important;
+  white-space: nowrap !important;
+  gap: 24px !important; /* Giảm gap từ 32px xuống 24px */
+}
+
+.nav-link {
+  white-space: nowrap !important; /* Ngăn text wrap */
+  font-size: 15px !important; /* Giảm font size một chút */
+  padding: 8px 4px !important; /* Thêm padding để dễ click */
+}
+
+/* Logo adjustments */
+.logo {
+  flex-shrink: 0 !important; /* Không cho logo bị thu nhỏ */
+  font-size: 26px !important; /* Giảm font size logo một chút */
+}
+
+/* Header actions adjustments */
+.header-actions {
+  flex-shrink: 0 !important; /* Không cho actions bị thu nhỏ */
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important; /* Giảm gap actions */
+}
+
+/* Responsive improvements - Medium screens */
+@media (max-width: 1200px) and (min-width: 769px) {
+  .nav-menu {
+    gap: 20px !important;
+  }
+  
+  .nav-link {
+    font-size: 14px !important;
+  }
+  
+  .logo {
+    font-size: 24px !important;
+  }
+  
+  .header-actions {
+    gap: 10px !important;
+  }
+}
+
+/* Responsive improvements - Tablet screens */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .nav-menu {
+    gap: 16px !important;
+  }
+  
+  .nav-link {
+    font-size: 13px !important;
+    padding: 6px 2px !important;
+  }
+  
+  .logo {
+    font-size: 22px !important;
+  }
+  
+  .header-content {
+    padding: 12px 16px !important;
+  }
+}
+
+/* Small desktop screens */
+@media (max-width: 950px) and (min-width: 769px) {
+  .nav-menu {
+    gap: 12px !important;
+  }
+  
+  .nav-link {
+    font-size: 12px !important;
+    padding: 4px 2px !important;
+  }
+  
+  .logo {
+    font-size: 20px !important;
+  }
+  
+  .header-actions {
+    gap: 8px !important;
+  }
+}
+
+/* Very small desktop screens - before mobile breakpoint */
+@media (max-width: 850px) and (min-width: 769px) {
+  .nav-menu {
+    gap: 8px !important;
+  }
+  
+  .nav-link {
+    font-size: 11px !important;
+    padding: 4px 1px !important;
+  }
+  
+  .logo {
+    font-size: 18px !important;
+  }
+  
+  .header-content {
+    padding: 8px 12px !important;
+  }
+}
+
+/* Ensure category dropdown doesn't interfere */
+#categoryMenu {
+  position: relative !important;
+}
+
+/* User info section adjustments */
+#userInfo {
+  flex-shrink: 0 !important;
+  max-width: 200px !important; /* Giới hạn width */
+}
+
+#headerUserName {
+  max-width: 120px !important; /* Giới hạn width của tên user */
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Fix for overflow issues - only apply to nav menu, not entire header */
+.nav-menu {
+  overflow: visible !important; /* Cho phép mega menu hiển thị */
+}
+
+/* Prevent header from creating horizontal scrollbar */
+.header-content {
+  overflow-x: hidden !important;
+  overflow-y: visible !important; /* Cho phép mega menu xuất hiện */
+}
+
+/* Ensure buttons don't wrap */
+.search-btn,
+.cart-btn,
+.user-btn,
+.wishlist-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+} 

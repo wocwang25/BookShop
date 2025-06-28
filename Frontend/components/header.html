@@ -26,10 +26,22 @@
               style="position:absolute;left:50%;transform:translateX(-50%);top:100%;width:120px;height:32px;z-index:51;pointer-events:auto;">
             </div>
             <div id="categoryMegaMenu"
-              class="fixed left-0 right-0 mx-auto top-18 w-[1450px] bg-white shadow-2xl border border-gray-100 mt-3 py-6 px-12 rounded-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto z-50 flex flex-row flex-nowrap justify-between gap-8 text-left transition-opacity duration-300"
-              style="min-width:400px; transition: opacity 0.5s, visibility 0.5s;">
-              <div class="flex flex-row w-full gap-4 overflow-x-auto">
-                <!-- Categories will be dynamically loaded here -->
+              class="fixed left-4 right-4 mx-auto top-18 max-w-7xl bg-white shadow-2xl border border-gray-100 mt-3 py-6 px-6 rounded-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto z-50 transition-opacity duration-300"
+              style="transition: opacity 0.5s, visibility 0.5s;">
+              <div class="w-full">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-primarynavy text-lg flex items-center gap-2">
+                    <i class="ri-list-unordered"></i>
+                    Danh mục thể loại
+                  </h3>
+                  <div class="text-sm text-gray-500">
+                    <i class="ri-arrow-left-right-line"></i>
+                    Cuộn để xem thêm
+                  </div>
+                </div>
+                <div id="categoryContainer" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  <!-- Categories will be dynamically loaded here -->
+                </div>
               </div>
           </li>
           <li><a href="reviews" class="nav-link">Đánh giá</a></li>
@@ -377,6 +389,68 @@
   button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  /* Custom scrollbar for category mega menu */
+  #categoryContainer {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  #categoryContainer::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  #categoryContainer::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+
+  #categoryContainer::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+  }
+
+  #categoryContainer::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Smooth scroll behavior */
+  #categoryContainer {
+    scroll-behavior: smooth;
+  }
+
+  /* Category card animations */
+  #categoryContainer .group {
+    transform: translateY(0);
+    transition: all 0.2s ease;
+  }
+
+  #categoryContainer .group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Responsive mega menu */
+  @media (max-width: 1024px) {
+    #categoryMegaMenu {
+      left: 2rem;
+      right: 2rem;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #categoryMegaMenu {
+      left: 1rem;
+      right: 1rem;
+      padding: 1rem;
+    }
+    
+    #categoryContainer .group {
+      min-width: 180px;
+    }
   }
 </style>
 <script>

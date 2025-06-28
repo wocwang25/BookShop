@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="./assets/css/my_order.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/css/header-fix.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Pacifico&display=swap"
     rel="stylesheet">
@@ -120,9 +121,9 @@
         if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
             console.warn('⚠️ User not authenticated, redirecting to login');
             window.location.href = 'login.html';
-            return;
-        }
-        
+        return;
+      }
+
         // Show loading message while myOrder.js loads the data
         const tbody = document.querySelector('.order-table tbody');
         if (tbody) {
@@ -132,10 +133,10 @@
                         <div class="flex items-center justify-center gap-2">
                             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                             <span class="text-gray-500">Đang tải đơn hàng...</span>
-                        </div>
+            </div>
                     </td>
                 </tr>
-            `;
+        `;
         }
     });
   </script>

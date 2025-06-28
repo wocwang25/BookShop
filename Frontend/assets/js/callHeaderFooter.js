@@ -1837,7 +1837,7 @@ function getCategoryIcon(categoryName) {
   return iconMap[categoryName] || 'ri-book-line'; // Default icon
 }
 
-// Render categories into the mega menu with multi-column layout
+// Render categories into the mega menu with horizontal scrollable layout
 function renderCategories(categories) {
   const megaMenu = document.getElementById('categoryMegaMenu');
   if (!megaMenu) {
@@ -1846,71 +1846,66 @@ function renderCategories(categories) {
   }
 
   // Find the container div that needs to be updated
-  const flexContainer = megaMenu.querySelector('.flex.flex-row.w-full.gap-4.overflow-x-auto');
-  if (!flexContainer) {
+  const container = document.getElementById('categoryContainer');
+  if (!container) {
     console.warn('⚠️ [callHeaderFooter] Category container not found');
     return;
   }
 
   // Clear existing content
-  flexContainer.innerHTML = '';
+  container.innerHTML = '';
 
-  // Calculate items per column (aim for 4 columns)
-  const itemsPerColumn = Math.ceil(categories.length / 4);
-  const columns = [];
+  // Create category items as horizontal scrollable cards
+  categories.forEach(category => {
+    const categoryCard = document.createElement('div');
+    categoryCard.className = 'flex-shrink-0 min-w-[200px] max-w-[250px] bg-gray-50 hover:bg-primarynavy/10 border border-gray-200 hover:border-primarynavy/30 rounded-lg p-3 transition-all duration-200 cursor-pointer group';
 
-  // Split categories into 4 columns
-  for (let i = 0; i < 4; i++) {
-    const start = i * itemsPerColumn;
-    const end = start + itemsPerColumn;
-    columns.push(categories.slice(start, end));
-  }
+    const link = document.createElement('a');
+    link.href = `/searchBooks?category=${encodeURIComponent(category.name)}`;
+    link.setAttribute('data-category', category.name);
+    link.className = 'flex items-center gap-3 text-gray-700 group-hover:text-primarynavy transition-colors no-underline';
 
-  // Create columns
-  columns.forEach((columnCategories, columnIndex) => {
-    if (columnCategories.length === 0) return;
+    const iconWrapper = document.createElement('div');
+    iconWrapper.className = 'w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:bg-primarynavy group-hover:text-white transition-all';
 
-    const columnDiv = document.createElement('div');
-    columnDiv.className = 'w-[340px] min-w-[320px] max-w-[400px]';
+    const icon = document.createElement('i');
+    icon.className = getCategoryIcon(category.name) + ' text-lg';
 
-    // Column header
-    const headerDiv = document.createElement('div');
-    if (columnIndex === 0) {
-      headerDiv.className = 'font-bold mb-4 text-primarynavy text-base flex items-center gap-2';
-      headerDiv.textContent = 'Danh mục thể loại';
-    } else {
-      headerDiv.className = 'font-bold mb-4 text-white text-base opacity-0 select-none';
-      headerDiv.textContent = 'Ẩn';
-    }
+    const textWrapper = document.createElement('div');
+    textWrapper.className = 'flex-1 min-w-0';
 
-    // Categories list
-    const ul = document.createElement('ul');
-    ul.className = columnIndex === 0 ? 'space-y-2' : 'space-y-2 mt-2';
+    const title = document.createElement('div');
+    title.className = 'font-medium text-sm truncate';
+    title.textContent = category.name;
 
-    columnCategories.forEach(category => {
-      const li = document.createElement('li');
+    const count = document.createElement('div');
+    count.className = 'text-xs text-gray-500 group-hover:text-primarynavy/70 transition-colors';
+    count.textContent = category.bookCount ? `${category.bookCount} sách` : 'Xem tất cả';
 
-      const link = document.createElement('a');
-      link.href = `/searchBooks?category=${encodeURIComponent(category.name)}`;
-      link.setAttribute('data-category', category.name);
-      link.className = 'flex items-center gap-2 text-gray-700 hover:text-primarynavy transition font-medium';
-
-      const icon = document.createElement('i');
-      icon.className = getCategoryIcon(category.name);
-
-      link.appendChild(icon);
-      link.appendChild(document.createTextNode(category.name));
-
-      li.appendChild(link);
-      ul.appendChild(li);
-    });
-
-    columnDiv.appendChild(headerDiv);
-    columnDiv.appendChild(ul);
-    flexContainer.appendChild(columnDiv);
+    iconWrapper.appendChild(icon);
+    textWrapper.appendChild(title);
+    textWrapper.appendChild(count);
+    link.appendChild(iconWrapper);
+    link.appendChild(textWrapper);
+    categoryCard.appendChild(link);
+    container.appendChild(categoryCard);
   });
 
-  console.log('✅ [callHeaderFooter] Categories rendered in multi-column layout:', categories.length, 'items in', columns.filter(col => col.length > 0).length, 'columns');
+  // Add scroll indicators if content overflows
+  setTimeout(() => {
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    
+    if (scrollWidth > clientWidth) {
+      // Show scroll indicator
+      const scrollIndicator = megaMenu.querySelector('.text-sm.text-gray-500');
+      if (scrollIndicator) {
+        scrollIndicator.style.display = 'flex';
+      }
+    }
+  }, 100);
+
+  console.log('✅ [callHeaderFooter] Categories rendered in horizontal scrollable layout:', categories.length, 'items');
 }
 
 // Main header/footer loader

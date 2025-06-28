@@ -314,7 +314,7 @@ async function saveUserInfo() {
                 const currentUser = AuthManager.getUser();
                 if (currentUser) {
                     if (formData.name) {
-                        currentUser.name = formData.name;
+                    currentUser.name = formData.name;
                     }
                     
                     // Update avatar in user data
