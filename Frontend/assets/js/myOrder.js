@@ -44,12 +44,8 @@ function determineOrderStatus(createdAt) {
 
 // Convert invoice data to order format for UI
 function convertInvoiceToOrder(invoice) {
-    console.log('🔄 Converting invoice to order:', invoice);
-
     // Prepare items array
     const items = (invoice.items || []).map(item => {
-        console.log('📦 Processing item:', item);
-
         // Handle different possible data structures
         const book = item.book || {};
         const title = book.title || item.title || 'Sách không xác định';
@@ -89,11 +85,8 @@ function convertInvoiceToOrder(invoice) {
 // Load orders from API
 async function loadOrders() {
     try {
-        console.log('📄 Loading orders from API...');
-
         // Check authentication
         if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
-            console.warn('⚠️ User not authenticated, redirecting to login');
             window.location.href = 'login.html';
             return;
         }
@@ -118,20 +111,14 @@ async function loadOrders() {
             throw new Error(response.error || 'Failed to load invoices');
         }
 
-        console.log('✅ API response:', response);
-
         // Convert sales invoices to orders (only sales, not rental)
         const salesInvoices = response.salesInvoices || [];
         orders = salesInvoices.map(invoice => convertInvoiceToOrder(invoice));
-
-        console.log('📋 Converted orders:', orders);
 
         // Display orders
         displayOrders();
 
     } catch (error) {
-        console.error('❌ Error loading orders:', error);
-
         // Show error state
         const tbody = document.querySelector('.order-table tbody');
         tbody.innerHTML = `
@@ -236,15 +223,10 @@ function attachStatusLinkEvents() {
 
 // Open order details modal
 async function openModal(order) {
-    console.log('📖 Opening modal for order:', order);
-    console.log('📊 Order status:', order.status);
-    console.log('📍 Order items count:', order.items?.length);
-
     currentOrderModal = order;
     const modal = document.getElementById('orderModal');
 
     if (!modal) {
-        console.error('❌ Modal not found');
         return;
     }
 
@@ -258,11 +240,9 @@ async function openModal(order) {
 
     if (modalTitle) {
         modalTitle.textContent = `Mã: ${order.id}`;
-        console.log('✅ Updated modal title');
     }
     if (modalDate) {
         modalDate.textContent = order.date;
-        console.log('✅ Updated modal date');
     }
 
     // Update status display
@@ -272,9 +252,6 @@ async function openModal(order) {
             <div class="font-medium text-sm mb-1">Trạng thái: <span class="text-blue-600">${order.status}</span></div>
             `;
         // <div class="text-xs text-gray-500">Dự kiến nhận hàng: ${getDeliveryDate(order.date)}</div>
-        console.log('✅ Updated modal status to:', order.status);
-    } else {
-        console.log('❌ Modal status element not found');
     }
 
     // Update status circle color based on status
@@ -324,16 +301,11 @@ async function openModal(order) {
         const profile = await window.ApiService?.getProfile();
         let address = 'Địa chỉ chưa được cập nhật';
 
-        console.log('👤 Profile for address:', profile);
         const userProfile = profile?.user;
-        console.log('👤 User profile for address:', userProfile);
 
         // Check user profile address
         if (userProfile?.customerProfile?.address) {
             address = userProfile.customerProfile.address;
-            console.log('✅ Found address in customer profile:', address);
-        } else {
-            console.log('⚠️ No address found in customer profile');
         }
 
         deliveryElement.textContent = `Địa chỉ: ${address}`;
@@ -369,8 +341,6 @@ function closeModal() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📱 MyOrder page loaded');
-
     // Load orders from API
     loadOrders();
 

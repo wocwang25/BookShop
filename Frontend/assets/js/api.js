@@ -4,7 +4,7 @@ const API_BASE_URL = window.location.origin + '/api';
 class ApiService {
     // Debounce mechanism to prevent multiple calls
     static _pendingOperations = new Set();
-    
+
     static async request(endpoint, options = {}) {
         const url = `${API_BASE_URL}${endpoint}`;
 
@@ -53,17 +53,6 @@ class ApiService {
             const endpoint = `/books${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
             const response = await this.request(endpoint);
 
-            // Debug API response
-            console.log('📚 [API] getAllBooks response:', response);
-            if (response.books && response.books.length > 0) {
-                console.log('📚 [API] Sample book from getAllBooks:', response.books[0]);
-                console.log('📚 [API] Sample book stock fields:', {
-                    quantity: response.books[0].quantity,
-                    availableStock: response.books[0].availableStock,
-                    stock: response.books[0].stock
-                });
-            }
-
             // Đảm bảo response có định dạng phù hợp
             return {
                 success: true,
@@ -88,18 +77,6 @@ class ApiService {
             }
 
             const response = await this.request(`/books/${id}`);
-
-            // Debug API response
-            console.log('📖 [API] getBookById response:', response);
-            if (response.book) {
-                console.log('📖 [API] Book from getBookById:', response.book);
-                console.log('📖 [API] Book stock fields:', {
-                    quantity: response.book.quantity,
-                    availableStock: response.book.availableStock,
-                    stock: response.book.stock
-                });
-            }
-
             // Kiểm tra định dạng response từ backend
             if (response.success && response.book) {
                 return response;
@@ -128,18 +105,6 @@ class ApiService {
             if (keyword) queryParams.append('keyword', keyword);
 
             const response = await this.request(`/books/search?${queryParams.toString()}`);
-
-            // Debug API response
-            console.log('🔍 [API] searchBooks response:', response);
-            if (response.books && response.books.length > 0) {
-                console.log('🔍 [API] Sample book from searchBooks:', response.books[0]);
-                console.log('🔍 [API] Sample book stock fields:', {
-                    quantity: response.books[0].quantity,
-                    availableStock: response.books[0].availableStock,
-                    stock: response.books[0].stock
-                });
-            }
-
             // Đảm bảo response có định dạng phù hợp
             return {
                 success: true,
@@ -160,17 +125,15 @@ class ApiService {
     // Cart API
     static async addToCart(bookId, quantity = 1, type = 'buy') {
         const operationKey = `addToCart-${bookId}`;
-        
+
         // Prevent duplicate operations
         if (this._pendingOperations.has(operationKey)) {
-            console.log('🛒 [API] Skipping duplicate addToCart operation for:', bookId);
             return { success: false, message: 'Operation already in progress' };
         }
-        
+
         try {
             this._pendingOperations.add(operationKey);
-            console.log('🛒 [API] Adding to cart:', { bookId, quantity, type });
-            
+
             const result = await this.request('/cart', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -179,7 +142,7 @@ class ApiService {
                     type
                 })
             });
-            
+
             return result;
         } catch (error) {
             console.error('Error adding to cart:', error);
@@ -200,7 +163,6 @@ class ApiService {
 
     static async updateCartItem(bookId, quantity, type = 'buy') {
         try {
-            console.log('🛒 [API] Updating cart item:', { bookId, quantity, type });
             return await this.request('/cart', {
                 method: 'PUT',
                 body: JSON.stringify({
@@ -217,7 +179,6 @@ class ApiService {
 
     static async removeCartItem(bookId) {
         try {
-            console.log('🛒 [API] Removing cart item:', bookId);
             return await this.request(`/cart/${bookId}`, {
                 method: 'DELETE'
             });
@@ -230,17 +191,15 @@ class ApiService {
     // Sales Invoice API
     static async createSalesInvoice(customerName, items) {
         try {
-            console.log('📄 [API] Creating sales invoice:', { customerName, items });
-            
             // Validate input
             if (!customerName || customerName.trim() === '') {
                 throw new Error('Customer name is required');
             }
-            
+
             if (!items || !Array.isArray(items) || items.length === 0) {
                 throw new Error('Items array is required and cannot be empty');
             }
-            
+
             // Validate each item
             for (const item of items) {
                 if (!item.title || !item.quantity) {
@@ -248,22 +207,20 @@ class ApiService {
                     throw new Error('Each item must have title and quantity');
                 }
             }
-            
+
             const requestData = {
                 customer_name: customerName,
                 items: items
             };
-            
-            console.log('📤 [API] Sending request data:', requestData);
-            
+
+
             // Check if user is authenticated
             if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
                 throw new Error('User not authenticated. Please login first.');
             }
-            
+
             const token = window.AuthManager.getToken();
-            console.log('🔑 [API] Token available:', !!token);
-            
+
             return await this.request('/invoice/sale', {
                 method: 'POST',
                 body: JSON.stringify(requestData)
@@ -277,22 +234,19 @@ class ApiService {
     // Favourite API
     static async addToFavourites(bookId) {
         const operationKey = `addToFav-${bookId}`;
-        
+
         // Prevent duplicate operations
         if (this._pendingOperations.has(operationKey)) {
-            console.log('💖 [API] Skipping duplicate addToFavourites operation for:', bookId);
             return { success: false, message: 'Operation already in progress' };
         }
-        
+
         try {
             this._pendingOperations.add(operationKey);
-            console.log('➕ [API] Adding to favourites, bookId:', bookId);
-            
+
             const result = await this.request(`/favourite/${bookId}`, {
                 method: 'POST'
             });
-            
-            console.log('✅ [API] Add to favourites successful:', result);
+
             return result;
         } catch (error) {
             console.error('❌ [API] Error adding to favourite:', error);
@@ -304,22 +258,19 @@ class ApiService {
 
     static async removeFromFavourites(bookId) {
         const operationKey = `removeFav-${bookId}`;
-        
+
         // Prevent duplicate operations
         if (this._pendingOperations.has(operationKey)) {
-            console.log('💖 [API] Skipping duplicate removeFromFavourites operation for:', bookId);
             return { success: false, message: 'Operation already in progress' };
         }
-        
+
         try {
             this._pendingOperations.add(operationKey);
-            console.log('➖ [API] Removing from favourites, bookId:', bookId);
-            
+
             const result = await this.request(`/favourite/${bookId}`, {
                 method: 'PATCH'
             });
-            
-            console.log('✅ [API] Remove from favourites successful:', result);
+
             return result;
         } catch (error) {
             console.error('❌ [API] Error removing from favourites:', error);
@@ -408,7 +359,7 @@ class ApiService {
     static async getAllCategory() {
         try {
             const response = await this.request('/category');
-            
+
             // Đảm bảo response có định dạng phù hợp
             return {
                 success: true,
@@ -428,7 +379,6 @@ class ApiService {
         try {
             return await this.request(`/category/${id}`)
         } catch (error) {
-            console.log('Error getting Category', error);
             throw error;
         }
     }
@@ -436,23 +386,18 @@ class ApiService {
     // Customer API
     static async getMyInvoices() {
         try {
-            console.log('📄 [API] Getting my invoices...');
-            
+
             // Check if user is authenticated
             if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
                 throw new Error('User not authenticated. Please login first.');
             }
-            
+
             const response = await this.request('/customer/profile');
-            
-            // Debug API response
-            console.log('👤 [API] Profile response:', response);
-            console.log('👤 [API] Customer profile:', response.user?.customerProfile);
-            
+
             // Extract invoices from profile
             const user = response.user;
             const customerProfile = user?.customerProfile;
-            
+
             if (!customerProfile) {
                 console.warn('⚠️ No customer profile found');
                 return {
@@ -462,15 +407,11 @@ class ApiService {
                     total: 0
                 };
             }
-            
+
             const salesInvoices = customerProfile.salesInvoices || [];
             const rentalInvoices = customerProfile.rentalInvoices || [];
-            
-            console.log('📊 [API] Found invoices:', {
-                sales: salesInvoices.length,
-                rental: rentalInvoices.length
-            });
-            
+
+
             return {
                 success: true,
                 salesInvoices,
@@ -593,5 +534,3 @@ class ApiService {
 
 // Export for use in other files
 window.ApiService = ApiService;
-
-// Example: getBooks().then(data => console.log(data));

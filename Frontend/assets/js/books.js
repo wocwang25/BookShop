@@ -70,19 +70,15 @@ async function fetchUserCartAndWishlist() {
         // Check if user is logged in
         const isLoggedIn = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!isLoggedIn) {
-            console.log('💳 [books.js] User not logged in');
             userCartBookIds = [];
             userFavouriteBookIds = [];
             return;
         }
 
-        console.log('💳 [books.js] Fetching cart and favourites...');
 
         // Fetch cart
         try {
             const cartRes = await ApiService.getCart();
-            console.log('💳 [books.js] Cart response:', cartRes);
-
             let cartItems = [];
             if (cartRes.items) {
                 cartItems = cartRes.items;
@@ -96,7 +92,6 @@ async function fetchUserCartAndWishlist() {
                 item.bookId || item.book?._id || item.book || item._id || item.id
             ).filter(id => id);
 
-            console.log('💳 [books.js] Cart book IDs:', userCartBookIds);
         } catch (cartError) {
             console.error('❌ [books.js] Error fetching cart:', cartError);
             userCartBookIds = [];
@@ -105,7 +100,6 @@ async function fetchUserCartAndWishlist() {
         // Fetch favourites
         try {
             const favRes = await ApiService.getFavourites();
-            console.log('💖 [books.js] Favourites response:', favRes);
 
             let favourites = [];
             if (favRes.favourites) {
@@ -127,7 +121,6 @@ async function fetchUserCartAndWishlist() {
                 return null;
             }).filter(id => id);
 
-            console.log('💖 [books.js] Favourite book IDs:', userFavouriteBookIds);
         } catch (favError) {
             console.error('❌ [books.js] Error fetching favourites:', favError);
             userFavouriteBookIds = [];
@@ -227,20 +220,10 @@ function displayBooks() {
 // Create book card HTML
 function createBookCard(book) {
     const bookId = book._id || book.id;
-    
+
     // Get stock quantity from various possible fields
     const stockQuantity = book.quantity || book.availableStock || book.stock || 0;
-    
-    // Debug stock quantity
-    console.log('📦 [books.js] Stock debug for book:', book.title, {
-        bookId: bookId,
-        quantity: book.quantity,
-        availableStock: book.availableStock,
-        stock: book.stock,
-        finalStock: stockQuantity,
-        allFields: Object.keys(book)
-    });
-    
+
     // Check if book is in cart or favourites
     const isInCart = userCartBookIds.some(cartId =>
         cartId === bookId || cartId === String(bookId)
@@ -455,8 +438,6 @@ function clearSearch() {
 
 // Add event listeners to book cards
 function addBookCardEventListeners() {
-    // Note: Event listeners are now handled inline in createBookCard
-    // This function is kept for compatibility but can be removed later
     console.log('📘 [books.js] Book card event listeners handled inline');
 }
 
@@ -535,39 +516,37 @@ function showError(message) {
 
 async function addToCart(event, bookId) {
     event.stopPropagation();
-    
+
     const button = event.target;
     const originalText = button.textContent;
     const originalClasses = button.className;
-    
+
     // Check if already in cart or if button is processing
     if (button.disabled) return;
-    
+
     // Get stock from book card data
     const bookCard = button.closest('.book-card-item');
     const stockQuantity = parseInt(bookCard?.dataset?.stock || '0');
-    
+
     // Validate stock before proceeding
     if (stockQuantity <= 0) {
-        console.log('📚 [books.js] Book out of stock:', bookId);
         alert('Sách này hiện đã hết hàng!');
         return;
     }
-    
+
     // Check if already in cart by ID
     const isInCart = userCartBookIds.some(cartId =>
         cartId === bookId || cartId === String(bookId)
     );
 
     if (isInCart) {
-        console.log('📚 [books.js] Book already in cart:', bookId);
         return;
     }
-    
+
     try {
         button.textContent = 'Đang thêm...';
         button.disabled = true;
-        
+
         // Use the global addToCartFromExternal function
         if (window.addToCartFromExternal) {
             const success = await window.addToCartFromExternal(bookId, 1, 'buy');
@@ -576,28 +555,27 @@ async function addToCart(event, bookId) {
                 if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
                     userCartBookIds.push(bookId);
                 }
-                
+
                 button.textContent = '✔ Đã thêm';
                 button.className = 'bg-green-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
-                console.log('✅ [books.js] Successfully added to cart:', bookId);
             } else {
                 throw new Error('Failed to add to cart');
             }
         } else {
             // Fallback to direct API call
             await ApiService.addToCart(bookId, 1, 'buy');
-            
+
             // Update local state
             if (!userCartBookIds.some(cartId => cartId === bookId || cartId === String(bookId))) {
                 userCartBookIds.push(bookId);
             }
-            
+
             button.textContent = '✔ Đã thêm';
             button.className = 'bg-green-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
         }
     } catch (error) {
         console.error('❌ [books.js] Error adding to cart:', error);
-        
+
         // Check if error is related to stock
         if (error.message.includes('stock') || error.message.includes('hết hàng') || error.message.includes('insufficient')) {
             button.textContent = 'Hết hàng';
@@ -607,7 +585,7 @@ async function addToCart(event, bookId) {
         } else {
             button.textContent = 'Lỗi!';
             button.className = 'bg-red-500 text-white px-4 py-2 !rounded-button whitespace-nowrap transition';
-            
+
             setTimeout(() => {
                 button.textContent = originalText;
                 button.className = originalClasses;
@@ -619,44 +597,42 @@ async function addToCart(event, bookId) {
 
 async function toggleFavorite(event, bookId) {
     event.stopPropagation();
-    
+
     const button = event.target.closest('button');
     const icon = button.querySelector('i');
     const isFaved = icon.classList.contains('ri-star-fill');
-    
+
     // Prevent multiple clicks
     if (button.disabled) return;
-    
+
     try {
         button.disabled = true;
         button.style.opacity = '0.5';
-        
+
         if (isFaved) {
             await ApiService.removeFromFavourites(bookId);
-            
+
             // Update local state
             userFavouriteBookIds = userFavouriteBookIds.filter(id =>
                 id !== bookId && id !== String(bookId)
             );
-            
+
             icon.classList.remove('ri-star-fill', 'text-yellow-400');
             icon.classList.add('ri-star-line', 'text-gray-800');
-            console.log('✅ [books.js] Removed from favourites:', bookId);
         } else {
             await ApiService.addToFavourites(bookId);
-            
+
             // Update local state
             if (!userFavouriteBookIds.some(favId => favId === bookId || favId === String(bookId))) {
                 userFavouriteBookIds.push(bookId);
             }
-            
+
             icon.classList.remove('ri-star-line', 'text-gray-800');
             icon.classList.add('ri-star-fill', 'text-yellow-400');
-            console.log('✅ [books.js] Added to favourites:', bookId);
         }
     } catch (error) {
         console.error('❌ [books.js] Error toggling favourite:', error);
-        
+
         // Revert on error
         if (isFaved) {
             icon.classList.add('ri-star-fill', 'text-yellow-400');
@@ -683,7 +659,6 @@ if (window.location.pathname === '/books' || window.location.pathname.endsWith('
     window.addToCart = addToCart;
     window.toggleFavorite = toggleFavorite;
     window.viewBookDetail = viewBookDetail;
-    console.log('📘 [books.js] Functions exported for /books page');
 } else {
     console.log('📘 [books.js] Skipping function export - not on /books page');
 }

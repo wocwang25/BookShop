@@ -57,7 +57,6 @@ const User_Schema = new mongoose.Schema(
                 createdAt: {
                     type: Date,
                     default: Date.now,
-                    expires: 60 * 60 * 24 // Token hết hạn sau 1 ngày (tuỳ chỉnh)
                 }
             }
         ]

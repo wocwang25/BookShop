@@ -25,16 +25,11 @@ function initializeSearchFunctionality() {
   const searchInput = document.querySelector('.search-input');
   const searchBtnHero = document.querySelector('.search-btn-hero');
 
-  console.log('Search input found:', searchInput);
-  console.log('Search button found:', searchBtnHero);
-
   if (searchInput) {
     // Real-time search suggestions
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       const query = e.target.value.trim();
-
-      console.log('Search input changed:', query);
 
       if (query.length >= 2) {
         searchTimeout = setTimeout(() => {
@@ -76,7 +71,7 @@ function initializeSearchFunctionality() {
       }, 200);
     });
   } else {
-    console.warn('Search input not found! Looking for element with class .search-input');
+    // console.warn('Search input not found! Looking for element with class .search-input');
   }
 
   if (searchBtnHero) {
@@ -85,7 +80,7 @@ function initializeSearchFunctionality() {
       handleSearch();
     });
   } else {
-    console.warn('Search button not found! Looking for element with class .search-btn-hero');
+    // console.warn('Search button not found! Looking for element with class .search-btn-hero');
   }
 }
 
@@ -94,22 +89,17 @@ async function performLiveSearch(query) {
   if (isSearching) return;
   isSearching = true;
 
-  console.log('Performing live search for:', query);
-
   try {
     const response = await ApiService.searchBooks(query);
-    console.log('Search response:', response);
 
     if (response.success && response.books) {
       searchResults = response.books.slice(0, 5); // Limit to 5 suggestions
       showSearchResults(query);
     } else {
-      console.log('No books found or API error');
       searchResults = [];
       showSearchResults(query);
     }
   } catch (error) {
-    console.error('Live search failed:', error);
     searchResults = [];
     showSearchResults(query);
   } finally {
@@ -121,7 +111,7 @@ async function performLiveSearch(query) {
 function showSearchResults(query) {
   const searchContainer = document.querySelector('.hero-search');
   if (!searchContainer) {
-    console.warn('Search container not found!');
+    // console.warn('Search container not found!');
     return;
   }
 
@@ -208,10 +198,8 @@ async function handleSearch() {
   const searchInput = document.querySelector('.search-input');
   const query = searchInput ? searchInput.value.trim() : '';
 
-  console.log('Handling search for:', query);
-
   if (!query) {
-    console.warn('No search query provided');
+    // console.warn('No search query provided');
     return;
   }
 
@@ -235,10 +223,8 @@ async function handleSearch() {
     hideSearchResults();
 
     // Redirect to books page with search query
-    console.log('Redirecting to search results page');
     window.location.href = `/searchBooks?search=${encodeURIComponent(query)}`;
   } catch (error) {
-    console.error('Search failed:', error);
     alert('Tìm kiếm thất bại. Vui lòng thử lại.');
 
     // Reset button state on error
@@ -252,8 +238,6 @@ async function handleSearch() {
 
 // Load homepage data when page loads
 document.addEventListener('DOMContentLoaded', async function () {
-  console.log('DOM loaded, initializing homepage');
-
   try {
     await Promise.all([
       loadFeaturedBooks(),
@@ -261,25 +245,20 @@ document.addEventListener('DOMContentLoaded', async function () {
       loadBookStats()
     ]);
   } catch (error) {
-    console.error('Failed to load homepage data:', error);
+    // console.error('Failed to load homepage data:', error);
   }
 });
 
 // Load featured books for hero section
 async function loadFeaturedBooks() {
   try {
-    console.log('Loading featured books...');
     const response = await ApiService.getAllBooks(3, '-createdAt'); // Get 3 newest books
-    console.log('Featured books response:', response); // Debug log
     if (response.success && response.books && response.books.length > 0) {
-      console.log('Featured books data:', response.books); // Debug log
       renderFeaturedBooks(response.books);
     } else {
-      console.log('No featured books found');
       renderFeaturedBooks([]);
     }
   } catch (error) {
-    console.error('Failed to load featured books:', error);
     renderFeaturedBooks([]);
   }
 }
@@ -287,18 +266,13 @@ async function loadFeaturedBooks() {
 // Load popular books section
 async function loadPopularBooks() {
   try {
-    console.log('Loading popular books...');
     const response = await ApiService.getAllBooks(4, '-createdAt'); // Get 4 books for popular section
-    console.log('Popular books response:', response); // Debug log
     if (response.success && response.books && response.books.length > 0) {
-      console.log('Popular books data:', response.books); // Debug log
       renderPopularBooks(response.books);
     } else {
-      console.log('No popular books found');
       renderPopularBooks([]);
     }
   } catch (error) {
-    console.error('Failed to load popular books:', error);
     renderPopularBooks([]);
   }
 }
@@ -306,18 +280,13 @@ async function loadPopularBooks() {
 // Load book listing section
 async function loadBookListing() {
   try {
-    console.log('Loading book listing...');
     const response = await ApiService.getAllBooks(9); // Get 9 books for main listing
-    console.log('Book listing response:', response); // Debug log
     if (response.success && response.books && response.books.length > 0) {
-      console.log('Book listing data:', response.books); // Debug log
       renderBookListing(response.books);
     } else {
-      console.log('No books found for listing');
       renderBookListing([]);
     }
   } catch (error) {
-    console.error('Failed to load book listing:', error);
     renderBookListing([]);
   }
 }
@@ -325,13 +294,11 @@ async function loadBookListing() {
 // Load statistics for hero section
 async function loadBookStats() {
   try {
-    console.log('Loading book stats...');
     const response = await ApiService.getAllBooks(); // Get all books to calculate stats
     if (response.success && response.books) {
       updateStatsDisplay(response.books);
     }
   } catch (error) {
-    console.error('Failed to load book stats:', error);
     // Keep default stats if API fails
   }
 }
@@ -340,7 +307,7 @@ async function loadBookStats() {
 function renderFeaturedBooks(books) {
   const featuredBooksContainer = document.querySelector('.featured-books');
   if (!featuredBooksContainer) {
-    console.warn('Featured books container not found');
+    // console.warn('Featured books container not found');
     return;
   }
 
@@ -355,7 +322,6 @@ function renderFeaturedBooks(books) {
   }
 
   const booksHtml = books.slice(0, 3).map(book => {
-    console.log('Rendering featured book:', book); // Debug log
     return `
       <div class="book-card fade-in" onclick="viewBookDetail('${book._id}')">
         <div class="book-cover">
@@ -380,7 +346,7 @@ function renderFeaturedBooks(books) {
 function renderPopularBooks(books) {
   const popularBooksContainer = document.querySelector('.py-20.bg-gray-50 .grid.grid-cols-1.md\\:grid-cols-4');
   if (!popularBooksContainer) {
-    console.warn('Popular books container not found');
+    // console.warn('Popular books container not found');
     return;
   }
 
@@ -394,7 +360,6 @@ function renderPopularBooks(books) {
   }
 
   const booksHtml = books.slice(0, 4).map(book => {
-    console.log('Rendering popular book:', book); // Debug log
     return `
       <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
         <div class="relative h-96 w-full flex-shrink-0">
@@ -421,7 +386,7 @@ function renderPopularBooks(books) {
 function renderBookListing(books) {
   const bookListingContainer = document.querySelector('main .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
   if (!bookListingContainer) {
-    console.warn('Book listing container not found');
+    // console.warn('Book listing container not found');
     return;
   }
 
@@ -435,7 +400,6 @@ function renderBookListing(books) {
   }
 
   const booksHtml = books.slice(0, 9).map(book => {
-    console.log('Rendering book listing:', book); // Debug log
     return `
       <div class="bg-white rounded shadow-sm overflow-hidden flex flex-col h-full">
         <div class="relative h-96 w-full flex-shrink-0">
@@ -482,18 +446,13 @@ function updateStatsDisplay(books) {
 
 // Helper functions
 function getBookImage(book) {
-  console.log('Getting image for book:', book);
-  console.log('Book imageUrl:', book.imageUrl);
-
   // Check if imageUrl exists and is not empty
   if (!book.imageUrl || book.imageUrl.trim() === '') {
-    console.log('No imageUrl found, using default');
     return getDefaultImage();
   }
 
   // Convert Google Drive link to direct image link if needed
   const directImageUrl = convertGoogleDriveLink(book.imageUrl);
-  console.log('Converted image URL:', directImageUrl);
 
   return directImageUrl;
 }
@@ -542,7 +501,6 @@ function escapeHtml(text) {
 
 function addToCart(bookId) {
   // TODO: Implement add to cart functionality with API
-  console.log('Add to cart:', bookId);
 
   // Show loading state
   const button = event.target;
@@ -561,7 +519,6 @@ function addToCart(bookId) {
 
 function toggleFavorite(bookId) {
   // TODO: Implement favorite functionality with API
-  console.log('Toggle favorite:', bookId);
 
   const button = event.target.closest('button');
   const icon = button.querySelector('i');
@@ -598,4 +555,3 @@ window.viewBookDetail = viewBookDetail;
 window.addToCart = addToCart;
 window.toggleFavorite = toggleFavorite;
 window.loadFeaturedBooks = loadFeaturedBooks;
-

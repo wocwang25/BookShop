@@ -69,7 +69,7 @@ function initializeFormHandlers() {
     // Specific handlers for address dropdowns
     const provinceSelect = document.getElementById('province');
     if (provinceSelect) {
-        provinceSelect.addEventListener('change', function() {
+        provinceSelect.addEventListener('change', function () {
             const selectedCode = this.value;
             if (selectedCode) {
                 loadDistricts(selectedCode);
@@ -86,7 +86,7 @@ function initializeFormHandlers() {
 
     const districtSelect = document.getElementById('district');
     if (districtSelect) {
-        districtSelect.addEventListener('change', function() {
+        districtSelect.addEventListener('change', function () {
             const selectedCode = this.value;
             if (selectedCode) {
                 loadWards(selectedCode);
@@ -101,7 +101,7 @@ function initializeFormHandlers() {
 
     const wardSelect = document.getElementById('ward');
     if (wardSelect) {
-        wardSelect.addEventListener('change', function() {
+        wardSelect.addEventListener('change', function () {
             updateCompleteAddress();
         });
     }
@@ -163,7 +163,6 @@ async function loadUserProfile() {
         }
 
     } catch (error) {
-        console.error('❌ Error loading profile:', error);
         showMessage('Không thể tải thông tin tài khoản. Vui lòng thử lại.', 'error');
     } finally {
         hideLoadingSpinner();
@@ -257,7 +256,6 @@ function formatCurrency(amount) {
 // Save user information
 async function saveUserInfo() {
     try {
-        console.log('💾 Saving user info...');
         showSaveLoading();
 
         // Collect form data
@@ -273,7 +271,6 @@ async function saveUserInfo() {
         // Add avatar data if available
         if (window.tempAvatarData) {
             formData.avatar = window.tempAvatarData;
-            console.log('📷 Including avatar data in save');
         }
 
         // Validate required fields
@@ -293,11 +290,8 @@ async function saveUserInfo() {
             formData.birthday = new Date(formData.birthday).toISOString();
         }
 
-        console.log('📤 Sending update data:', formData);
-
         // Call API to update profile
         const response = await ApiService.updateProfile(formData);
-        console.log('✅ Update response:', response);
 
         if (response.success || response.status === 'success') {
             showMessage('Cập nhật thông tin thành công!', 'success');
@@ -306,7 +300,6 @@ async function saveUserInfo() {
             // Clear temp avatar data after successful save
             if (window.tempAvatarData) {
                 delete window.tempAvatarData;
-                console.log('📷 Avatar saved successfully, temp data cleared');
             }
 
             // Update AuthManager if name or avatar changed
@@ -314,25 +307,22 @@ async function saveUserInfo() {
                 const currentUser = AuthManager.getUser();
                 if (currentUser) {
                     if (formData.name) {
-                    currentUser.name = formData.name;
+                        currentUser.name = formData.name;
                     }
-                    
+
                     // Update avatar in user data
                     if (formData.avatar) {
                         if (!currentUser.customerProfile) {
                             currentUser.customerProfile = {};
                         }
                         currentUser.customerProfile.avatar = formData.avatar;
-                        console.log('📷 Updated user avatar in AuthManager');
                     }
-                    
+
                     localStorage.setItem('userData', JSON.stringify(currentUser));
 
                     // Trigger header update
                     setTimeout(() => {
                         if (typeof window.updateHeaderAuthState === 'function') {
-                            console.log('🔄 Updating header with new user info...');
-                            window.updateHeaderAuthState();
                         }
                     }, 100);
                 }
@@ -347,7 +337,6 @@ async function saveUserInfo() {
         }
 
     } catch (error) {
-        console.error('❌ Error saving profile:', error);
         showMessage(error.message || 'Có lỗi xảy ra khi cập nhật thông tin', 'error');
     } finally {
         hideSaveLoading();
@@ -386,12 +375,10 @@ async function handleChangePassword() {
             throw new Error('Mật khẩu mới phải khác mật khẩu hiện tại');
         }
 
-        console.log('🔒 Changing password...');
         showPasswordLoading();
 
         // Call API
         const response = await ApiService.changePassword(currentPassword, newPassword);
-        console.log('✅ Password change response:', response);
 
         if (response.status === 'success') {
             showMessage('Đổi mật khẩu thành công!', 'success');
@@ -404,7 +391,6 @@ async function handleChangePassword() {
         }
 
     } catch (error) {
-        console.error('❌ Error changing password:', error);
         showMessage(error.message, 'error');
     } finally {
         hidePasswordLoading();
@@ -415,7 +401,6 @@ async function handleChangePassword() {
 function changeAvatar(event) {
     const file = event.target.files[0];
     if (file) {
-        console.log('📷 Avatar file selected:', file.name, file.size, file.type);
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
@@ -527,7 +512,6 @@ function loadSavedFormData() {
             });
 
         } catch (error) {
-            console.error('Error loading saved form data:', error);
         }
     }
 }
@@ -633,7 +617,6 @@ function loadProvinces() {
             }
         })
         .catch(error => {
-            console.error('Error loading provinces:', error);
         });
 }
 
@@ -648,7 +631,6 @@ function loadDistricts(provinceCode) {
         return;
     }
 
-    console.log('📍 Loading districts for province:', provinceCode);
     fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
         .then(res => res.json())
         .then(data => {
@@ -659,7 +641,6 @@ function loadDistricts(provinceCode) {
                 data.districts.forEach(d => {
                     districtSelect.innerHTML += `<option value="${d.code}">${d.name}</option>`;
                 });
-                console.log('✅ Loaded', data.districts.length, 'districts');
             }
             if (wardSelect) {
                 wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
@@ -667,7 +648,6 @@ function loadDistricts(provinceCode) {
             updateCompleteAddress();
         })
         .catch(error => {
-            console.error('❌ Error loading districts:', error);
         });
 }
 
@@ -680,7 +660,6 @@ function loadWards(districtCode) {
         return;
     }
 
-    console.log('📍 Loading wards for district:', districtCode);
     fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
         .then(res => res.json())
         .then(data => {
@@ -690,12 +669,10 @@ function loadWards(districtCode) {
                 data.wards.forEach(w => {
                     wardSelect.innerHTML += `<option value="${w.code}">${w.name}</option>`;
                 });
-                console.log('✅ Loaded', data.wards.length, 'wards');
             }
             updateCompleteAddress();
         })
         .catch(error => {
-            console.error('❌ Error loading wards:', error);
         });
 }
 
@@ -736,7 +713,7 @@ function updateCompleteAddress() {
 
     // Build address parts array (street first, then ward, district, province, country)
     const addressParts = [];
-    
+
     if (streetDetail.trim()) {
         addressParts.push(streetDetail.trim());
     }
@@ -755,14 +732,11 @@ function updateCompleteAddress() {
 
     // Update the complete address field
     fullAddressField.value = addressParts.join(', ');
-    
-    console.log('📍 Complete address updated:', fullAddressField.value);
 }
 
 // Save delivery address functionality
 async function saveDeliveryAddress() {
     try {
-        console.log('📍 Saving delivery address...');
         showDeliveryLoading();
 
         // Get full address from textarea
@@ -778,11 +752,8 @@ async function saveDeliveryAddress() {
             address: fullAddress.trim()
         };
 
-        console.log('📤 Sending address data:', addressData);
-
         // Call API to update profile with new address
         const response = await ApiService.updateProfile(addressData);
-        console.log('✅ Address update response:', response);
 
         if (response.success || response.status === 'success') {
             showMessage('Cập nhật địa chỉ giao hàng thành công!', 'success');
@@ -798,7 +769,6 @@ async function saveDeliveryAddress() {
         }
 
     } catch (error) {
-        console.error('❌ Error saving delivery address:', error);
         showMessage(error.message || 'Có lỗi xảy ra khi cập nhật địa chỉ', 'error');
     } finally {
         hideDeliveryLoading();

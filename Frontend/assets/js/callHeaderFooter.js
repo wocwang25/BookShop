@@ -14,7 +14,6 @@ document.addEventListener('click', function (e) {
     (!userInfo || !userInfo.contains(e.target)) &&
     (!userInfoBtn || !userInfoBtn.contains(e.target))
   ) {
-    console.log('🖱️ [callHeaderFooter] Clicked outside user panel, closing...');
     closeUserPanel();
   }
 });
@@ -48,13 +47,11 @@ function initHeaderPanel() {
 
   userBtn.onclick = function (e) {
     e.stopPropagation(); // Prevent event bubbling
-    console.log('🖱️ [callHeaderFooter] User button clicked');
     openUserPanel();
   };
 
   closeUserPanelBtn.onclick = function (e) {
     e.stopPropagation();
-    console.log('🖱️ [callHeaderFooter] Close button clicked');
     closeUserPanel();
   };
 
@@ -66,7 +63,6 @@ function initHeaderPanel() {
 
 // Auth state management for header
 function updateHeaderAuthState() {
-  console.log('🔄 [callHeaderFooter] Updating header auth state...');
 
   const userBtn = document.getElementById('userBtn');
   const userInfo = document.getElementById('userInfo');
@@ -80,7 +76,6 @@ function updateHeaderAuthState() {
 
   if (typeof window.AuthManager !== 'undefined' && window.AuthManager.isAuthenticated()) {
     const user = window.AuthManager.getUser();
-    console.log('👤 [callHeaderFooter] User authenticated:', user);
 
     if (user) {
       // Hide guest button, show user info in header
@@ -103,7 +98,6 @@ function updateHeaderAuthState() {
       if (userInfo && !userInfo._clickHandlerAdded) {
         userInfo.addEventListener('click', function (e) {
           e.stopPropagation(); // Prevent event bubbling
-          console.log('🖱️ [callHeaderFooter] User info clicked');
           openUserPanel();
         });
         userInfo._clickHandlerAdded = true;
@@ -111,16 +105,12 @@ function updateHeaderAuthState() {
       if (userInfoBtn && !userInfoBtn._clickHandlerAdded) {
         userInfoBtn.addEventListener('click', function (e) {
           e.stopPropagation(); // Prevent event bubbling  
-          console.log('🖱️ [callHeaderFooter] User info button clicked');
           openUserPanel();
         });
         userInfoBtn._clickHandlerAdded = true;
       }
-
-      console.log('✅ [callHeaderFooter] Header updated for authenticated user:', displayName);
     }
   } else {
-    console.log('🚫 [callHeaderFooter] User not authenticated, showing guest state');
 
     // Show guest button, hide user info
     if (userBtn) userBtn.classList.remove('hidden');
@@ -137,8 +127,6 @@ function updateHeaderAuthState() {
 
 // Handle logout button
 function handleLogout() {
-  console.log('🚪 [callHeaderFooter] Logout button clicked');
-
   if (typeof window.AuthManager !== 'undefined') {
     // Close user panel first
     closeUserPanel();
@@ -198,8 +186,6 @@ function convertGoogleDriveLink(url) {
 }
 
 function updateUserAvatars(user) {
-  console.log('🖼️ [callHeaderFooter] Updating user avatars for user:', user);
-
   const headerUserAvatar = document.getElementById('headerUserAvatar');
   const panelUserAvatar = document.getElementById('panelUserAvatar');
 
@@ -217,7 +203,6 @@ function updateUserAvatars(user) {
     headerUserAvatar.src = avatarUrl;
     headerUserAvatar.onerror = function () {
       this.src = getDefaultAvatar();
-      console.log('⚠️ [callHeaderFooter] Header avatar failed to load, using default');
     };
   }
 
@@ -226,16 +211,11 @@ function updateUserAvatars(user) {
     panelUserAvatar.src = avatarUrl;
     panelUserAvatar.onerror = function () {
       this.src = getDefaultAvatar();
-      console.log('⚠️ [callHeaderFooter] Panel avatar failed to load, using default');
     };
   }
-
-  console.log('✅ [callHeaderFooter] Avatars updated successfully');
 }
 
 function resetUserAvatars() {
-  console.log('🔄 [callHeaderFooter] Resetting avatars to default');
-
   const headerUserAvatar = document.getElementById('headerUserAvatar');
   const panelUserAvatar = document.getElementById('panelUserAvatar');
 
@@ -295,7 +275,6 @@ async function loadCart() {
   }
 
   if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
-    console.log('🛒 [Cart] User not authenticated, cart will be empty');
     isCartLoading = false;
     cart = [];
     renderCart();
@@ -305,10 +284,8 @@ async function loadCart() {
   try {
     isCartLoading = true;
     renderCart(); // Show loading state immediately
-    console.log('🛒 [Cart] Loading cart from API...');
 
     const response = await window.ApiService.getCart();
-    console.log('🛒 [Cart] Raw API response:', JSON.stringify(response, null, 2));
 
     // Reset cart first
     cart = [];
@@ -316,7 +293,6 @@ async function loadCart() {
     // Check for different response formats - prioritize direct array first
     if (response && Array.isArray(response)) {
       // Format: [...] - Direct array response (most common)
-      console.log('🛒 [Cart] Direct array format detected, length:', response.length);
       cart = response.map(item => {
         try {
           return transformCartItem(item);
@@ -325,9 +301,7 @@ async function loadCart() {
           return null;
         }
       }).filter(item => item !== null);
-      console.log('✅ [Cart] Cart loaded (direct array):', cart.length, 'items');
     } else if (response && response.success && response.cart) {
-      console.log('🛒 [Cart] Using success format, cart:', response.cart);
 
       if (response.cart.items && Array.isArray(response.cart.items)) {
         // Format: { success: true, cart: { items: [...] } }
@@ -339,7 +313,6 @@ async function loadCart() {
             return null;
           }
         }).filter(item => item !== null);
-        console.log('✅ [Cart] Cart loaded (success.cart.items):', cart.length, 'items');
       } else if (Array.isArray(response.cart)) {
         // Format: { success: true, cart: [...] }
         cart = response.cart.map(item => {
@@ -350,11 +323,8 @@ async function loadCart() {
             return null;
           }
         }).filter(item => item !== null);
-        console.log('✅ [Cart] Cart loaded (success.cart array):', cart.length, 'items');
       }
     } else if (response && response.cart) {
-      console.log('🛒 [Cart] Using direct cart format, cart:', response.cart);
-
       if (response.cart.items && Array.isArray(response.cart.items)) {
         // Format: { cart: { items: [...] } }
         cart = response.cart.items.map(item => {
@@ -365,7 +335,6 @@ async function loadCart() {
             return null;
           }
         }).filter(item => item !== null);
-        console.log('✅ [Cart] Cart loaded (cart.items):', cart.length, 'items');
       } else if (Array.isArray(response.cart)) {
         // Format: { cart: [...] }
         cart = response.cart.map(item => {
@@ -376,11 +345,8 @@ async function loadCart() {
             return null;
           }
         }).filter(item => item !== null);
-        console.log('✅ [Cart] Cart loaded (cart array):', cart.length, 'items');
       }
     } else {
-      console.log('📦 [Cart] No items in cart or unrecognized format');
-      console.log('🔍 [Cart] Response type:', typeof response, 'Is array:', Array.isArray(response));
       cart = [];
     }
 
@@ -403,16 +369,13 @@ async function fetchMissingBookDetails() {
   const itemsNeedingDetails = cart.filter(item => item.needsBookDetails);
 
   if (itemsNeedingDetails.length === 0) {
-    console.log('🔍 [Cart] No items need book details');
     return;
   }
 
-  console.log('🔍 [Cart] Fetching details for', itemsNeedingDetails.length, 'books...');
 
   // Fetch details for each book
   const promises = itemsNeedingDetails.map(async (item) => {
     try {
-      console.log('📖 [Cart] Fetching book details for ID:', item.id);
       const response = await window.ApiService.getBookById(item.id);
 
       if (response.success && response.book) {
@@ -428,7 +391,6 @@ async function fetchMissingBookDetails() {
             image: getBookImageForCart(book),
             needsBookDetails: false
           };
-          console.log('✅ [Cart] Updated book details for:', book.title);
         }
       } else {
         console.warn('⚠️ [Cart] Failed to fetch book details for ID:', item.id);
@@ -442,12 +404,10 @@ async function fetchMissingBookDetails() {
 
   // Re-render cart with updated book details
   renderCart();
-  console.log('🔄 [Cart] Updated cart with book details');
 }
 
 // Transform cart item to consistent format
 function transformCartItem(item) {
-  console.log('🔄 [Cart] Transforming item:', JSON.stringify(item, null, 2));
 
   // Handle different item structures
   let book, bookId, title, author, price, quantity;
@@ -488,7 +448,6 @@ function transformCartItem(item) {
   // For now, use placeholder title that can be updated
   if (!title || title.startsWith('Book ')) {
     title = `Book ${bookId.slice(-6)}...`; // Placeholder title
-    console.log('📝 [Cart] Using placeholder title for book ID:', bookId);
   }
 
   const transformed = {
@@ -501,7 +460,6 @@ function transformCartItem(item) {
     needsBookDetails: typeof item.book === 'string' // Flag to fetch book details later
   };
 
-  console.log('✅ [Cart] Transformed:', transformed);
   return transformed;
 }
 
@@ -640,8 +598,6 @@ function renderCart() {
       cartBadge.classList.remove('cart-has-items');
     }
   }
-
-  console.log('🛒 [Cart] Rendered', cart.length, 'items, total:', formatVND(total));
 }
 
 // Escape HTML for cart display
@@ -666,13 +622,11 @@ async function cartEventHandler(e) {
   target.disabled = true;
 
   try {
-    console.log('🛒 [Cart] Action:', action, 'for book:', bookId, 'index:', idx);
 
     if (action === 'decrease') {
       if (cart[idx] && cart[idx].quantity > 1) {
         await updateCartQuantity(bookId, cart[idx].quantity - 1);
       } else {
-        console.log('🛒 [Cart] Cannot decrease below 1, consider removing item');
         showCartError('Số lượng tối thiểu là 1');
       }
     } else if (action === 'increase') {
@@ -684,7 +638,6 @@ async function cartEventHandler(e) {
       }
     } else if (action === 'remove') {
       // Confirm removal for better UX
-      console.log('🗑️ [Cart] Removing item:', bookId);
       await removeFromCart(bookId);
     } else {
       console.warn('⚠️ [Cart] Unknown action:', action);
@@ -704,15 +657,12 @@ async function updateCartQuantity(bookId, newQuantity) {
   }
 
   try {
-    console.log('🛒 [Cart] Updating quantity for book:', bookId, 'to:', newQuantity);
-
     // Use updateCartItem method instead of addToCart to set absolute quantity
     const response = await window.ApiService.updateCartItem(bookId, newQuantity, 'buy');
 
     if (response.success || response.message) {
       // Reload cart to get updated data
       await loadCart();
-      console.log('✅ [Cart] Quantity updated successfully');
     } else {
       throw new Error(response.error || 'Failed to update cart');
     }
@@ -721,7 +671,6 @@ async function updateCartQuantity(bookId, newQuantity) {
 
     // Fallback to addToCart with difference calculation if updateCartItem fails
     try {
-      console.log('🔄 [Cart] Trying fallback with addToCart difference...');
 
       // Find current quantity in cart
       const currentItem = cart.find(item => item.id === bookId);
@@ -730,14 +679,11 @@ async function updateCartQuantity(bookId, newQuantity) {
       // Calculate the difference to send to API (since backend adds to existing quantity)
       const quantityDifference = newQuantity - currentQuantity;
 
-      console.log('🧮 [Cart] Current:', currentQuantity, 'New:', newQuantity, 'Difference:', quantityDifference);
-
       if (quantityDifference !== 0) {
         const fallbackResponse = await window.ApiService.addToCart(bookId, quantityDifference, 'buy');
 
         if (fallbackResponse.success || fallbackResponse.message) {
           await loadCart();
-          console.log('✅ [Cart] Quantity updated via fallback');
         } else {
           throw new Error(fallbackResponse.error || 'Fallback failed');
         }
@@ -756,8 +702,6 @@ async function removeFromCart(bookId) {
   }
 
   try {
-    console.log('🛒 [Cart] Removing book from cart:', bookId);
-
     // Find item in local cart
     const itemIndex = cart.findIndex(item => item.id === bookId);
     if (itemIndex === -1) {
@@ -765,7 +709,6 @@ async function removeFromCart(bookId) {
     }
 
     // Use dedicated remove API (backend issue has been fixed)
-    console.log('🗑️ [Cart] Calling removeCartItem API for book:', bookId);
     const response = await window.ApiService.removeCartItem(bookId);
 
     if (response.success || response.message || response.msg) {
@@ -777,19 +720,16 @@ async function removeFromCart(bookId) {
       setTimeout(loadCart, 100);
 
       showCartSuccess('Đã xóa sản phẩm khỏi giỏ hàng');
-      console.log('✅ [Cart] Item removed successfully');
     } else {
       console.error('❌ [Cart] Unexpected response format:', response);
 
       // Last resort: reload cart to check if item was actually removed
-      console.log('🔄 [Cart] Reloading cart to verify removal...');
       await loadCart();
 
       // Check if item is still in cart after reload
       const stillExists = cart.find(item => item.id === bookId);
       if (!stillExists) {
         showCartSuccess('Đã xóa sản phẩm khỏi giỏ hàng');
-        console.log('✅ [Cart] Item was removed despite unclear response');
       } else {
         throw new Error('Không thể xóa sản phẩm khỏi giỏ hàng');
       }
@@ -850,7 +790,6 @@ function initCartPanel() {
   // Cart button click handler - load cart when opening
   cartBtn.onclick = function (e) {
     e.preventDefault();
-    console.log('🛒 [Cart] Cart button clicked');
     openCartPanel();
     // Load cart data when panel opens
     loadCart();
@@ -883,8 +822,6 @@ function initCartPanel() {
   } else {
     renderCart(); // Show empty cart
   }
-
-  console.log('🛒 [Cart] Cart panel initialized');
 }
 
 // Add to cart function for external use
@@ -896,7 +833,6 @@ async function addToCartFromExternal(bookId, quantity = 1, type = 'buy') {
   }
 
   if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
-    console.log('🔐 [Cart] User not authenticated, redirecting to login');
     showCartError('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
     setTimeout(() => {
       window.location.href = '/login';
@@ -905,8 +841,6 @@ async function addToCartFromExternal(bookId, quantity = 1, type = 'buy') {
   }
 
   try {
-    console.log('🛒 [Cart] Adding to cart:', { bookId, quantity, type });
-
     const response = await window.ApiService.addToCart(bookId, quantity, type);
 
     if (response.success || response.message) {
@@ -914,7 +848,6 @@ async function addToCartFromExternal(bookId, quantity = 1, type = 'buy') {
       showCartSuccess(`Đã thêm sách ${actionText} vào giỏ hàng`);
       // Reload cart to update display
       await loadCart();
-      console.log('✅ [Cart] Added to cart successfully');
       return true;
     } else {
       throw new Error(response.error || 'Failed to add to cart');
@@ -934,14 +867,6 @@ async function refreshCart() {
 
 // Debug function for cart
 function debugCart() {
-  console.log('=== CART DEBUG ===');
-  console.log('isCartLoading:', isCartLoading);
-  console.log('cart array:', cart);
-  console.log('cart length:', cart.length);
-  console.log('AuthManager available:', !!window.AuthManager);
-  console.log('ApiService available:', !!window.ApiService);
-  console.log('User authenticated:', window.AuthManager?.isAuthenticated());
-  console.log('==================');
   return { isCartLoading, cart, authAvailable: !!window.AuthManager, apiAvailable: !!window.ApiService };
 }
 
@@ -987,7 +912,6 @@ async function loadWishlist() {
   }
 
   if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
-    console.log('❤️ [Wishlist] User not authenticated, wishlist will be empty');
     isWishlistLoading = false;
     wishlist = [];
     renderWishlist();
@@ -997,18 +921,14 @@ async function loadWishlist() {
   try {
     isWishlistLoading = true;
     renderWishlist(); // Show loading state immediately
-    console.log('❤️ [Wishlist] Loading wishlist from API...');
 
     const response = await window.ApiService.getFavourites();
-    console.log('❤️ [Wishlist] Raw API response:', JSON.stringify(response, null, 2));
 
     // Reset wishlist first
     wishlist = [];
 
     // Check for different response formats
     if (response && Array.isArray(response)) {
-      // Format: [...] - Direct array response
-      console.log('❤️ [Wishlist] Direct array format detected, length:', response.length);
       wishlist = response.map(item => {
         try {
           return transformWishlistItem(item);
@@ -1017,9 +937,7 @@ async function loadWishlist() {
           return null;
         }
       }).filter(item => item !== null);
-      console.log('✅ [Wishlist] Wishlist loaded (direct array):', wishlist.length, 'items');
     } else if (response && response.success && response.favourites) {
-      console.log('❤️ [Wishlist] Using success format, favourites:', response.favourites);
 
       if (Array.isArray(response.favourites)) {
         wishlist = response.favourites.map(item => {
@@ -1030,10 +948,8 @@ async function loadWishlist() {
             return null;
           }
         }).filter(item => item !== null);
-        console.log('✅ [Wishlist] Wishlist loaded (success.favourites):', wishlist.length, 'items');
       }
     } else if (response && response.favourites && Array.isArray(response.favourites)) {
-      console.log('❤️ [Wishlist] Using direct favourites format');
       wishlist = response.favourites.map(item => {
         try {
           return transformWishlistItem(item);
@@ -1042,9 +958,7 @@ async function loadWishlist() {
           return null;
         }
       }).filter(item => item !== null);
-      console.log('✅ [Wishlist] Wishlist loaded (favourites array):', wishlist.length, 'items');
     } else {
-      console.log('📦 [Wishlist] No items in wishlist or unrecognized format');
       wishlist = [];
     }
 
@@ -1059,8 +973,6 @@ async function loadWishlist() {
 
 // Transform wishlist item to consistent format
 function transformWishlistItem(item) {
-  console.log('🔄 [Wishlist] Transforming item:', JSON.stringify(item, null, 2));
-
   // Handle different item structures - similar to cart but for books
   let book, bookId, title, author, price;
 
@@ -1101,7 +1013,6 @@ function transformWishlistItem(item) {
     image: getBookImageForWishlist(book)
   };
 
-  console.log('✅ [Wishlist] Transformed:', transformed);
   return transformed;
 }
 
@@ -1230,8 +1141,6 @@ function renderWishlist() {
       wishlistBadge.classList.remove('wishlist-has-items');
     }
   }
-
-  console.log('❤️ [Wishlist] Rendered', wishlist.length, 'items');
 }
 
 // Escape HTML for wishlist display
@@ -1256,13 +1165,10 @@ async function wishlistEventHandler(e) {
   target.disabled = true;
 
   try {
-    console.log('❤️ [Wishlist] Action:', action, 'for book:', bookId, 'index:', idx);
 
     if (action === 'remove') {
-      console.log('🗑️ [Wishlist] Removing item:', bookId);
       await removeFromWishlist(bookId);
     } else if (action === 'add-to-cart') {
-      console.log('🛒 [Wishlist] Adding to cart:', bookId);
       const success = await addToCartFromExternal(bookId, 1, 'buy');
       if (success) {
         showWishlistSuccess('Đã thêm sách vào giỏ hàng');
@@ -1285,15 +1191,12 @@ async function removeFromWishlist(bookId) {
   }
 
   try {
-    console.log('❤️ [Wishlist] Removing book from wishlist:', bookId);
-
     // Find item in local wishlist
     const itemIndex = wishlist.findIndex(item => item.id === bookId);
     if (itemIndex === -1) {
       throw new Error('Sách không tồn tại trong danh sách yêu thích');
     }
 
-    console.log('🗑️ [Wishlist] Calling removeFromFavourites API for book:', bookId);
     const response = await window.ApiService.removeFromFavourites(bookId);
 
     if (response.success || response.message || response.msg) {
@@ -1305,19 +1208,15 @@ async function removeFromWishlist(bookId) {
       setTimeout(loadWishlist, 100);
 
       showWishlistSuccess('Đã xóa sách khỏi danh sách yêu thích');
-      console.log('✅ [Wishlist] Item removed successfully');
     } else {
       console.error('❌ [Wishlist] Unexpected response format:', response);
 
-      // Last resort: reload wishlist to check if item was actually removed
-      console.log('🔄 [Wishlist] Reloading wishlist to verify removal...');
       await loadWishlist();
 
       // Check if item is still in wishlist after reload
       const stillExists = wishlist.find(item => item.id === bookId);
       if (!stillExists) {
         showWishlistSuccess('Đã xóa sách khỏi danh sách yêu thích');
-        console.log('✅ [Wishlist] Item was removed despite unclear response');
       } else {
         throw new Error('Không thể xóa sách khỏi danh sách yêu thích');
       }
@@ -1378,7 +1277,6 @@ function initWishlistPanel() {
   // Wishlist button click handler - load wishlist when opening
   wishlistBtn.onclick = function (e) {
     e.preventDefault();
-    console.log('❤️ [Wishlist] Wishlist button clicked');
     openWishlistPanel();
     // Load wishlist data when panel opens
     loadWishlist();
@@ -1411,8 +1309,6 @@ function initWishlistPanel() {
   } else {
     renderWishlist(); // Show empty wishlist
   }
-
-  console.log('❤️ [Wishlist] Wishlist panel initialized');
 }
 
 // Add to wishlist function for external use
@@ -1424,7 +1320,6 @@ async function addToWishlistFromExternal(bookId) {
   }
 
   if (!window.AuthManager || !window.AuthManager.isAuthenticated()) {
-    console.log('🔐 [Wishlist] User not authenticated, redirecting to login');
     showWishlistError('Vui lòng đăng nhập để thêm sách yêu thích');
     setTimeout(() => {
       window.location.href = '/login';
@@ -1433,15 +1328,12 @@ async function addToWishlistFromExternal(bookId) {
   }
 
   try {
-    console.log('❤️ [Wishlist] Adding to wishlist:', bookId);
-
     const response = await window.ApiService.addToFavourites(bookId);
 
     if (response.success || response.message) {
       showWishlistSuccess('Đã thêm sách vào danh sách yêu thích');
       // Reload wishlist to update display
       await loadWishlist();
-      console.log('✅ [Wishlist] Added to wishlist successfully');
       return true;
     } else {
       throw new Error(response.error || 'Failed to add to wishlist');
@@ -1455,20 +1347,11 @@ async function addToWishlistFromExternal(bookId) {
 
 // Refresh wishlist data (for external use)
 async function refreshWishlist() {
-  console.log('🔄 [Wishlist] Refreshing wishlist data...');
   await loadWishlist();
 }
 
 // Debug function for wishlist
 function debugWishlist() {
-  console.log('=== WISHLIST DEBUG ===');
-  console.log('isWishlistLoading:', isWishlistLoading);
-  console.log('wishlist array:', wishlist);
-  console.log('wishlist length:', wishlist.length);
-  console.log('AuthManager available:', !!window.AuthManager);
-  console.log('ApiService available:', !!window.ApiService);
-  console.log('User authenticated:', window.AuthManager?.isAuthenticated());
-  console.log('======================');
   return { isWishlistLoading, wishlist, authAvailable: !!window.AuthManager, apiAvailable: !!window.ApiService };
 }
 
@@ -1479,8 +1362,6 @@ window.debugWishlist = debugWishlist;
 
 // Search overlay logic
 function showSearchOverlay() {
-  console.log('🔍 [Search] Showing search overlay');
-
   // Tạo overlay nếu chưa có
   let searchOverlay = document.getElementById('searchOverlay');
   if (!searchOverlay) {
@@ -1534,7 +1415,6 @@ function showSearchOverlay() {
 }
 
 function hideSearchOverlay() {
-  console.log('🔍 [Search] Hiding search overlay');
   const searchOverlay = document.getElementById('searchOverlay');
   if (searchOverlay) {
     // Fade out animation
@@ -1573,8 +1453,6 @@ function initSearchOverlay() {
       hideSearchOverlay();
     }
   });
-
-  console.log('✅ [Search] Search overlay initialized');
 }
 
 // Unified search handling function
@@ -1583,16 +1461,13 @@ function handleSearchSubmit(query) {
     const trimmedQuery = query.trim();
     // Chuyển đến trang search với search parameter
     const searchUrl = `/searchBooks?search=${encodeURIComponent(trimmedQuery)}`;
-    console.log('🔍 [Search] Navigating to:', searchUrl);
     window.location.href = searchUrl;
   } else {
     // Nếu không có query, chuyển đến trang search tổng quát
-    console.log('🔍 [Search] Navigating to general search page');
     window.location.href = '/searchBooks';
   }
 }
 
-// Hiển thị ô tìm kiếm thay thế phần center của header, giữ logo và các nút hai bên, giữ chiều cao header, trượt ngang mượt mà, click ra ngoài sẽ trở lại bình thường
 function showHeaderSearchBar() {
   const header = document.getElementById('header');
   if (!header) return;
@@ -1654,7 +1529,6 @@ function showHeaderSearchBar() {
     closeBtn.onclick = function (e) {
       e.preventDefault();
       e.stopPropagation();
-      console.log('🔍 [Search] Close button clicked');
       closeHeaderSearchBarWithTransition();
     };
   }
@@ -1666,7 +1540,6 @@ function showHeaderSearchBar() {
       e.preventDefault();
       const input = document.getElementById('headerSearchInput');
       const query = input ? input.value.trim() : '';
-      console.log('🔍 [Search] Header search form submitted with query:', query);
       handleSearchSubmit(query);
     };
   }
@@ -1738,11 +1611,9 @@ function initSearchBarButton() {
   if (!searchBtn._searchHandlerAdded) {
     searchBtn.onclick = function (e) {
       e.preventDefault();
-      console.log('🔍 [Search] Search button clicked');
       showHeaderSearchBar();
     };
     searchBtn._searchHandlerAdded = true;
-    console.log('✅ [Search] Search button handler added');
   }
 }
 
@@ -1754,19 +1625,16 @@ window.debugHeaderState = function () {
   const isAuth = window.AuthManager && window.AuthManager.isAuthenticated ? window.AuthManager.isAuthenticated() : false;
   const token = localStorage.getItem('authToken');
   const userData = localStorage.getItem('userData');
-  console.log('[debugHeaderState] isAuthenticated:', isAuth, '\nuser:', user, '\nauthToken:', token, '\nuserData:', userData);
   return { isAuthenticated: isAuth, user, authToken: token, userData };
 };
 
 // Load and render categories in header mega menu
 async function loadCategories() {
   try {
-    console.log('🏷️ [callHeaderFooter] Loading categories...');
     const response = await window.ApiService.getAllCategory();
 
     if (response.success && response.categories && response.categories.length > 0) {
       renderCategories(response.categories);
-      console.log('✅ [callHeaderFooter] Categories loaded successfully:', response.categories.length, 'categories');
     } else {
       console.warn('⚠️ [callHeaderFooter] No categories found:', response.error || 'Empty response');
     }
@@ -1895,7 +1763,7 @@ function renderCategories(categories) {
   setTimeout(() => {
     const scrollHeight = container.scrollHeight;
     const clientHeight = container.clientHeight;
-    
+
     if (scrollHeight > clientHeight) {
       // Show scroll indicator
       const scrollIndicator = megaMenu.querySelector('.text-sm.text-gray-500');
@@ -1904,8 +1772,6 @@ function renderCategories(categories) {
       }
     }
   }, 100);
-
-  console.log('✅ [callHeaderFooter] Categories rendered in grid layout (4 columns):', categories.length, 'items');
 }
 
 // Main header/footer loader
@@ -1948,7 +1814,7 @@ function loadHeaderFooter() {
           if (e.target.id === 'logoutBtn' || (e.target.closest && e.target.closest('#logoutBtn'))) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('🚪 [callHeaderFooter] Logout button clicked via delegation');
+            ('🚪 [callHeaderFooter] Logout button clicked via delegation');
             handleLogout();
           }
         };
@@ -1994,7 +1860,6 @@ function loadHeaderFooter() {
 // Entry point: load header/footer immediately (no dependency wait)
 loadHeaderFooter();
 
-// (Đã bỏ hoàn toàn các đoạn fetch header/footer cũ và logic waitForDependencies)
 // ====== PATCH AuthManager FOR CROSS-TAB LOGIN/LOGOUT SYNC ======
 (function patchAuthManagerForSync() {
   function fireStorageEvent(key, oldValue, newValue) {

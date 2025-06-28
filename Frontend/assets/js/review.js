@@ -1,5 +1,5 @@
 // Star rating selection logic
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const stars = document.querySelectorAll('#star-rating i');
   const ratingInput = document.getElementById('rating-value');
   let current = 0;

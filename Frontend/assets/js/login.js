@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     } catch (error) {
-        console.error('Error checking authentication:', error);
         // Continue to show login page if there's any error
     }
 
@@ -89,8 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
         Array.from(loginForm.querySelectorAll('button[type="button"]')).find(btn =>
             btn.textContent.includes('Đăng nhập') && !btn.classList.contains('social-btn'));
 
-    console.log('Login button found:', loginButton);
-
     if (loginButton) {
         loginButton.addEventListener('click', async function (e) {
             e.preventDefault();
@@ -120,7 +117,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Force update header if function is available
                     if (typeof window.updateHeaderAuthState === 'function') {
-                        console.log('🔄 [login] Triggering header update after login...');
                         setTimeout(() => {
                             window.updateHeaderAuthState();
                         }, 100);
@@ -132,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }, 1500);
                 }
             } catch (error) {
-                console.error('Login error:', error);
                 showMessage(error.message || 'Đăng nhập không thành công. Vui lòng thử lại.');
             } finally {
                 // Restore button
@@ -153,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
             !target.classList.contains('social-btn') &&
             registerForm && registerForm.contains(target)) {
 
-            console.log('🎯 REGISTER BUTTON CLICKED VIA DELEGATION!');
             e.preventDefault();
 
             const email = document.getElementById('reg-email').value.trim();
@@ -162,16 +156,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm').value;
 
-            console.log('Form values:', {
-                email,
-                name,
-                password: password ? 'filled' : 'empty',
-                confirmPassword: confirmPassword ? 'filled' : 'empty'
-            });
-
             // Validation
             if (!email || !name || !username || !password || !confirmPassword) {
-                console.log('Validation failed - missing fields');
                 showMessage('Vui lòng điền đầy đủ thông tin');
                 return;
             }
@@ -201,9 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // // Tạo username từ email (lấy phần trước @)
                 // const username = email.split('@')[0];
 
-                console.log('Calling API register with:', { name, username, email });
                 const response = await ApiService.register(name, username, email, password);
-                console.log('API response:', response);
 
                 if (response.success) {
                     showMessage('Đăng ký thành công! Bạn đã được tự động đăng nhập.', 'success');
@@ -213,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Force update header if function is available
                     if (typeof window.updateHeaderAuthState === 'function') {
-                        console.log('🔄 [register] Triggering header update after register...');
                         setTimeout(() => {
                             window.updateHeaderAuthState();
                         }, 100);
@@ -225,7 +208,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }, 2000);
                 }
             } catch (error) {
-                console.error('Register error:', error);
                 showMessage(error.message || 'Đăng ký không thành công. Vui lòng thử lại.');
             } finally {
                 // Restore button

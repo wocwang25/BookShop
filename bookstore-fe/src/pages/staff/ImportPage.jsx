@@ -736,12 +736,12 @@ const ImportPage = () => {
                         </thead>
                         <tbody>
                             ${slip.items.map((item, idx) => {
-                                const bookTitle = item.book?.title ||
-                                    (typeof item.book === 'string' ?
-                                        allBooks.find(b => b._id === item.book)?.label || 'Không rõ' :
-                                        'Không rõ');
-                                const total = item.quantity * item.unitImportPrice;
-                                return `
+            const bookTitle = item.book?.title ||
+                (typeof item.book === 'string' ?
+                    allBooks.find(b => b._id === item.book)?.label || 'Không rõ' :
+                    'Không rõ');
+            const total = item.quantity * item.unitImportPrice;
+            return `
                                     <tr>
                                         <td style="text-align: center;">${idx + 1}</td>
                                         <td>${bookTitle}</td>
@@ -750,7 +750,7 @@ const ImportPage = () => {
                                         <td style="text-align: right;">${total.toLocaleString('vi-VN')} ₫</td>
                                     </tr>
                                 `;
-                            }).join('')}
+        }).join('')}
                         </tbody>
                     </table>
 
