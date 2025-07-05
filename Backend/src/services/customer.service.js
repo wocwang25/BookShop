@@ -81,6 +81,7 @@ const CustomerService = {
     async updateCustomerProfile(userId, updateData) {
         const session = await mongoose.startSession();
         session.startTransaction();
+        console.log(updateData)
 
         try {
             const user = await User.findById(userId).session(session);
@@ -88,30 +89,29 @@ const CustomerService = {
                 throw new Error("Không tìm thấy tài khoản người dùng.");
             }
 
-            if (user.role !== 'customer') {
-                throw new Error("Chỉ tài khoản khách hàng mới có hồ sơ để cập nhật.");
-            }
             if (!user.customerProfile) {
                 throw new Error("Hồ sơ khách hàng chưa được liên kết với tài khoản.");
             }
 
             // Separate User fields from Customer fields
             const userFields = {};
-            const customerFields = {};
 
             Object.keys(updateData).forEach(key => {
-                if (['name', 'email'].includes(key)) {
-                    userFields[key] = updateData[key];
-                } else {
-                    customerFields[key] = updateData[key];
-                }
+                userFields[key] = updateData[key];
             });
 
             // Check email uniqueness if email is being updated
-            if (userFields.email && userFields.email !== user.email) {
-                const existingUserWithEmail = await User.findOne({ email: userFields.email }).session(session);
+            if (userFields.email && userFields.email != "" && userFields.email !== userFields.email) {
+                const existingUserWithEmail = await User.findOne({ email: userFields.email || userFields.email }).session(session);
                 if (existingUserWithEmail && !existingUserWithEmail._id.equals(user._id)) {
                     throw new Error("Email này đã được sử dụng bởi tài khoản khác.");
+                }
+            }
+
+            //Check phone number valid
+            if (userFields.phone && userFields.phone != "") {
+                if (!/^\d+$/.test(userFields.phone)) {
+                    throw new Error("Số điện thoại chỉ được chứa chữ số.");
                 }
             }
 
@@ -125,10 +125,10 @@ const CustomerService = {
             }
 
             // Update Customer fields if any
-            if (Object.keys(customerFields).length > 0) {
+            if (Object.keys(userFields).length > 0) {
                 await Customer.findByIdAndUpdate(
                     user.customerProfile,
-                    { $set: customerFields },
+                    { $set: userFields },
                     { new: true, session }
                 );
             }

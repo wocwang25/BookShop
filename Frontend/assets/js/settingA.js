@@ -261,9 +261,9 @@ async function saveUserInfo() {
         // Collect form data
         const formData = {
             name: document.getElementById('input-name')?.value,
-            email: document.getElementById('input-email')?.value,
-            phone: document.getElementById('input-phone')?.value,
-            address: document.getElementById('input-address')?.value,
+            email: document.getElementById('input-email')?.value || '',
+            phone: document.getElementById('input-phone')?.value || '',
+            address: document.getElementById('input-address')?.value || '',
             sex: document.getElementById('input-sex')?.value,
             birthday: document.getElementById('input-birthday')?.value
         };
@@ -275,15 +275,40 @@ async function saveUserInfo() {
 
         // Validate required fields
         if (!formData.name || formData.name.trim() === '') {
+            showMessage('Vui lòng nhập tên', 'error');
+            setTimeout(() => window.location.reload(), 1500);
             throw new Error('Vui lòng nhập tên');
         }
 
-        // Clean data - remove empty strings and format birthday
-        Object.keys(formData).forEach(key => {
-            if (formData[key] === '') {
-                delete formData[key];
+        if (!formData.email || formData.email.trim() === '') {
+            showMessage('Email không được bỏ trống', 'error');
+            setTimeout(() => window.location.reload(), 1500);
+            throw new Error('Email không được bỏ trống');
+        }
+
+        if (!/^\d+$/.test(formData.phone)) {
+            showMessage("Số điện thoại chỉ được chứa số", 'error');
+            const phoneInput = document.getElementById('input-phone');
+            if (phoneInput) phoneInput.value = '';
+            // Xóa giá trị phone trong localStorage trước khi reload
+            const savedData = localStorage.getItem('settingsFormData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    data.phone = '';
+                    localStorage.setItem('settingsFormData', JSON.stringify(data));
+                } catch (e) { }
             }
-        });
+            setTimeout(() => window.location.reload(), 1500);
+            throw new Error("Số điện thoại chỉ được chứa số");
+        }
+
+        // // Clean data - remove empty strings and format birthday
+        // Object.keys(formData).forEach(key => {
+        //     if (formData[key] === '') {
+        //         delete formData[key];
+        //     }
+        // });
 
         // Convert birthday to proper Date format if provided
         if (formData.birthday) {
@@ -605,7 +630,7 @@ function hidePasswordLoading() {
 // ================= DYNAMIC ADDRESS API INTEGRATION =================
 // API tỉnh - quận - phường
 function loadProvinces() {
-    fetch("https://provinces.open-api.vn/api/?depth=1")
+    fetch("https://provinces.open-api.vn/api/?depth=2")
         .then(res => res.json())
         .then(data => {
             const provinceSelect = document.getElementById("province");

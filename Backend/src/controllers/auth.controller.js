@@ -479,7 +479,7 @@ const AuthController = {
     searchUsers: async (req, res) => {
         try {
             const { keyword } = req.query;
-            
+
             if (!keyword || keyword.trim().length === 0) {
                 return res.status(400).json({
                     success: false,
@@ -488,7 +488,7 @@ const AuthController = {
             }
 
             const searchRegex = new RegExp(keyword.trim(), 'i');
-            
+
             const users = await User.find({
                 $or: [
                     { name: searchRegex },
@@ -496,10 +496,10 @@ const AuthController = {
                     { email: searchRegex }
                 ]
             })
-            .populate('customerProfile', 'name email phone address debt')
-            .select('-password')
-            .sort({ createdAt: -1 })
-            .limit(50); // Giới hạn 50 kết quả
+                .populate('customerProfile', 'name email phone address debt')
+                .select('-password')
+                .sort({ createdAt: -1 })
+                .limit(50); // Giới hạn 50 kết quả
 
             res.status(200).json({
                 success: true,

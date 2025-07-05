@@ -14,7 +14,12 @@ const ReportService = {
             const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
             const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
-            // STEP 1: Get Imported Quantities
+            // Get current date to calculate current month's opening stock
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1;
+            const currentYear = currentDate.getFullYear();
+
+            // STEP 1: Get Imported Quantities for target month
             const imported = await BookImportSlip.aggregate([
                 { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
                 { $unwind: '$items' },
@@ -26,7 +31,7 @@ const ReportService = {
                 }
             ]);
 
-            // STEP 2: Get Sold Quantities
+            // STEP 2: Get Sold Quantities for target month
             const sold = await SalesInvoice.aggregate([
                 { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
                 { $unwind: '$items' },
@@ -38,7 +43,7 @@ const ReportService = {
                 }
             ]);
 
-            // STEP 2: Get Rent Quantities
+            // STEP 3: Get Rent Quantities for target month
             const rent = await RentalInvoice.aggregate([
                 { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
                 { $unwind: '$items' },
@@ -50,36 +55,112 @@ const ReportService = {
                 }
             ]);
 
+            // STEP 4: Calculate net changes from end of target month to current date
+            // This will help us calculate the opening stock of target month from current stock
+            let netChangesFromTargetEnd = new Map();
 
+            if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                // Calculate start of next month after target month
+                const nextMonthStart = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+                const currentDateEnd = new Date();
 
-            // Convert arrays to Map for easy lookup
+                // Get all transactions from end of target month to current date
+                const importedAfterTarget = await BookImportSlip.aggregate([
+                    { $match: { createdAt: { $gte: nextMonthStart, $lte: currentDateEnd } } },
+                    { $unwind: '$items' },
+                    {
+                        $group: {
+                            _id: '$items.book',
+                            imported: { $sum: '$items.quantity' }
+                        }
+                    }
+                ]);
+
+                const soldAfterTarget = await SalesInvoice.aggregate([
+                    { $match: { createdAt: { $gte: nextMonthStart, $lte: currentDateEnd } } },
+                    { $unwind: '$items' },
+                    {
+                        $group: {
+                            _id: '$items.book',
+                            sold: { $sum: '$items.quantity' }
+                        }
+                    }
+                ]);
+
+                const rentAfterTarget = await RentalInvoice.aggregate([
+                    { $match: { createdAt: { $gte: nextMonthStart, $lte: currentDateEnd } } },
+                    { $unwind: '$items' },
+                    {
+                        $group: {
+                            _id: '$items.book',
+                            rent: { $sum: '$items.quantity' }
+                        }
+                    }
+                ]);
+
+                // Calculate net changes for each book
+                const importedAfterMap = new Map(importedAfterTarget.map(item => [item._id.toString(), item.imported]));
+                const soldAfterMap = new Map(soldAfterTarget.map(item => [item._id.toString(), item.sold]));
+                const rentAfterMap = new Map(rentAfterTarget.map(item => [item._id.toString(), item.rent]));
+
+                // Get all unique book IDs
+                const allBookIds = new Set([
+                    ...importedAfterMap.keys(),
+                    ...soldAfterMap.keys(),
+                    ...rentAfterMap.keys()
+                ]);
+
+                allBookIds.forEach(bookId => {
+                    const importedAfter = importedAfterMap.get(bookId) || 0;
+                    const soldAfter = soldAfterMap.get(bookId) || 0;
+                    const rentAfter = rentAfterMap.get(bookId) || 0;
+                    // Net change = imported - sold - rent
+                    const netChange = importedAfter - soldAfter - rentAfter;
+                    netChangesFromTargetEnd.set(bookId, netChange);
+                });
+            }
+
+            // Convert target month arrays to Map for easy lookup
             const importedMap = new Map(imported.map(item => [item._id.toString(), item.imported]));
             const soldMap = new Map(sold.map(item => [item._id.toString(), item.sold]));
             const rentMap = new Map(rent.map(item => [item._id.toString(), item.rent]));
 
-            // STEP 3: Get all books with current stock
+            // STEP 5: Get all books with current stock
             const books = await Book.find({}).populate('availableStock');
 
-            // STEP 4: Build report
+            // STEP 6: Build report
             const report = books.map(book => {
-
                 const bookId = book._id.toString();
-                const closingStock = book.availableStock;
+                const currentStock = book.availableStock;
                 const importedQty = importedMap.get(bookId) || 0;
                 const soldQty = soldMap.get(bookId) || 0;
                 const rentQty = rentMap.get(bookId) || 0;
-                // Opening Stock = Closing Stock - Imported + Sold + Rented
-                const openingStock = closingStock - importedQty + soldQty + rentQty;
-                console.log(openingStock, closingStock)
+
+                let openingStock;
+                let closingStock;
+
+                if (year === currentYear && month === currentMonth) {
+                    // For current month, calculate opening stock from current stock
+                    openingStock = currentStock - importedQty + soldQty + rentQty;
+                    closingStock = currentStock;
+                } else {
+                    // For past months, calculate closing stock at end of target month
+                    // Current stock = closing stock of target month + net changes from target month end to now
+                    const netChangeFromTargetEnd = netChangesFromTargetEnd.get(bookId) || 0;
+                    closingStock = currentStock - netChangeFromTargetEnd;
+                    
+                    // Opening stock = closing stock - imported + sold + rent
+                    openingStock = closingStock - importedQty + soldQty + rentQty;
+                }
 
                 return {
                     bookId: book._id,
                     title: book.title,
-                    openingStock: openingStock,
+                    openingStock: Math.max(0, openingStock),
                     imported: importedQty,
                     sold: soldQty,
                     rent: rentQty,
-                    closingStock: closingStock
+                    closingStock: Math.max(0, closingStock)
                 };
             });
 
