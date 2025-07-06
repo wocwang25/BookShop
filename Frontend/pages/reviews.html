@@ -15,64 +15,40 @@
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
   <link rel="stylesheet" href="./assets/css/home.css">
   <link rel="stylesheet" href="./assets/css/review.css">
-  <link rel="stylesheet" href="./assets/css/header-fix.css">
   <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/callHeaderFooter.js"></script>
-
+  <script src="../assets/js/api.js"></script>
+  <script src="./assets/js/callHeaderFooter.js"></script>
 </head>
 
 <body class="bg-light">
 
-  <!-- Zero Section -->
-  <section class="relative py-16 md:py-24 overflow-hidden"
-    style="background: url('https://i.pinimg.com/736x/12/15/19/121519de4a486c801a3069e66944aebf.jpg') center/cover no-repeat; margin-top:64px;">
-
-    <div class="container mx-auto px-4 relative z-10 flex flex-col items-center text-center">
-      <div class="flex flex-col items-center">
-        <div class="mb-4 flex gap-2 justify-center">
-          <i class="ri-star-smile-line text-5xl text-yellow-400 animate-pulse"></i>
-        </div>
-        <h1 class="text-4xl md:text-5xl font-bold font-['Lora'] gradient-text drop-shadow-lg mb-4 text-white"
-          style="text-shadow: 0 2px 8px #f7e9e9, 0 1px 0 #ffffff;">Readify trao gửi yêu thương</h1>
-        <p class="text-lg md:text-xl text-white mb-6 max-w-2xl"
-          style="margin-bottom:2.5rem; text-shadow: 0 1px 6px #1d3557;">Nơi bạn có thể khám phá, đánh giá và chia sẻ
-          trải nghiệm về hàng ngàn cuốn sách cùng cộng đồng yêu sách Việt Nam.</p>
-        <a href="#hero-section"
-          class="btn-discover inline-flex items-center gap-2 px-6 py-3 bg-primarynavy text-white rounded-button font-medium shadow-lg hover:bg-primary transition duration-200 animate-bounce-slow">
-          Khám phá ngay
-          <i class="ri-arrow-down-line text-xl"></i>
-        </a>
-      </div>
-    </div>
-    <style>
-      .gradient-text {
-        background: linear-gradient(90deg, #f5f5dc 0%, #fff 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .animate-bounce-slow {
-        animation: bounce-slow 2.2s infinite;
-      }
-
-      @keyframes bounce-slow {
-
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-
-        50% {
-          transform: translateY(-12px);
-        }
-      }
-    </style>
-  </section>
-
   <!-- Header -->
   <div id="header-placeholder"></div>
-  <div id="hero-section"></div>
+
+  <!-- Breadcrumb -->
+  <div class="container mx-auto px-4 mt-16">
+    <nav class="text-sm text-gray-500 py-4 flex items-center gap-2" aria-label="Breadcrumb">
+      <a href="/" class="hover:underline text-primarynavy font-semibold font-medium flex items-center gap-1">
+        <i class="ri-home-5-line text-base"></i> Home
+      </a>
+      <span class="mx-1 text-primarynavy">/</span>
+      <span class="text-primarynavy">Reviews</span>
+    </nav>
+  </div>
+
+  <!-- Hero Section  -->
+  <section class="w-full flex flex-col items-center justify-center text-center py-8 md:py-14 ">
+    <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Reviews</h1>
+    <img src="https://www.readings.com.au/assets/5921c16e12c18d2c6577.png" alt="Books Illustration"
+      class="mx-auto mb-8 max-w-[500px] w-full h-auto" style="filter: grayscale(1);" loading="lazy">
+    <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mt-2">
+      Mỗi cuốn sách là một người bạn.
+    </p>
+    <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mt-2">
+      Người mà truyền cảm hứng đầy sức mạnh giúp ta trưởng thành.
+    </p>
+  </section>
+  <!-- End Hero Section -->
 
   <!-- Why Readify? Let our users tell you -->
   <section class="bg-white py-6 border-t">
