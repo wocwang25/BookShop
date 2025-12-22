@@ -1,6 +1,6 @@
-# 📚 BookShop Backend
+# 📚 BookShop
 
-A Node.js backend project organized with **feature-based MVC architecture** for a bookshop, supporting both book sales and rentals.
+A Node.js/React fullstack project organized with **feature-based MVC architecture** for a bookshop, supporting both book sales and rentals.
 
 **Note:** This project branch provides **two separate user interfaces**:
 
@@ -112,5 +112,6 @@ docker-compose down -v
 Visit website render.com and follow the instruction to deploy easily.
 
 ## ✍️ Author
+
 
 - **Võ Quốc Quang** –
